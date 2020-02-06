@@ -141,6 +141,7 @@ subprojects {
             name = project.name
             licenses = ['Apache-2.0']
             publicDownloadNumbers = true
+            vcsUrl = 'git@github.com:kala-projects/kala-base.git'
             version {
                 name = project.version
                 desc = "${project.name} ${project.version}"
