@@ -55,6 +55,18 @@ subprojects {
     test {
         testLogging.showStandardStreams = true
         useJUnitPlatform()
+
+        moduleOptions {
+            runOnClasspath = true
+        }
+    }
+
+    compileTestJava {
+        moduleOptions {
+            addReads = [
+                    (moduleName): 'org.junit.jupiter.api'
+            ]
+        }
     }
 
     if (project.name != 'kala-base' && !project.name.endsWith('kotlin')) {
@@ -136,10 +148,10 @@ subprojects {
         }
     }
 
-    task travisBuild(dependsOn: check) {}
+    task travisPublish() {}
 
     if (!project.version.toString().endsWith("SHAPSHOT")) {
-        travisBuild.dependsOn(bintrayUpload)
+        travisPublish.dependsOn(bintrayUpload)
     }
 
 }
