@@ -63,6 +63,7 @@ subprojects {
 
     compileTestJava {
         moduleOptions {
+            addModules = ['org.junit.jupiter.api']
             addReads = [
                     (moduleName): 'org.junit.jupiter.api'
             ]
