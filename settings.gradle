@@ -1,0 +1,3 @@
+rootProject.name = 'kala-base-modules'
+
+include 'kala-base', 'kala-base-kotlin', 'kala-common', 'kala-common-kotlin'

@@ -1,0 +1,11 @@
+def gen = new File("$buildDir/src-gen")
+sourceSets.main.java.srcDirs += gen
+
+task generateSources {
+    doLast {
+        //noinspection UnnecessaryQualifiedReference
+        asia.kala.gen.TuplesGenerator.generate(gen, "asia.kala", 9)
+    }
+}
+
+compileJava.dependsOn(generateSources)
