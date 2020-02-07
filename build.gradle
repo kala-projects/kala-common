@@ -42,7 +42,7 @@ subprojects {
         testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.2'
     }
 
-    if (project.name.endsWith('kotlin') && (project != project(':kala-base-kotlin'))) {
+    if (project.name.endsWith('kotlin') && (project != project(':kala-common-kotlin'))) {
         apply plugin: 'kotlin'
 
         compileKotlin {
@@ -70,7 +70,7 @@ subprojects {
         }
     }
 
-    if (project.name != 'kala-base' && !project.name.endsWith('kotlin')) {
+    if (project != project(':kala-common') && !project.name.endsWith('kotlin')) {
         javadoc {
             source = sourceSets.main.allSource
 
@@ -109,7 +109,7 @@ subprojects {
 
                 artifact sourcesJar
 
-                if (project.name != 'kala-base' && !project.name.endsWith('kotlin')) {
+                if (project != project(':kala-common') && !project.name.endsWith('kotlin')) {
                     artifact javadocJar
                 }
                 pom {
@@ -141,7 +141,7 @@ subprojects {
             name = project.name
             licenses = ['Apache-2.0']
             publicDownloadNumbers = true
-            vcsUrl = 'git@github.com:kala-projects/kala-base.git'
+            vcsUrl = 'git@github.com:kala-projects/kala-common.git'
             version {
                 name = project.version
                 desc = "${project.name} ${project.version}"

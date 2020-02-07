@@ -36,7 +36,7 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
 
     @Contract("_ -> fail")
     public static void throwExceptionUnchecked(@NotNull Throwable throwable) {
-        Objects.requireNonNull(throwable, "throwable");
+        Objects.requireNonNull(throwable);
         throwExceptionUnchecked0(throwable);
     }
 
@@ -53,14 +53,14 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
     @NotNull
     @Contract("_ -> new")
     public static <T> Try.Failure<T> failure(Throwable throwable) {
-        Objects.requireNonNull(throwable, "throwable");
+        Objects.requireNonNull(throwable);
         return new Try.Failure<>(throwable);
     }
 
     @NotNull
     @Contract("_ -> new")
     public static <T> Try<T> run(@NotNull CheckedSupplier<T, ? extends Throwable> supplier) {
-        Objects.requireNonNull(supplier, "supplier");
+        Objects.requireNonNull(supplier);
         try {
             return success(supplier.get());
         } catch (Throwable throwable) {
@@ -71,7 +71,7 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
     @NotNull
     @Contract("_ -> new")
     public static <T> Try<T> runCallable(@NotNull Callable<? extends T> callable) {
-        Objects.requireNonNull(callable, "callable");
+        Objects.requireNonNull(callable);
         try {
             return success(callable.call());
         } catch (Throwable throwable) {
@@ -309,7 +309,7 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
         @Override
         @NotNull
         public final <U> Success<U> map(@NotNull Function<? super T, ? extends U> mapper) {
-            Objects.requireNonNull(mapper, "mapper");
+            Objects.requireNonNull(mapper);
             return new Success<>(mapper.apply(value));
         }
 
@@ -396,7 +396,7 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
         @Override
         @Contract("_ -> new")
         public final Success<T> recover(@NotNull Function<? super Throwable, ? extends T> op) {
-            Objects.requireNonNull(op, "op");
+            Objects.requireNonNull(op);
             return Try.success(op.apply(throwable));
         }
 
@@ -408,8 +408,8 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
         public final Try<T> recover(
                 @NotNull Class<? extends Throwable> type,
                 @NotNull Function<? super Throwable, ? extends T> op) {
-            Objects.requireNonNull(type, "type");
-            Objects.requireNonNull(op, "op");
+            Objects.requireNonNull(type);
+            Objects.requireNonNull(op);
             if (type.isInstance(true)) {
                 return Try.success(op.apply(throwable));
             }
@@ -422,7 +422,7 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
         @NotNull
         @Override
         public final Try<T> recoverWith(@NotNull Function<? super Throwable, ? extends Try<? extends T>> op) {
-            Objects.requireNonNull(op, "op");
+            Objects.requireNonNull(op);
             return (Try<T>) op.apply(throwable);
         }
 
@@ -434,8 +434,8 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
         public final Try<T> recoverWith(
                 @NotNull Class<? extends Throwable> type,
                 @NotNull Function<? super Throwable, ? extends Try<? extends T>> op) {
-            Objects.requireNonNull(type, "type");
-            Objects.requireNonNull(op, "op");
+            Objects.requireNonNull(type);
+            Objects.requireNonNull(op);
             if (type.isInstance(throwable)) {
                 return (Try<T>) op.apply(throwable);
             }
@@ -456,7 +456,7 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
          */
         @Override
         public final <E extends Throwable> Try<T> rethrow(@NotNull Class<? extends E> type) throws E {
-            Objects.requireNonNull(type, "type");
+            Objects.requireNonNull(type);
             if (type.isInstance(throwable)) {
                 throw (E) throwable;
             }

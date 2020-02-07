@@ -267,7 +267,7 @@ public abstract class Tuple implements Serializable {
     @NotNull
     @Contract("_ -> new")
     public static <T extends Tuple> T of(Object... values) {
-        Objects.requireNonNull(values, "values");
+        Objects.requireNonNull(values);
         switch (values.length) {
             case 0:
                 return (T) Tuple0.INSTANCE;

@@ -1,6 +1,6 @@
-# Kala base
+# Kala common
 
-## Adding Kala base to your build
+## Adding Kala common to your build
 
 First, add the Glavo Maven repository to your project configuration file:
 

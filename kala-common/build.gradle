@@ -1,0 +1,9 @@
+dependencies {
+    api group: group, name: 'kala-base', version: version
+    api group: group, name: 'kala-platform', version: version
+    api group: group, name: 'kala-collection', version: version
+}
+
+compileJava.dependsOn(':kala-base:publishToMavenLocal')
+compileJava.dependsOn(':kala-platform:publishToMavenLocal')
+compileJava.dependsOn(':kala-collection:publishToMavenLocal')

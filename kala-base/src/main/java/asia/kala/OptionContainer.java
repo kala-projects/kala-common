@@ -131,7 +131,7 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
      */
     @Override
     default <U> U foldLeft(U zero, @NotNull BiFunction<? super U, ? super T, ? extends U> op) {
-        Objects.requireNonNull(op, "op");
+        Objects.requireNonNull(op);
         if (isEmpty()) {
             return zero;
         }
@@ -145,7 +145,7 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
     @Override
     @Contract(pure = true)
     default <U> U foldRight(U zero, @NotNull BiFunction<? super T, ? super U, ? extends U> op) {
-        Objects.requireNonNull(op, "op");
+        Objects.requireNonNull(op);
         if (isEmpty()) {
             return zero;
         }
@@ -157,7 +157,7 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
      */
     @Override
     default T reduceLeft(@NotNull BiFunction<? super T, ? super T, ? extends T> op) {
-        Objects.requireNonNull(op, "op");
+        Objects.requireNonNull(op);
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
@@ -169,7 +169,7 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
      */
     @Override
     default T reduceRight(@NotNull BiFunction<? super T, ? super T, ? extends T> op) {
-        Objects.requireNonNull(op, "op");
+        Objects.requireNonNull(op);
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
@@ -183,7 +183,7 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
     @NotNull
     @Contract(pure = true)
     default Option<T> reduceLeftOption(@NotNull BiFunction<? super T, ? super T, ? extends T> op) {
-        Objects.requireNonNull(op, "op");
+        Objects.requireNonNull(op);
         return getOption();
     }
 
@@ -194,7 +194,7 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
     @NotNull
     @Contract(pure = true)
     default Option<T> reduceRightOption(@NotNull BiFunction<? super T, ? super T, ? extends T> op) {
-        Objects.requireNonNull(op, "op");
+        Objects.requireNonNull(op);
         return getOption();
     }
 
@@ -204,7 +204,7 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
     @Override
     @Contract(pure = true)
     default boolean forall(@NotNull Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate, "predicate");
+        Objects.requireNonNull(predicate);
         return isEmpty() || predicate.test(get());
     }
 
@@ -214,7 +214,7 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
     @Override
     @Contract(pure = true)
     default boolean exists(@NotNull Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate, "predicate");
+        Objects.requireNonNull(predicate);
         return isDefined() && predicate.test(get());
     }
 
@@ -232,7 +232,7 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
     @Override
     @Contract(pure = true)
     default int count(@NotNull Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate, "predicate");
+        Objects.requireNonNull(predicate);
         return exists(predicate) ? 1 : 0;
     }
 
@@ -242,7 +242,7 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
     @Override
     @NotNull
     default Option<T> find(@NotNull Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate, "predicate");
+        Objects.requireNonNull(predicate);
         return isDefined() && predicate.test(get()) ? Option.some(get()) : Option.none();
     }
 
@@ -295,7 +295,7 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
      */
     @Override
     default void forEach(@NotNull Consumer<? super T> action) {
-        Objects.requireNonNull(action, "action");
+        Objects.requireNonNull(action);
         if (isDefined()) {
             action.accept(get());
         }

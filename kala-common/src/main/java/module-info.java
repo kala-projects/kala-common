@@ -1,7 +1,8 @@
-module asia.kala.common {
-    requires static org.jetbrains.annotations;
-
-    exports asia.kala;
-    exports asia.kala.annotations;
-    exports asia.kala.function;
+/**
+ * Kala base modules.
+ */
+module asia.kala.commmon {
+    requires transitive asia.kala.base;
+    requires transitive asia.kala.platform;
+    requires transitive asia.kala.collection;
 }

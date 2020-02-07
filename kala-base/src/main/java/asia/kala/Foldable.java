@@ -27,7 +27,7 @@ public interface Foldable<T> {
      * please override the default implementation.
      */
     default T fold(T zero, @NotNull BiFunction<? super T, ? super T, ? extends T> op) {
-        Objects.requireNonNull(op, "op");
+        Objects.requireNonNull(op);
         return foldLeft(zero, op);
     }
 
@@ -67,7 +67,7 @@ public interface Foldable<T> {
      * please override the default implementation.
      */
     default T reduce(@NotNull BiFunction<? super T, ? super T, ? extends T> op) throws NoSuchElementException {
-        Objects.requireNonNull(op, "op");
+        Objects.requireNonNull(op);
         return reduceLeft(op);
     }
 
@@ -105,7 +105,7 @@ public interface Foldable<T> {
      */
     @NotNull
     default Option<T> reduceOption(@NotNull BiFunction<? super T, ? super T, ? extends T> op) {
-        Objects.requireNonNull(op, "op");
+        Objects.requireNonNull(op);
         return reduceLeftOption(op);
     }
 

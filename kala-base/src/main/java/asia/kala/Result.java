@@ -110,7 +110,7 @@ public abstract class Result<T, E> implements OptionContainer<T>, Serializable {
         @Override
         @Contract("_ -> new")
         public final <U> Result<U, E> map(@NotNull Function<? super T, ? extends U> mapper) {
-            Objects.requireNonNull(mapper, "mapper");
+            Objects.requireNonNull(mapper);
             return Result.ok(mapper.apply(value));
         }
 

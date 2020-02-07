@@ -2,6 +2,7 @@ package asia.kala;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 
 import org.jetbrains.annotations.Contract;
@@ -15,6 +16,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class Tuple1<T1> extends HList<T1, Tuple0> implements Value<T1>, Serializable {
     private static final long serialVersionUID = -2553287320045901284L;
+
+    private static final int hashMagic = -2034664103;
 
     /**
      * The 1st element of this tuple.
@@ -105,14 +108,23 @@ public final class Tuple1<T1> extends HList<T1, Tuple0> implements Value<T1>, Se
         return new Tuple2<>(head, _1);
     }
 
+    @Override
+    public final T1 get() {
+        return _1;
+    }
+
+    @Override
+    @NotNull
+    public final <U> Tuple1<U> map(@NotNull Function<? super T1, ? extends U> mapper) {
+        return new Tuple1<>(mapper.apply(_1));
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public final int hashCode() {
-        int hash = 0;
-        hash = 31 * hash + Objects.hashCode(_1);
-        return hash;
+        return Objects.hashCode(_1) + hashMagic;
     }
 
     /**

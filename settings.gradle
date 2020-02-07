@@ -1,4 +1,4 @@
-rootProject.name = 'kala-base-modules'
+rootProject.name = 'kala-common-modules'
 
 include 'kala-base', 'kala-base-kotlin',
         'kala-common', 'kala-common-kotlin',

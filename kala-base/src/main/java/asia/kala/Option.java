@@ -144,13 +144,13 @@ public final class Option<T> implements OptionContainer<T>, Iterable<T>, Seriali
     @Override
     @NotNull
     public final <U> Option<U> map(@NotNull Function<? super T, ? extends U> mapper) {
-        Objects.requireNonNull(mapper, "mapper");
+        Objects.requireNonNull(mapper);
         return isDefined() ? some(mapper.apply(value)) : none();
     }
 
     @NotNull
     public final Option<T> filter(@NotNull Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate, "predicate");
+        Objects.requireNonNull(predicate);
         return isDefined() && predicate.test(value) ? this : none();
     }
 
@@ -173,7 +173,7 @@ public final class Option<T> implements OptionContainer<T>, Iterable<T>, Seriali
     @Override
     @NotNull
     public final Option<T> find(@NotNull Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate, "predicate");
+        Objects.requireNonNull(predicate);
         return isDefined() && predicate.test(value) ? this : none();
     }
 
@@ -197,7 +197,7 @@ public final class Option<T> implements OptionContainer<T>, Iterable<T>, Seriali
         if (isEmpty()) {
             return Optional.empty();
         }
-        Objects.requireNonNull(value, "value is null");
+        Objects.requireNonNull(value);
         return Optional.of(value);
     }
 

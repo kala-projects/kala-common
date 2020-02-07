@@ -30,7 +30,7 @@ final class OptionContainerIterator<T> implements Iterator<T>, Spliterator<T> {
 
     @Override
     public boolean tryAdvance(Consumer<? super T> action) {
-        Objects.requireNonNull(action, "action");
+        Objects.requireNonNull(action);
         if (hasNext()) {
             action.accept(next());
             return true;
@@ -55,7 +55,7 @@ final class OptionContainerIterator<T> implements Iterator<T>, Spliterator<T> {
 
     @Override
     public void forEachRemaining(Consumer<? super T> action) {
-        Objects.requireNonNull(action, "action");
+        Objects.requireNonNull(action);
         if (hasNext()) {
             action.accept(next());
         }

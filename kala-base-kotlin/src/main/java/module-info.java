@@ -1,5 +1,7 @@
 module kala.base {
+    requires kotlin.stdlib;
+
     requires transitive asia.kala.base;
 
-    requires transitive kala.common;
+    exports kala;
 }

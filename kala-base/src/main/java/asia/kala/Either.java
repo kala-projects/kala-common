@@ -150,7 +150,7 @@ public abstract class Either<A, B> implements Serializable {
         @NotNull
         @Override
         public final <U> Either<U, B> mapLeft(@NotNull Function<? super A, ? extends U> mapper) {
-            Objects.requireNonNull(mapper, "mapper");
+            Objects.requireNonNull(mapper);
             return Either.left(mapper.apply(value));
         }
 
@@ -291,7 +291,7 @@ public abstract class Either<A, B> implements Serializable {
         @NotNull
         @Override
         public final <U> Either<A, U> mapRight(@NotNull Function<? super B, ? extends U> mapper) {
-            Objects.requireNonNull(mapper, "mapper");
+            Objects.requireNonNull(mapper);
             return Either.right(mapper.apply(value));
         }
 
@@ -393,7 +393,7 @@ public abstract class Either<A, B> implements Serializable {
         @Override
         @NotNull
         public final <U> Either<U, B>.LeftProjection map(@NotNull Function<? super A, ? extends U> mapper) {
-            Objects.requireNonNull(mapper, "mapper");
+            Objects.requireNonNull(mapper);
             if (isDefined()) {
                 return Either.<U, B>left(mapper.apply(getLeftValue())).new LeftProjection();
             }
@@ -424,7 +424,7 @@ public abstract class Either<A, B> implements Serializable {
         @Override
         @NotNull
         public final <U> Either<A, U>.RightProjection map(@NotNull Function<? super B, ? extends U> mapper) {
-            Objects.requireNonNull(mapper, "mapper");
+            Objects.requireNonNull(mapper);
             if (isDefined()) {
                 return Either.<A, U>right(mapper.apply(getRightValue())).new RightProjection();
             }
