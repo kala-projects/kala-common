@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 /**
  * A container object which may or may not contain a value.
  *
- * @param <T>the type of value
+ * @param <T> the type of value
  * @author Glavo
  */
 public interface ValueContainer<T> extends Iterable<T>, Functor<T>, Foldable<T> {

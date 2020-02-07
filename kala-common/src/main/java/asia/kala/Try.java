@@ -35,6 +35,16 @@ public abstract class Try<T> implements ValueContainer<T>, Serializable {
         return (Try.Failure<T>) failure;
     }
 
+    @Contract("_ -> fail")
+    public static void throwExceptionUnchecked(@NotNull Throwable throwable) {
+        Objects.requireNonNull(throwable, "throwable");
+        throwExceptionUnchecked0(throwable);
+    }
+
+    private static <E extends Throwable> void throwExceptionUnchecked0(Throwable throwable) throws E {
+        throw (E) throwable;
+    }
+
     @NotNull
     @Contract("_ -> new")
     public static <T> Try.Success<T> success(T value) {
@@ -233,6 +243,7 @@ public abstract class Try<T> implements ValueContainer<T>, Serializable {
         /**
          * {@inheritDoc}
          */
+        @NotNull
         @Override
         @Contract("_, _ -> this")
         public final Success<T> recover(
@@ -393,6 +404,7 @@ public abstract class Try<T> implements ValueContainer<T>, Serializable {
         /**
          * {@inheritDoc}
          */
+        @NotNull
         @Override
         public final Try<T> recover(
                 @NotNull Class<? extends Throwable> type,

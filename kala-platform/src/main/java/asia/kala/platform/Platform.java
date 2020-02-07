@@ -1,8 +1,5 @@
 package asia.kala.platform;
 
-import asia.kala.annotations.StaticClass;
-
-@StaticClass
 public final class Platform {
     private Platform() {
     }
