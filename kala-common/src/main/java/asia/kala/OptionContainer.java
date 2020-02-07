@@ -17,7 +17,7 @@ import java.util.stream.Stream;
  * @param <T> the type of value
  * @author Glavo
  */
-public interface ValueContainer<T> extends Iterable<T>, Functor<T>, Foldable<T> {
+public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T> {
 
     /**
      * Returns {@code true} if the container contain a value, otherwise return {@code false}.
@@ -120,7 +120,7 @@ public interface ValueContainer<T> extends Iterable<T>, Functor<T>, Foldable<T> 
 
     @NotNull
     @Override
-    <U> ValueContainer<U> map(@NotNull Function<? super T, ? extends U> mapper);
+    <U> OptionContainer<U> map(@NotNull Function<? super T, ? extends U> mapper);
 
     //
     // -- Foldable
@@ -273,9 +273,9 @@ public interface ValueContainer<T> extends Iterable<T>, Functor<T>, Foldable<T> 
     @Override
     default Iterator<T> iterator() {
         if (isDefined()) {
-            return new ValueContainerIterator<>(get());
+            return new OptionContainerIterator<>(get());
         }
-        return new ValueContainerIterator<>(Option.NoneTag.INSTANCE);
+        return new OptionContainerIterator<>(InternalEmptyTag.INSTANCE);
     }
 
     /**
@@ -284,9 +284,9 @@ public interface ValueContainer<T> extends Iterable<T>, Functor<T>, Foldable<T> 
     @Override
     default Spliterator<T> spliterator() {
         if (isDefined()) {
-            return new ValueContainerIterator<>(get());
+            return new OptionContainerIterator<>(get());
         }
-        return new ValueContainerIterator<>(Option.NoneTag.INSTANCE);
+        return new OptionContainerIterator<>(InternalEmptyTag.INSTANCE);
     }
 
 

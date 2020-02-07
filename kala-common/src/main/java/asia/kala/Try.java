@@ -1,7 +1,6 @@
 package asia.kala;
 
 import asia.kala.annotations.Sealed;
-import asia.kala.function.CheckedFunction;
 import asia.kala.function.CheckedSupplier;
 import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
@@ -16,7 +15,7 @@ import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 @Sealed(subclasses = {Try.Success.class, Try.Failure.class})
-public abstract class Try<T> implements ValueContainer<T>, Serializable {
+public abstract class Try<T> implements OptionContainer<T>, Serializable {
     Try() {
     }
 

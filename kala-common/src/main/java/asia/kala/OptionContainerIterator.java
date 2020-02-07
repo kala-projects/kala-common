@@ -6,25 +6,25 @@ import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-final class ValueContainerIterator<T> implements Iterator<T>, Spliterator<T> {
+final class OptionContainerIterator<T> implements Iterator<T>, Spliterator<T> {
     private Object valueRef;
 
-    ValueContainerIterator(Object value) {
+    OptionContainerIterator(Object value) {
         this.valueRef = value;
     }
 
     @Override
     public boolean hasNext() {
-        return valueRef != Option.NoneTag.INSTANCE;
+        return valueRef != InternalEmptyTag.INSTANCE;
     }
 
     @Override
     public T next() {
-        if (valueRef == Option.NoneTag.INSTANCE) {
+        if (valueRef == InternalEmptyTag.INSTANCE) {
             throw new NoSuchElementException("OptionIterator.next");
         }
         @SuppressWarnings("unchecked") T v = (T) valueRef;
-        valueRef = Option.NoneTag.INSTANCE;
+        valueRef = InternalEmptyTag.INSTANCE;
         return v;
     }
 

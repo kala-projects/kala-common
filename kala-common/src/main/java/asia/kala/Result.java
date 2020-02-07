@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 @Sealed(subclasses = {Result.Ok.class, Result.Err.class})
-public abstract class Result<T, E> implements ValueContainer<T>, Serializable {
+public abstract class Result<T, E> implements OptionContainer<T>, Serializable {
     Result() {
     }
 

@@ -346,7 +346,7 @@ public abstract class Either<A, B> implements Serializable {
         }
     }
 
-    public abstract class Projection<T> implements ValueContainer<T> {
+    public abstract class Projection<T> implements OptionContainer<T> {
         Projection() {
         }
 

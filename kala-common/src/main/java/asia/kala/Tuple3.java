@@ -3,16 +3,16 @@ package asia.kala;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.IntFunction;
+
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
- *  A tuple of 3 elements.
+ * A tuple of 3 elements.
  *
  * @param <T1> type of the 1st element
  * @param <T2> type of the 2nd element
  * @param <T3> type of the 3rd element
- *
  * @author Glavo
  */
 public final class Tuple3<T1, T2, T3> extends HList<T1, Tuple2<T2, T3>> implements Serializable {
@@ -74,7 +74,7 @@ public final class Tuple3<T1, T2, T3> extends HList<T1, Tuple2<T2, T3>> implemen
             case 2:
                 return (U) _3;
             default:
-                throw new IndexOutOfBoundsException("Index out of range: " +index);
+                throw new IndexOutOfBoundsException("Index out of range: " + index);
         }
     }
 

@@ -34,7 +34,7 @@ public final class Tuple0 extends Tuple {
 
     @NotNull
     @Override
-    public final  <U> U[] toJavaArray(@NotNull IntFunction<U[]> generator) {
+    public final <U> U[] toJavaArray(@NotNull IntFunction<U[]> generator) {
         return generator.apply(0);
     }
 

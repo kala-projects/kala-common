@@ -3,17 +3,17 @@ package asia.kala;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.IntFunction;
+
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
- *  A tuple of 1 element.
+ * A tuple of 1 element.
  *
  * @param <T1> type of the 1st element
- *
  * @author Glavo
  */
-public final class Tuple1<T1> extends HList<T1, Tuple0> implements Serializable {
+public final class Tuple1<T1> extends HList<T1, Tuple0> implements Value<T1>, Serializable {
     private static final long serialVersionUID = -2553287320045901284L;
 
     /**
@@ -53,7 +53,7 @@ public final class Tuple1<T1> extends HList<T1, Tuple0> implements Serializable 
             case 0:
                 return (U) _1;
             default:
-                throw new IndexOutOfBoundsException("Index out of range: " +index);
+                throw new IndexOutOfBoundsException("Index out of range: " + index);
         }
     }
 

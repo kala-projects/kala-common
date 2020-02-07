@@ -3,11 +3,12 @@ package asia.kala;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.IntFunction;
+
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
- *  A tuple of 8 elements.
+ * A tuple of 8 elements.
  *
  * @param <T1> type of the 1st element
  * @param <T2> type of the 2nd element
@@ -17,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
  * @param <T6> type of the 6th element
  * @param <T7> type of the 7th element
  * @param <T8> type of the 8th element
- *
  * @author Glavo
  */
 public final class Tuple8<T1, T2, T3, T4, T5, T6, T7, T8> extends HList<T1, Tuple7<T2, T3, T4, T5, T6, T7, T8>> implements Serializable {
@@ -124,7 +124,7 @@ public final class Tuple8<T1, T2, T3, T4, T5, T6, T7, T8> extends HList<T1, Tupl
             case 7:
                 return (U) _8;
             default:
-                throw new IndexOutOfBoundsException("Index out of range: " +index);
+                throw new IndexOutOfBoundsException("Index out of range: " + index);
         }
     }
 

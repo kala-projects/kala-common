@@ -3,6 +3,7 @@ package asia.kala;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.IntFunction;
+
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,7 +14,8 @@ import org.jetbrains.annotations.NotNull;
  * @see HList
  */
 public abstract class Tuple implements Serializable {
-    Tuple() {}
+    Tuple() {
+    }
 
     /**
      * Returns the number of elements of this {@code Tuple}.
@@ -27,9 +29,9 @@ public abstract class Tuple implements Serializable {
      *
      * @return the element at the specified position in this {@code Tuple}
      * @throws IndexOutOfBoundsException if the index is out of range ({@code index < 0 || index >=
-     *     arity()})
+     *                                   arity()})
      * @apiNote this method is not type safe, please use {@code Tuple.componentN(tuple)} to get the
-     *     Nth element of the tuple (when {@code N <= 18}).
+     * Nth element of the tuple (when {@code N <= 18}).
      */
     public abstract <U> U elementAt(int index);
 
@@ -46,7 +48,7 @@ public abstract class Tuple implements Serializable {
      * @return an array containing all of the elements in this tuple
      */
     @NotNull
-    @Contract("_ -> new")
+    @Contract("-> new")
     public Object[] toJavaArray() {
         return toJavaArray(Object[]::new);
     }
@@ -57,7 +59,7 @@ public abstract class Tuple implements Serializable {
      *
      * @return an array containing all of the elements in this tuple
      * @throws ArrayStoreException if any element of this tuple cannot be stored in the generated
-     *     array because the runtime type does not match
+     *                             array because the runtime type does not match
      */
     @NotNull
     public abstract <U> U[] toJavaArray(@NotNull IntFunction<U[]> generator);
@@ -70,7 +72,7 @@ public abstract class Tuple implements Serializable {
      * Creates a tuple of 1 element.
      *
      * @param <T1> type of the 1st element
-     * @param t1 the 1st element
+     * @param t1   the 1st element
      * @return a tuple of 1 element
      */
     @NotNull
@@ -84,8 +86,8 @@ public abstract class Tuple implements Serializable {
      *
      * @param <T1> type of the 1st element
      * @param <T2> type of the 2nd element
-     * @param t1 the 1st element
-     * @param t2 the 2nd element
+     * @param t1   the 1st element
+     * @param t2   the 2nd element
      * @return a tuple of 2 elements
      */
     @NotNull
@@ -100,9 +102,9 @@ public abstract class Tuple implements Serializable {
      * @param <T1> type of the 1st element
      * @param <T2> type of the 2nd element
      * @param <T3> type of the 3rd element
-     * @param t1 the 1st element
-     * @param t2 the 2nd element
-     * @param t3 the 3rd element
+     * @param t1   the 1st element
+     * @param t2   the 2nd element
+     * @param t3   the 3rd element
      * @return a tuple of 3 elements
      */
     @NotNull
@@ -118,10 +120,10 @@ public abstract class Tuple implements Serializable {
      * @param <T2> type of the 2nd element
      * @param <T3> type of the 3rd element
      * @param <T4> type of the 4th element
-     * @param t1 the 1st element
-     * @param t2 the 2nd element
-     * @param t3 the 3rd element
-     * @param t4 the 4th element
+     * @param t1   the 1st element
+     * @param t2   the 2nd element
+     * @param t3   the 3rd element
+     * @param t4   the 4th element
      * @return a tuple of 4 elements
      */
     @NotNull
@@ -138,11 +140,11 @@ public abstract class Tuple implements Serializable {
      * @param <T3> type of the 3rd element
      * @param <T4> type of the 4th element
      * @param <T5> type of the 5th element
-     * @param t1 the 1st element
-     * @param t2 the 2nd element
-     * @param t3 the 3rd element
-     * @param t4 the 4th element
-     * @param t5 the 5th element
+     * @param t1   the 1st element
+     * @param t2   the 2nd element
+     * @param t3   the 3rd element
+     * @param t4   the 4th element
+     * @param t5   the 5th element
      * @return a tuple of 5 elements
      */
     @NotNull
@@ -161,12 +163,12 @@ public abstract class Tuple implements Serializable {
      * @param <T4> type of the 4th element
      * @param <T5> type of the 5th element
      * @param <T6> type of the 6th element
-     * @param t1 the 1st element
-     * @param t2 the 2nd element
-     * @param t3 the 3rd element
-     * @param t4 the 4th element
-     * @param t5 the 5th element
-     * @param t6 the 6th element
+     * @param t1   the 1st element
+     * @param t2   the 2nd element
+     * @param t3   the 3rd element
+     * @param t4   the 4th element
+     * @param t5   the 5th element
+     * @param t6   the 6th element
      * @return a tuple of 6 elements
      */
     @NotNull
@@ -186,13 +188,13 @@ public abstract class Tuple implements Serializable {
      * @param <T5> type of the 5th element
      * @param <T6> type of the 6th element
      * @param <T7> type of the 7th element
-     * @param t1 the 1st element
-     * @param t2 the 2nd element
-     * @param t3 the 3rd element
-     * @param t4 the 4th element
-     * @param t5 the 5th element
-     * @param t6 the 6th element
-     * @param t7 the 7th element
+     * @param t1   the 1st element
+     * @param t2   the 2nd element
+     * @param t3   the 3rd element
+     * @param t4   the 4th element
+     * @param t5   the 5th element
+     * @param t6   the 6th element
+     * @param t7   the 7th element
      * @return a tuple of 7 elements
      */
     @NotNull
@@ -213,14 +215,14 @@ public abstract class Tuple implements Serializable {
      * @param <T6> type of the 6th element
      * @param <T7> type of the 7th element
      * @param <T8> type of the 8th element
-     * @param t1 the 1st element
-     * @param t2 the 2nd element
-     * @param t3 the 3rd element
-     * @param t4 the 4th element
-     * @param t5 the 5th element
-     * @param t6 the 6th element
-     * @param t7 the 7th element
-     * @param t8 the 8th element
+     * @param t1   the 1st element
+     * @param t2   the 2nd element
+     * @param t3   the 3rd element
+     * @param t4   the 4th element
+     * @param t5   the 5th element
+     * @param t6   the 6th element
+     * @param t7   the 7th element
+     * @param t8   the 8th element
      * @return a tuple of 8 elements
      */
     @NotNull
@@ -242,22 +244,22 @@ public abstract class Tuple implements Serializable {
      * @param <T7> type of the 7th element
      * @param <T8> type of the 8th element
      * @param <T9> type of the 9th element
-     * @param t1 the 1st element
-     * @param t2 the 2nd element
-     * @param t3 the 3rd element
-     * @param t4 the 4th element
-     * @param t5 the 5th element
-     * @param t6 the 6th element
-     * @param t7 the 7th element
-     * @param t8 the 8th element
-     * @param t9 the 9th element
+     * @param t1   the 1st element
+     * @param t2   the 2nd element
+     * @param t3   the 3rd element
+     * @param t4   the 4th element
+     * @param t5   the 5th element
+     * @param t6   the 6th element
+     * @param t7   the 7th element
+     * @param t8   the 8th element
+     * @param t9   the 9th element
      * @return a tuple of 9 elements
      */
     @NotNull
     @Contract("_, _, _, _, _, _, _, _, _ -> new")
     public static <T1, T2, T3, T4, T5, T6, T7, T8, T9>
-            Tuple9<T1, T2, T3, T4, T5, T6, T7, T8, T9> of(
-                    T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9) {
+    Tuple9<T1, T2, T3, T4, T5, T6, T7, T8, T9> of(
+            T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9) {
         return new Tuple9<>(t1, t2, t3, t4, t5, t6, t7, t8, t9);
     }
 
@@ -306,7 +308,7 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 1st element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 1st element of the {@code tuple}
      */
@@ -318,7 +320,7 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 2nd element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 2nd element of the {@code tuple}
      */
@@ -330,7 +332,7 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 3rd element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 3rd element of the {@code tuple}
      */
@@ -343,7 +345,7 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 4th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 4th element of the {@code tuple}
      */
@@ -357,28 +359,28 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 5th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 5th element of the {@code tuple}
      */
     public static <T> T component5(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    T,
-                                                                                                    ?>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            T,
+                                                                                            ?>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(4);
     }
@@ -386,31 +388,31 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 6th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 6th element of the {@code tuple}
      */
     public static <T> T component6(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    ?,
-                                                                                                    ? extends
-                                                                                                            HList<
-                                                                                                                    T,
-                                                                                                                    ?>>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            ?,
+                                                                                            ? extends
+                                                                                                    HList<
+                                                                                                            T,
+                                                                                                            ?>>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(5);
     }
@@ -418,34 +420,34 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 7th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 7th element of the {@code tuple}
      */
     public static <T> T component7(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    ?,
-                                                                                                    ? extends
-                                                                                                            HList<
-                                                                                                                    ?,
-                                                                                                                    ? extends
-                                                                                                                            HList<
-                                                                                                                                    T,
-                                                                                                                                    ?>>>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            ?,
+                                                                                            ? extends
+                                                                                                    HList<
+                                                                                                            ?,
+                                                                                                            ? extends
+                                                                                                                    HList<
+                                                                                                                            T,
+                                                                                                                            ?>>>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(6);
     }
@@ -453,37 +455,37 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 8th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 8th element of the {@code tuple}
      */
     public static <T> T component8(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    ?,
-                                                                                                    ? extends
-                                                                                                            HList<
-                                                                                                                    ?,
-                                                                                                                    ? extends
-                                                                                                                            HList<
-                                                                                                                                    ?,
-                                                                                                                                    ? extends
-                                                                                                                                            HList<
-                                                                                                                                                    T,
-                                                                                                                                                    ?>>>>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            ?,
+                                                                                            ? extends
+                                                                                                    HList<
+                                                                                                            ?,
+                                                                                                            ? extends
+                                                                                                                    HList<
+                                                                                                                            ?,
+                                                                                                                            ? extends
+                                                                                                                                    HList<
+                                                                                                                                            T,
+                                                                                                                                            ?>>>>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(7);
     }
@@ -491,40 +493,40 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 9th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 9th element of the {@code tuple}
      */
     public static <T> T component9(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    ?,
-                                                                                                    ? extends
-                                                                                                            HList<
-                                                                                                                    ?,
-                                                                                                                    ? extends
-                                                                                                                            HList<
-                                                                                                                                    ?,
-                                                                                                                                    ? extends
-                                                                                                                                            HList<
-                                                                                                                                                    ?,
-                                                                                                                                                    ? extends
-                                                                                                                                                            HList<
-                                                                                                                                                                    T,
-                                                                                                                                                                    ?>>>>>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            ?,
+                                                                                            ? extends
+                                                                                                    HList<
+                                                                                                            ?,
+                                                                                                            ? extends
+                                                                                                                    HList<
+                                                                                                                            ?,
+                                                                                                                            ? extends
+                                                                                                                                    HList<
+                                                                                                                                            ?,
+                                                                                                                                            ? extends
+                                                                                                                                                    HList<
+                                                                                                                                                            T,
+                                                                                                                                                            ?>>>>>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(8);
     }
@@ -532,43 +534,43 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 10th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 10th element of the {@code tuple}
      */
     public static <T> T component10(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    ?,
-                                                                                                    ? extends
-                                                                                                            HList<
-                                                                                                                    ?,
-                                                                                                                    ? extends
-                                                                                                                            HList<
-                                                                                                                                    ?,
-                                                                                                                                    ? extends
-                                                                                                                                            HList<
-                                                                                                                                                    ?,
-                                                                                                                                                    ? extends
-                                                                                                                                                            HList<
-                                                                                                                                                                    ?,
-                                                                                                                                                                    ? extends
-                                                                                                                                                                            HList<
-                                                                                                                                                                                    T,
-                                                                                                                                                                                    ?>>>>>>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            ?,
+                                                                                            ? extends
+                                                                                                    HList<
+                                                                                                            ?,
+                                                                                                            ? extends
+                                                                                                                    HList<
+                                                                                                                            ?,
+                                                                                                                            ? extends
+                                                                                                                                    HList<
+                                                                                                                                            ?,
+                                                                                                                                            ? extends
+                                                                                                                                                    HList<
+                                                                                                                                                            ?,
+                                                                                                                                                            ? extends
+                                                                                                                                                                    HList<
+                                                                                                                                                                            T,
+                                                                                                                                                                            ?>>>>>>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(9);
     }
@@ -576,46 +578,46 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 11th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 11th element of the {@code tuple}
      */
     public static <T> T component11(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    ?,
-                                                                                                    ? extends
-                                                                                                            HList<
-                                                                                                                    ?,
-                                                                                                                    ? extends
-                                                                                                                            HList<
-                                                                                                                                    ?,
-                                                                                                                                    ? extends
-                                                                                                                                            HList<
-                                                                                                                                                    ?,
-                                                                                                                                                    ? extends
-                                                                                                                                                            HList<
-                                                                                                                                                                    ?,
-                                                                                                                                                                    ? extends
-                                                                                                                                                                            HList<
-                                                                                                                                                                                    ?,
-                                                                                                                                                                                    ? extends
-                                                                                                                                                                                            HList<
-                                                                                                                                                                                                    T,
-                                                                                                                                                                                                    ?>>>>>>>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            ?,
+                                                                                            ? extends
+                                                                                                    HList<
+                                                                                                            ?,
+                                                                                                            ? extends
+                                                                                                                    HList<
+                                                                                                                            ?,
+                                                                                                                            ? extends
+                                                                                                                                    HList<
+                                                                                                                                            ?,
+                                                                                                                                            ? extends
+                                                                                                                                                    HList<
+                                                                                                                                                            ?,
+                                                                                                                                                            ? extends
+                                                                                                                                                                    HList<
+                                                                                                                                                                            ?,
+                                                                                                                                                                            ? extends
+                                                                                                                                                                                    HList<
+                                                                                                                                                                                            T,
+                                                                                                                                                                                            ?>>>>>>>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(10);
     }
@@ -623,49 +625,49 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 12th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 12th element of the {@code tuple}
      */
     public static <T> T component12(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    ?,
-                                                                                                    ? extends
-                                                                                                            HList<
-                                                                                                                    ?,
-                                                                                                                    ? extends
-                                                                                                                            HList<
-                                                                                                                                    ?,
-                                                                                                                                    ? extends
-                                                                                                                                            HList<
-                                                                                                                                                    ?,
-                                                                                                                                                    ? extends
-                                                                                                                                                            HList<
-                                                                                                                                                                    ?,
-                                                                                                                                                                    ? extends
-                                                                                                                                                                            HList<
-                                                                                                                                                                                    ?,
-                                                                                                                                                                                    ? extends
-                                                                                                                                                                                            HList<
-                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                    T,
-                                                                                                                                                                                                                    ?>>>>>>>>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            ?,
+                                                                                            ? extends
+                                                                                                    HList<
+                                                                                                            ?,
+                                                                                                            ? extends
+                                                                                                                    HList<
+                                                                                                                            ?,
+                                                                                                                            ? extends
+                                                                                                                                    HList<
+                                                                                                                                            ?,
+                                                                                                                                            ? extends
+                                                                                                                                                    HList<
+                                                                                                                                                            ?,
+                                                                                                                                                            ? extends
+                                                                                                                                                                    HList<
+                                                                                                                                                                            ?,
+                                                                                                                                                                            ? extends
+                                                                                                                                                                                    HList<
+                                                                                                                                                                                            ?,
+                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                            T,
+                                                                                                                                                                                                            ?>>>>>>>>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(11);
     }
@@ -673,52 +675,52 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 13th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 13th element of the {@code tuple}
      */
     public static <T> T component13(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    ?,
-                                                                                                    ? extends
-                                                                                                            HList<
-                                                                                                                    ?,
-                                                                                                                    ? extends
-                                                                                                                            HList<
-                                                                                                                                    ?,
-                                                                                                                                    ? extends
-                                                                                                                                            HList<
-                                                                                                                                                    ?,
-                                                                                                                                                    ? extends
-                                                                                                                                                            HList<
-                                                                                                                                                                    ?,
-                                                                                                                                                                    ? extends
-                                                                                                                                                                            HList<
-                                                                                                                                                                                    ?,
-                                                                                                                                                                                    ? extends
-                                                                                                                                                                                            HList<
-                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                    T,
-                                                                                                                                                                                                                                    ?>>>>>>>>>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            ?,
+                                                                                            ? extends
+                                                                                                    HList<
+                                                                                                            ?,
+                                                                                                            ? extends
+                                                                                                                    HList<
+                                                                                                                            ?,
+                                                                                                                            ? extends
+                                                                                                                                    HList<
+                                                                                                                                            ?,
+                                                                                                                                            ? extends
+                                                                                                                                                    HList<
+                                                                                                                                                            ?,
+                                                                                                                                                            ? extends
+                                                                                                                                                                    HList<
+                                                                                                                                                                            ?,
+                                                                                                                                                                            ? extends
+                                                                                                                                                                                    HList<
+                                                                                                                                                                                            ?,
+                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                            T,
+                                                                                                                                                                                                                            ?>>>>>>>>>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(12);
     }
@@ -726,55 +728,55 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 14th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 14th element of the {@code tuple}
      */
     public static <T> T component14(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    ?,
-                                                                                                    ? extends
-                                                                                                            HList<
-                                                                                                                    ?,
-                                                                                                                    ? extends
-                                                                                                                            HList<
-                                                                                                                                    ?,
-                                                                                                                                    ? extends
-                                                                                                                                            HList<
-                                                                                                                                                    ?,
-                                                                                                                                                    ? extends
-                                                                                                                                                            HList<
-                                                                                                                                                                    ?,
-                                                                                                                                                                    ? extends
-                                                                                                                                                                            HList<
-                                                                                                                                                                                    ?,
-                                                                                                                                                                                    ? extends
-                                                                                                                                                                                            HList<
-                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                    T,
-                                                                                                                                                                                                                                                    ?>>>>>>>>>>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            ?,
+                                                                                            ? extends
+                                                                                                    HList<
+                                                                                                            ?,
+                                                                                                            ? extends
+                                                                                                                    HList<
+                                                                                                                            ?,
+                                                                                                                            ? extends
+                                                                                                                                    HList<
+                                                                                                                                            ?,
+                                                                                                                                            ? extends
+                                                                                                                                                    HList<
+                                                                                                                                                            ?,
+                                                                                                                                                            ? extends
+                                                                                                                                                                    HList<
+                                                                                                                                                                            ?,
+                                                                                                                                                                            ? extends
+                                                                                                                                                                                    HList<
+                                                                                                                                                                                            ?,
+                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                            T,
+                                                                                                                                                                                                                                            ?>>>>>>>>>>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(13);
     }
@@ -782,58 +784,58 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 15th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 15th element of the {@code tuple}
      */
     public static <T> T component15(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    ?,
-                                                                                                    ? extends
-                                                                                                            HList<
-                                                                                                                    ?,
-                                                                                                                    ? extends
-                                                                                                                            HList<
-                                                                                                                                    ?,
-                                                                                                                                    ? extends
-                                                                                                                                            HList<
-                                                                                                                                                    ?,
-                                                                                                                                                    ? extends
-                                                                                                                                                            HList<
-                                                                                                                                                                    ?,
-                                                                                                                                                                    ? extends
-                                                                                                                                                                            HList<
-                                                                                                                                                                                    ?,
-                                                                                                                                                                                    ? extends
-                                                                                                                                                                                            HList<
-                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                                    T,
-                                                                                                                                                                                                                                                                    ?>>>>>>>>>>>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            ?,
+                                                                                            ? extends
+                                                                                                    HList<
+                                                                                                            ?,
+                                                                                                            ? extends
+                                                                                                                    HList<
+                                                                                                                            ?,
+                                                                                                                            ? extends
+                                                                                                                                    HList<
+                                                                                                                                            ?,
+                                                                                                                                            ? extends
+                                                                                                                                                    HList<
+                                                                                                                                                            ?,
+                                                                                                                                                            ? extends
+                                                                                                                                                                    HList<
+                                                                                                                                                                            ?,
+                                                                                                                                                                            ? extends
+                                                                                                                                                                                    HList<
+                                                                                                                                                                                            ?,
+                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                                            T,
+                                                                                                                                                                                                                                                            ?>>>>>>>>>>>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(14);
     }
@@ -841,61 +843,61 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 16th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 16th element of the {@code tuple}
      */
     public static <T> T component16(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    ?,
-                                                                                                    ? extends
-                                                                                                            HList<
-                                                                                                                    ?,
-                                                                                                                    ? extends
-                                                                                                                            HList<
-                                                                                                                                    ?,
-                                                                                                                                    ? extends
-                                                                                                                                            HList<
-                                                                                                                                                    ?,
-                                                                                                                                                    ? extends
-                                                                                                                                                            HList<
-                                                                                                                                                                    ?,
-                                                                                                                                                                    ? extends
-                                                                                                                                                                            HList<
-                                                                                                                                                                                    ?,
-                                                                                                                                                                                    ? extends
-                                                                                                                                                                                            HList<
-                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                                                    T,
-                                                                                                                                                                                                                                                                                    ?>>>>>>>>>>>>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            ?,
+                                                                                            ? extends
+                                                                                                    HList<
+                                                                                                            ?,
+                                                                                                            ? extends
+                                                                                                                    HList<
+                                                                                                                            ?,
+                                                                                                                            ? extends
+                                                                                                                                    HList<
+                                                                                                                                            ?,
+                                                                                                                                            ? extends
+                                                                                                                                                    HList<
+                                                                                                                                                            ?,
+                                                                                                                                                            ? extends
+                                                                                                                                                                    HList<
+                                                                                                                                                                            ?,
+                                                                                                                                                                            ? extends
+                                                                                                                                                                                    HList<
+                                                                                                                                                                                            ?,
+                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                                                            T,
+                                                                                                                                                                                                                                                                            ?>>>>>>>>>>>>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(15);
     }
@@ -903,64 +905,64 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 17th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 17th element of the {@code tuple}
      */
     public static <T> T component17(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    ?,
-                                                                                                    ? extends
-                                                                                                            HList<
-                                                                                                                    ?,
-                                                                                                                    ? extends
-                                                                                                                            HList<
-                                                                                                                                    ?,
-                                                                                                                                    ? extends
-                                                                                                                                            HList<
-                                                                                                                                                    ?,
-                                                                                                                                                    ? extends
-                                                                                                                                                            HList<
-                                                                                                                                                                    ?,
-                                                                                                                                                                    ? extends
-                                                                                                                                                                            HList<
-                                                                                                                                                                                    ?,
-                                                                                                                                                                                    ? extends
-                                                                                                                                                                                            HList<
-                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                                                                    T,
-                                                                                                                                                                                                                                                                                                    ?>>>>>>>>>>>>>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            ?,
+                                                                                            ? extends
+                                                                                                    HList<
+                                                                                                            ?,
+                                                                                                            ? extends
+                                                                                                                    HList<
+                                                                                                                            ?,
+                                                                                                                            ? extends
+                                                                                                                                    HList<
+                                                                                                                                            ?,
+                                                                                                                                            ? extends
+                                                                                                                                                    HList<
+                                                                                                                                                            ?,
+                                                                                                                                                            ? extends
+                                                                                                                                                                    HList<
+                                                                                                                                                                            ?,
+                                                                                                                                                                            ? extends
+                                                                                                                                                                                    HList<
+                                                                                                                                                                                            ?,
+                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                                                                            T,
+                                                                                                                                                                                                                                                                                            ?>>>>>>>>>>>>>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(16);
     }
@@ -968,67 +970,67 @@ public abstract class Tuple implements Serializable {
     /**
      * Return the 18th element of the {@code tuple}.
      *
-     * @param <T> type of the element
+     * @param <T>   type of the element
      * @param tuple a {@code Tuple}
      * @return the 18th element of the {@code tuple}
      */
     public static <T> T component18(
             @NotNull
                     HList<
-                                    ?,
-                                    ? extends
-                                            HList<
-                                                    ?,
-                                                    ? extends
-                                                            HList<
-                                                                    ?,
-                                                                    ? extends
-                                                                            HList<
-                                                                                    ?,
-                                                                                    ? extends
-                                                                                            HList<
-                                                                                                    ?,
-                                                                                                    ? extends
-                                                                                                            HList<
-                                                                                                                    ?,
-                                                                                                                    ? extends
-                                                                                                                            HList<
-                                                                                                                                    ?,
-                                                                                                                                    ? extends
-                                                                                                                                            HList<
-                                                                                                                                                    ?,
-                                                                                                                                                    ? extends
-                                                                                                                                                            HList<
-                                                                                                                                                                    ?,
-                                                                                                                                                                    ? extends
-                                                                                                                                                                            HList<
-                                                                                                                                                                                    ?,
-                                                                                                                                                                                    ? extends
-                                                                                                                                                                                            HList<
-                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                                                                    ?,
-                                                                                                                                                                                                                                                                                                    ? extends
-                                                                                                                                                                                                                                                                                                            HList<
-                                                                                                                                                                                                                                                                                                                    T,
-                                                                                                                                                                                                                                                                                                                    ?>>>>>>>>>>>>>>>>>>
-                            tuple) {
+                            ?,
+                            ? extends
+                                    HList<
+                                            ?,
+                                            ? extends
+                                                    HList<
+                                                            ?,
+                                                            ? extends
+                                                                    HList<
+                                                                            ?,
+                                                                            ? extends
+                                                                                    HList<
+                                                                                            ?,
+                                                                                            ? extends
+                                                                                                    HList<
+                                                                                                            ?,
+                                                                                                            ? extends
+                                                                                                                    HList<
+                                                                                                                            ?,
+                                                                                                                            ? extends
+                                                                                                                                    HList<
+                                                                                                                                            ?,
+                                                                                                                                            ? extends
+                                                                                                                                                    HList<
+                                                                                                                                                            ?,
+                                                                                                                                                            ? extends
+                                                                                                                                                                    HList<
+                                                                                                                                                                            ?,
+                                                                                                                                                                            ? extends
+                                                                                                                                                                                    HList<
+                                                                                                                                                                                            ?,
+                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                                                                            ?,
+                                                                                                                                                                                                                                                                                            ? extends
+                                                                                                                                                                                                                                                                                                    HList<
+                                                                                                                                                                                                                                                                                                            T,
+                                                                                                                                                                                                                                                                                                            ?>>>>>>>>>>>>>>>>>>
+                    tuple) {
         Objects.requireNonNull(tuple);
         return tuple.elementAt(17);
     }

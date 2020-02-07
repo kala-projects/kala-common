@@ -4,15 +4,15 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.IntFunction;
+
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
- *  A tuple of 2 elements.
+ * A tuple of 2 elements.
  *
  * @param <T1> type of the 1st element
  * @param <T2> type of the 2nd element
- *
  * @author Glavo
  */
 public final class Tuple2<T1, T2> extends HList<T1, Tuple1<T2>> implements Serializable, Map.Entry<T1, T2> {
@@ -65,7 +65,7 @@ public final class Tuple2<T1, T2> extends HList<T1, Tuple1<T2>> implements Seria
             case 1:
                 return (U) _2;
             default:
-                throw new IndexOutOfBoundsException("Index out of range: " +index);
+                throw new IndexOutOfBoundsException("Index out of range: " + index);
         }
     }
 

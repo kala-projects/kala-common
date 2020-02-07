@@ -23,7 +23,7 @@ import java.util.function.Predicate;
  * @author Glavo
  * @see Optional
  */
-public final class Option<T> implements ValueContainer<T>, Iterable<T>, Serializable {
+public final class Option<T> implements OptionContainer<T>, Iterable<T>, Serializable {
     private static final long serialVersionUID = -4962768465676381896L;
 
     private static final int hashMagic = -1623337737;
@@ -31,10 +31,10 @@ public final class Option<T> implements ValueContainer<T>, Iterable<T>, Serializ
     /**
      * The single instance of empty {@code Option}.
      */
-    public static final Option<?> NONE = new Option<>(NoneTag.INSTANCE);
+    public static final Option<?> NONE = new Option<>(InternalEmptyTag.INSTANCE);
 
     /**
-     * The value if this {@code Option} is not empty, otherwise {@link NoneTag#INSTANCE}.
+     * The value if this {@code Option} is not empty, otherwise {@link InternalEmptyTag#INSTANCE}.
      */
     private final T value;
 
@@ -102,7 +102,7 @@ public final class Option<T> implements ValueContainer<T>, Iterable<T>, Serializ
     }
 
     //
-    // -- ValueContainer
+    // -- OptionContainer
     //
 
     /**
@@ -209,13 +209,13 @@ public final class Option<T> implements ValueContainer<T>, Iterable<T>, Serializ
     @NotNull
     @Override
     public final Iterator<T> iterator() {
-        return new ValueContainerIterator<>(value);
+        return new OptionContainerIterator<>(value);
     }
 
     @NotNull
     @Override
     public final Spliterator<T> spliterator() {
-        return new ValueContainerIterator<>(value);
+        return new OptionContainerIterator<>(value);
     }
 
     //
@@ -263,34 +263,11 @@ public final class Option<T> implements ValueContainer<T>, Iterable<T>, Serializ
     //
 
     private Object readResolve() {
-        if (value == NoneTag.INSTANCE) {
+        if (value == InternalEmptyTag.INSTANCE) {
             return NONE;
         }
         return this;
     }
 
-    /**
-     * Provide a singleton object that supports serialization to fill the value field of {@code Option.none()}.
-     */
-    static final class NoneTag implements Serializable {
-        private static final long serialVersionUID = 0L;
-
-        /**
-         * The signal instance of {@code OptionNoneTag}.
-         */
-        static final NoneTag INSTANCE = new NoneTag();
-
-        private NoneTag() {
-        }
-
-        private Object readResolve() {
-            return INSTANCE;
-        }
-
-        @Override
-        public final int hashCode() {
-            return 0;
-        }
-    }
 }
 
