@@ -88,6 +88,7 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E>, Functor<E>
         return iterator().minByOption(comparator);
     }
 
+    @NotNull
     default Stream<E> stream() {
         return StreamSupport.stream(spliterator(), false);
     }

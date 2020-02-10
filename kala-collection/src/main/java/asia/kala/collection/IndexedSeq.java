@@ -6,6 +6,7 @@ import asia.kala.collection.mutable.CollectionBuilder;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.RandomAccess;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -34,6 +35,25 @@ public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
             return Option.none();
         }
         return Option.some(get(index));
+    }
+
+    @NotNull
+    @Override
+    default IndexedSeq<E> drop(int n) {
+        return SeqOps.drop(this, n, this.<E>newBuilder());
+    }
+
+    @NotNull
+    @Override
+    default IndexedSeq<E> dropWhile(@NotNull Predicate<? super E> predicate) {
+        return SeqOps.dropWhile(this, predicate, this.<E>newBuilder());
+    }
+
+    @NotNull
+    @Override
+    default IndexedSeq<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
+        Objects.requireNonNull(traversable);
+        return SeqOps.concat(this, traversable, this.<E>newBuilder());
     }
 
     //
@@ -81,6 +101,12 @@ public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
     @Override
     default IndexedSeq<E> filterNot(@NotNull Predicate<? super E> predicate) {
         return TraversableOps.filterNot(this, predicate, newBuilder());
+    }
+
+    @Override
+    @NotNull
+    default <U> IndexedSeq<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+        return TraversableOps.flatMap(this, mapper, newBuilder());
     }
 
     @Override

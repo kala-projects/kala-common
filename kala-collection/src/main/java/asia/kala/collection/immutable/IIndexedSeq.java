@@ -81,6 +81,12 @@ public interface IIndexedSeq<E> extends ISeq<E>, IndexedSeq<E> {
     }
 
     @Override
+    @NotNull
+    default <U> IIndexedSeq<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+        return TraversableOps.flatMap(this, mapper, newBuilder());
+    }
+
+    @Override
     default int knownSize() {
         return size();
     }

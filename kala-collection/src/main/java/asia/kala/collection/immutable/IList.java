@@ -18,32 +18,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public abstract class IList<E> implements ISeq<E>, Serializable {
-    public static final class Builder<E> implements CollectionBuilder<E, IList<E>> {
-        private MCons<E> first = null;
-        private MCons<E> last = null;
-
-        @Override
-        public final void add(E element) {
-            MCons<E> i = new MCons<>(element, IList.nil());
-            if (last == null) {
-                first = i;
-            } else {
-                last.tail = i;
-            }
-            last = i;
-        }
-
-        @Override
-        public final void clear() {
-            first = last = null;
-        }
-
-        @Override
-        public final IList<E> build() {
-            return first;
-        }
-    }
-
     IList() {
     }
 
@@ -87,10 +61,10 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
         return new ICons<>(element, this);
     }
 
+
     //
     // -- Seq
     //
-
     @NotNull
     @Override
     public abstract IList<E> drop(int n);
@@ -107,10 +81,10 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
     @Override
     public abstract <U> IList<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper);
 
+
     //
     // -- Traversable
     //
-
     @NotNull
     @Override
     public final <U> IList.Builder<U> newBuilder() {
@@ -121,10 +95,10 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
     @Override
     public abstract Tuple2<? extends IList<E>, ? extends IList<E>> span(@NotNull Predicate<? super E> predicate);
 
+
     //
     // -- TraversableOnce
     //
-
     @Override
     public final String stringPrefix() {
         return "IList";
@@ -142,8 +116,35 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
     @Override
     public abstract IList<E> filterNot(@NotNull Predicate<? super E> predicate);
 
+    public static final class Builder<E> implements CollectionBuilder<E, IList<E>> {
+        private MCons<E> first = null;
+        private MCons<E> last = null;
+
+        @Override
+        public final void add(E element) {
+            MCons<E> i = new MCons<>(element, IList.nil());
+            if (last == null) {
+                first = i;
+            } else {
+                last.tail = i;
+            }
+            last = i;
+        }
+
+        @Override
+        public final void clear() {
+            first = last = null;
+        }
+
+        @Override
+        public final IList<E> build() {
+            return first;
+        }
+    }
+
     public static final class Nil extends IList<Object> {
         private static final long serialVersionUID = -7963313933036451568L;
+        private static final int hashMagic = 251090697;
 
         static final Nil INSTANCE = new Nil();
 
@@ -230,15 +231,20 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
             return true;
         }
 
+        @Override
+        public final int knownSize() {
+            return 0;
+        }
+
         @NotNull
         @Override
-        public <U> IList<U> map(@NotNull Function<? super Object, ? extends U> mapper) {
+        public final <U> IList<U> map(@NotNull Function<? super Object, ? extends U> mapper) {
             return IList.nil();
         }
 
         @NotNull
         @Override
-        public <U> IList<U> flatMap(@NotNull Function<? super Object, ? extends TraversableOnce<? extends U>> mapper) {
+        public final <U> IList<U> flatMap(@NotNull Function<? super Object, ? extends TraversableOnce<? extends U>> mapper) {
             return IList.nil();
         }
 
@@ -250,7 +256,7 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
 
         @NotNull
         @Override
-        public IList<Object> filterNot(@NotNull Predicate<? super Object> predicate) {
+        public final IList<Object> filterNot(@NotNull Predicate<? super Object> predicate) {
             return IList.nil();
         }
 
@@ -258,6 +264,11 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
         @Override
         public final Enumerator<Object> iterator() {
             return Enumerator.empty();
+        }
+
+        @Override
+        public final int hashCode() {
+            return hashMagic;
         }
 
         @Override
@@ -276,6 +287,8 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
     }
 
     public static abstract class Cons<E> extends IList<E> {
+
+
         Cons() {
         }
 
@@ -334,31 +347,31 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
         //
 
         @Override
-        public boolean isEmpty() {
+        public final boolean isEmpty() {
             return false;
         }
 
         @NotNull
         @Override
-        public <U> IList<U> map(@NotNull Function<? super E, ? extends U> mapper) {
+        public final <U> IList<U> map(@NotNull Function<? super E, ? extends U> mapper) {
             return TraversableOps.map(this, mapper, newBuilder());
         }
 
         @NotNull
         @Override
-        public <U> IList<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+        public final <U> IList<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
             return TraversableOps.flatMap(this, mapper, newBuilder());
         }
 
         @NotNull
         @Override
-        public IList<E> filter(@NotNull Predicate<? super E> predicate) {
+        public final IList<E> filter(@NotNull Predicate<? super E> predicate) {
             return TraversableOps.filter(this, predicate, newBuilder());
         }
 
         @NotNull
         @Override
-        public IList<E> filterNot(@NotNull Predicate<? super E> predicate) {
+        public final IList<E> filterNot(@NotNull Predicate<? super E> predicate) {
             return TraversableOps.filterNot(this, predicate, newBuilder());
         }
 
@@ -369,8 +382,38 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
         }
 
         @Override
+        public final int hashCode() {
+            int hash = 0;
+            IList<E> list = this;
+            while (list != Nil.INSTANCE) {
+                hash = 31 * hash + Objects.hashCode(list.head());
+                list = list.tail();
+            }
+            hash += Nil.INSTANCE.hashCode();
+            return hash;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
         public final boolean equals(Object obj) {
-            return super.equals(obj);
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof Cons<?>)) {
+                return false;
+            }
+
+            IList<E> list1 = this;
+            IList<E> list2 = (IList<E>) obj;
+
+            while (list1 != Nil.INSTANCE && list2 != Nil.INSTANCE) {
+                if (!Objects.equals(list1.head(), list1.head())) {
+                    return false;
+                }
+                list1 = list1.tail();
+                list2 = list2.tail();
+            }
+            return list1 == list2;
         }
 
         @Override

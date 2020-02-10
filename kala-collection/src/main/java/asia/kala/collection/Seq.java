@@ -47,14 +47,17 @@ public interface Seq<E> extends Traversable<E> {
         return Option.none();
     }
 
+    @NotNull
     default Seq<E> drop(int n) {
         return SeqOps.drop(this, n, this.<E>newBuilder());
     }
 
+    @NotNull
     default Seq<E> dropWhile(@NotNull Predicate<? super E> predicate) {
         return SeqOps.dropWhile(this, predicate, this.<E>newBuilder());
     }
 
+    @NotNull
     default Seq<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
         Objects.requireNonNull(traversable);
         return SeqOps.concat(this, traversable, this.<E>newBuilder());
