@@ -84,7 +84,7 @@ public interface Value<T> extends Functor<T>, Foldable<T> {
     }
 
     @Override
-    default boolean contains(T v) {
+    default boolean contains(Object v) {
         return Objects.equals(get(), v);
     }
 

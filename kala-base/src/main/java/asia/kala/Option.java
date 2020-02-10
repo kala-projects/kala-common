@@ -163,7 +163,7 @@ public final class Option<T> implements OptionContainer<T>, Iterable<T>, Seriali
      */
     @Override
     @Contract(pure = true)
-    public final boolean contains(T v) {
+    public final boolean contains(Object v) {
         return Objects.equals(value, v);
     }
 

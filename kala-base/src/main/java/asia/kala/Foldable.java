@@ -81,7 +81,13 @@ public interface Foldable<T> {
      * @return the reduced value
      * @throws NoSuchElementException if this {@code Foldable} is empty
      */
-    T reduceLeft(@NotNull BiFunction<? super T, ? super T, ? extends T> op) throws NoSuchElementException;
+    default T reduceLeft(@NotNull BiFunction<? super T, ? super T, ? extends T> op) throws NoSuchElementException {
+        Option<T> opt = reduceLeftOption(op);
+        if (opt.isDefined()) {
+            return opt.get();
+        }
+        throw new NoSuchElementException("Foldable.reduceLeft");
+    }
 
     /**
      * Reduces this elements by apply {@code op}, going right to left.
@@ -93,7 +99,13 @@ public interface Foldable<T> {
      * @return the reduced value
      * @throws NoSuchElementException if this {@code Foldable} is empty
      */
-    T reduceRight(@NotNull BiFunction<? super T, ? super T, ? extends T> op) throws NoSuchElementException;
+    default T reduceRight(@NotNull BiFunction<? super T, ? super T, ? extends T> op) throws NoSuchElementException {
+        Option<T> opt = reduceRightOption(op);
+        if (opt.isDefined()) {
+            return opt.get();
+        }
+        throw new NoSuchElementException("Foldable.reduceRight");
+    }
 
     /**
      * Reduces this elements by apply {@code op}.
@@ -170,7 +182,7 @@ public interface Foldable<T> {
         return this.foldLeft(false, (l, r) -> l || predicate.test(r));
     }
 
-    default boolean contains(T v) {
+    default boolean contains(Object v) {
         return exists(Predicate.isEqual(v));
     }
 

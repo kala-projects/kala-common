@@ -72,7 +72,7 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
      * @return the value of the container if the container {@link #isDefined()}
      * @throws E if no value is present
      */
-    default <E extends Throwable> T getOrThrow(@NotNull E exception) throws E {
+    default <E extends Throwable> T getOrThrowException(@NotNull E exception) throws E {
         Objects.requireNonNull(exception);
         if (isEmpty()) {
             throw exception;
@@ -222,7 +222,7 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
      * {@inheritDoc}
      */
     @Override
-    default boolean contains(T v) {
+    default boolean contains(Object v) {
         return isDefined() && Objects.equals(v, get());
     }
 

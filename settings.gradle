@@ -1,6 +1,6 @@
 rootProject.name = 'kala-common-modules'
 
-include 'kala-base', 'kala-base-kotlin',
-        'kala-common', 'kala-common-kotlin',
+include 'kala-common', 'kala-common-kotlin',
+        'kala-base', 'kala-base-kotlin',
         'kala-platform','kala-platform-kotlin',
-        'kala-collection'
+        'kala-collection', 'kala-collection-kotlin'
