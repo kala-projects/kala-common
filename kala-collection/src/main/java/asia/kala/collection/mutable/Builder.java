@@ -10,8 +10,7 @@ import java.util.function.Function;
 
 public interface Builder<E, To> extends Growable<E> {
     @Override
-    @Contract("_ -> this")
-    Builder<E, To> addOne(E element);
+    void append(E element);
 
     void clear();
 
@@ -21,7 +20,7 @@ public interface Builder<E, To> extends Growable<E> {
     default Builder<E, To> addAll(@NotNull Iterable<? extends E> iterable) {
         Objects.requireNonNull(iterable);
         for (E e : iterable) {
-            this.addOne(e);
+            this.append(e);
         }
         return this;
     }

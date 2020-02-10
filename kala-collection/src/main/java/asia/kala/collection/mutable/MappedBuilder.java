@@ -11,7 +11,7 @@ final class MappedBuilder<E, To, OldTo> implements Builder<E, To> {
     @NotNull
     private final Function<? super OldTo, ? extends To> mapper;
 
-    MappedBuilder(Builder<E, OldTo> source, @NotNull Function<? super OldTo, ? extends To> mapper) {
+    MappedBuilder(@NotNull Builder<E, OldTo> source, @NotNull Function<? super OldTo, ? extends To> mapper) {
         assert source != null;
         assert mapper != null;
 
@@ -20,9 +20,8 @@ final class MappedBuilder<E, To, OldTo> implements Builder<E, To> {
     }
 
     @Override
-    public final Builder<E, To> addOne(E element) {
-        source.addOne(element);
-        return this;
+    public final void append(E element) {
+        source.append(element);
     }
 
     @Override

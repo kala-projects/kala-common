@@ -1,11 +1,11 @@
 package asia.kala.collection;
 
 import asia.kala.Option;
-import asia.kala.Tuple;
-import asia.kala.Tuple2;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -14,6 +14,42 @@ import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
 public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
+
+    @NotNull
+    static <E> Enumerator<E> fromJava(@NotNull Iterator<E> iterator) {
+        Objects.requireNonNull(iterator);
+        if (iterator instanceof Enumerator<?>) {
+            return (Enumerator<E>) iterator;
+        }
+        return new Enumerators.IteratorWrapper<>(iterator);
+    }
+
+    static <E> Enumerator<E> empty() {
+        return (Enumerator<E>) Enumerators.Empty.INSTANCE;
+    }
+
+    static <E> Enumerator<E> of() {
+        return empty();
+    }
+
+    @NotNull
+    @Contract(value = "_ -> new", pure = true)
+    static <E> Enumerator<E> of(E element) {
+        return new Enumerators.Single<>(element);
+    }
+
+    @NotNull
+    static <E> Enumerator<E> of(@NotNull E... elements) {
+        Objects.requireNonNull(elements);
+        int l = elements.length;
+        if (l == 0) {
+            return empty();
+        }
+        if (l == 1) {
+            return new Enumerators.Single<>(elements[0]);
+        }
+        return new Enumerators.OfArray<>(elements, 0, elements.length);
+    }
 
     /**
      * {@inheritDoc}
@@ -49,7 +85,6 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
         throw new UnsupportedOperationException("Enumerator.remove");
     }
 
-
     @NotNull
     default Enumerator<E> drop(int n) {
         while (n > 0 && hasNext()) {
@@ -62,18 +97,47 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
     @NotNull
     default Enumerator<E> dropWhile(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
-        return new Enumerators.Dropped<>(this, predicate);
+        return new Enumerators.DropWhile<>(this, predicate);
+    }
+
+    @NotNull
+    default Enumerator<E> take(int n) {
+        if (this.isEmpty() || n <= 0) {
+            return Enumerator.empty();
+        }
+
+        return new Enumerators.Take<>(this, n);
+    }
+
+    @NotNull
+    default Enumerator<E> takeWhile(@NotNull Predicate<? super E> predicate) {
+        Objects.requireNonNull(predicate);
+        return new Enumerators.TakeWhile<>(this, predicate);
     }
 
     //
     // -- TraversableOnce
     //
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default boolean isTraversableAgain() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default boolean isEmpty() {
+        return !hasNext();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NotNull
     default Enumerator<E> filter(@NotNull Predicate<? super E> predicate) {
@@ -81,6 +145,9 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
         return new Enumerators.Filtered<>(this, predicate);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NotNull
     default Enumerator<E> filterNot(@NotNull Predicate<? super E> predicate) {
@@ -88,35 +155,57 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
         return new Enumerators.Filtered<>(this, predicate.negate());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default <U> Enumerator<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+        Objects.requireNonNull(mapper);
+
+        return new Enumerators.Concat<>(this.map(mapper).map(TraversableOnce::iterator).iterator());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default E max() {
         return maxOption().getOrThrow(NoSuchElementException::new);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     default Option<E> maxOption() {
-        return maxByOption((Comparator<E>)Comparator.naturalOrder());
+        return maxByOption((Comparator<E>) Comparator.naturalOrder());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default E maxBy(@NotNull Comparator<? super E> comparator) {
         return maxByOption(comparator).getOrThrow(NoSuchElementException::new);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     default Option<E> maxByOption(@NotNull Comparator<? super E> comparator) {
         Objects.requireNonNull(comparator);
 
-        if(!hasNext()) {
+        if (!hasNext()) {
             return Option.none();
         }
 
         E e = next();
         while (hasNext()) {
             E nextValue = next();
-            if(comparator.compare(e, nextValue) < 0) {
+            if (comparator.compare(e, nextValue) < 0) {
                 e = nextValue;
             }
         }
@@ -124,40 +213,76 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
         return Option.some(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default E min() {
         return minOption().getOrThrow(NoSuchElementException::new);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     default Option<E> minOption() {
-        return minByOption((Comparator<E>)Comparator.naturalOrder());
+        return minByOption((Comparator<E>) Comparator.naturalOrder());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default E minBy(@NotNull Comparator<? super E> comparator) {
         return minByOption(comparator).getOrThrow(NoSuchElementException::new);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     default Option<E> minByOption(@NotNull Comparator<? super E> comparator) {
         Objects.requireNonNull(comparator);
 
-        if(!hasNext()) {
+        if (!hasNext()) {
             return Option.none();
         }
 
         E e = next();
         while (hasNext()) {
             E nextValue = next();
-            if(comparator.compare(e, nextValue) > 0) {
+            if (comparator.compare(e, nextValue) > 0) {
                 e = nextValue;
             }
         }
 
         return Option.some(e);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default <A extends Appendable> A joinTo(
+            @NotNull A buffer,
+            @NotNull CharSequence separator,
+            @NotNull CharSequence prefix,
+            @NotNull CharSequence postfix) {
+        try {
+            buffer.append(prefix);
+            if (hasNext()) {
+                buffer.append(Objects.toString(next()));
+            }
+            while (hasNext()) {
+                buffer.append(separator).append(Objects.toString(next()));
+            }
+            buffer.append(postfix);
+            return buffer;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     //

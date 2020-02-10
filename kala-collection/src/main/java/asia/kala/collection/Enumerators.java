@@ -14,6 +14,28 @@ final class Enumerators {
 
     static final Object TAG = new Object();
 
+
+    static final class IteratorWrapper<E> implements Enumerator<E> {
+        @NotNull
+        private final Iterator<? extends E> iterator;
+
+        IteratorWrapper(@NotNull Iterator<? extends E> iterator) {
+            assert iterator != null;
+
+            this.iterator = iterator;
+        }
+
+        @Override
+        public final boolean hasNext() {
+            return iterator.hasNext();
+        }
+
+        @Override
+        public final E next() {
+            return iterator.next();
+        }
+    }
+
     static final class Empty implements Enumerator<Object> {
         static final Enumerators.Empty INSTANCE = new Enumerators.Empty();
 
@@ -27,7 +49,7 @@ final class Enumerators {
 
         @Override
         public final Object next() {
-            throw new NoSuchElementException("Enumerators.Empty.next");
+            throw new NoSuchElementException("Enumerators.Empty.next()");
         }
 
         @Override
@@ -140,7 +162,7 @@ final class Enumerators {
         }
     }
 
-    static final class Dropped<E> implements Enumerator<E> {
+    static final class DropWhile<E> implements Enumerator<E> {
         @NotNull
         private final Iterator<? extends E> source;
 
@@ -148,7 +170,7 @@ final class Enumerators {
 
         private Object nextValue = TAG;
 
-        Dropped(@NotNull Iterator<? extends E> source, @NotNull Predicate<? super E> predicate) {
+        DropWhile(@NotNull Iterator<? extends E> source, @NotNull Predicate<? super E> predicate) {
             assert source != null;
             assert predicate != null;
 
@@ -158,16 +180,16 @@ final class Enumerators {
 
         @Override
         public final boolean hasNext() {
-            if(predicate == null) {
+            if (predicate == null) {
                 return source.hasNext();
             }
-            if(nextValue != TAG) {
+            if (nextValue != TAG) {
                 return true;
             }
 
             while (source.hasNext()) {
                 E e = source.next();
-                if(!predicate.test(e)) {
+                if (!predicate.test(e)) {
                     nextValue = e;
                     return true;
                 }
@@ -179,14 +201,139 @@ final class Enumerators {
         @Override
         @SuppressWarnings("unchecked")
         public final E next() {
-            if(hasNext()) {
-                if(predicate == null) {
+            if (hasNext()) {
+                if (predicate == null) {
                     return source.next();
                 }
                 predicate = null;
                 return (E) nextValue;
             }
-            throw new NoSuchElementException(this + ".next");
+            throw new NoSuchElementException(this + ".next()");
+        }
+    }
+
+    static final class Take<E> implements Enumerator<E> {
+        private final Enumerator<? extends E> source;
+        private int n;
+
+        Take(Enumerator<? extends E> source, int n) {
+            this.source = source;
+        }
+
+
+        @Override
+        public final boolean hasNext() {
+            return n > 0 && source.hasNext();
+        }
+
+        @Override
+        public final E next() {
+            if (hasNext()) {
+                --n;
+                return source.next();
+            }
+            throw new NoSuchElementException(this + ".next()");
+        }
+    }
+
+    static final class TakeWhile<E> implements Enumerator<E> {
+        @NotNull
+        private Iterator<? extends E> source;
+
+        private Predicate<? super E> predicate;
+
+        private Object nextValue = TAG;
+
+        TakeWhile(@NotNull Iterator<? extends E> source, Predicate<? super E> predicate) {
+            assert source != null;
+
+            this.source = source;
+            this.predicate = predicate;
+        }
+
+        @Override
+        public final boolean hasNext() {
+            if (nextValue != TAG) {
+                return true;
+            }
+            if (source.hasNext()) {
+                E e = source.next();
+                if (predicate.test(e)) {
+                    nextValue = e;
+                    return true;
+                } else {
+                    source = Enumerator.empty();
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public final E next() {
+            if (hasNext()) {
+                @SuppressWarnings("unchecked")
+                E e = (E) nextValue;
+                nextValue = TAG;
+                return e;
+            }
+            throw new NoSuchElementException(this + ".next()");
+        }
+    }
+
+    static final class Concat<E> implements Enumerator<E> {
+        @NotNull
+        private final Iterator<? extends Iterator<? extends E>> iterators;
+
+        private Iterator<? extends E> current = null;
+
+        Concat(@NotNull Iterator<? extends Iterator<? extends E>> iterators) {
+            this.iterators = iterators;
+        }
+
+        @Override
+        public final boolean hasNext() {
+            while ((current == null || !current.hasNext()) && iterators.hasNext()) {
+                current = iterators.next();
+            }
+            return current != null && current.hasNext();
+        }
+
+        @Override
+        public final E next() {
+            if (hasNext()) {
+                return current.next();
+            }
+            throw new NoSuchElementException(this + ".next()");
+        }
+    }
+
+    static final class OfArray<E> implements Enumerator<E> {
+        @NotNull
+        private final E[] array;
+        private final int end;
+
+        private int index;
+
+        OfArray(@NotNull E[] array, int start, int end) {
+            assert array != null;
+
+            this.array = array;
+            this.index = start;
+            this.end = end;
+        }
+
+
+        @Override
+        public final boolean hasNext() {
+            return index < end;
+        }
+
+        @Override
+        public final E next() {
+            if (index >= end) {
+                throw new NoSuchElementException(this + ".next()");
+            }
+            return array[index++];
         }
     }
 }
