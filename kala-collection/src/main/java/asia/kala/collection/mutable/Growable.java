@@ -1,7 +1,12 @@
 package asia.kala.collection.mutable;
 
-public interface Growable<E> {
-    void append(E element);
+import org.jetbrains.annotations.Contract;
 
+public interface Growable<E> {
+
+    @Contract(mutates = "this")
+    void add(E element);
+
+    @Contract(mutates = "this")
     void clear();
 }

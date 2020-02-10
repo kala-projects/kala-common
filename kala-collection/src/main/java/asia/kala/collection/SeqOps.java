@@ -1,7 +1,7 @@
 package asia.kala.collection;
 
 import asia.kala.annotations.StaticClass;
-import asia.kala.collection.mutable.Builder;
+import asia.kala.collection.mutable.CollectionBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -16,7 +16,7 @@ public final class SeqOps {
     public static <E, T extends Seq<? extends E>> T drop(
             @NotNull Seq<? extends E> seq,
             int n,
-            @NotNull Builder<? super E, ? extends T> builder
+            @NotNull CollectionBuilder<? super E, ? extends T> builder
     ) {
         Objects.requireNonNull(seq);
         Objects.requireNonNull(builder);
@@ -31,7 +31,7 @@ public final class SeqOps {
         }
 
         for (E e : seq.iterator().drop(n)) {
-            builder.append(e);
+            builder.add(e);
         }
         return builder.build();
     }
@@ -39,15 +39,31 @@ public final class SeqOps {
     public static <E, T extends Seq<? extends E>> T dropWhile(
             @NotNull Seq<? extends E> seq,
             @NotNull Predicate<? super E> predicate,
-            @NotNull Builder<? super E, ? extends T> builder
+            @NotNull CollectionBuilder<? super E, ? extends T> builder
     ) {
         Objects.requireNonNull(seq);
         Objects.requireNonNull(predicate);
         Objects.requireNonNull(builder);
 
-        for (E e : seq.iterator().dropWhile(predicate)) {
-            builder.append(e);
-        }
+        builder.addAll(seq.iterator().dropWhile(predicate));
+
+        return builder.build();
+    }
+
+    public static <E, T extends Seq<? extends E>> T concat(
+            @NotNull Seq<? extends E> seq,
+            @NotNull TraversableOnce<? extends E> traversable,
+            @NotNull CollectionBuilder<? super E, ? extends T> builder
+    ) {
+        Objects.requireNonNull(seq);
+        Objects.requireNonNull(traversable);
+        Objects.requireNonNull(builder);
+
+        builder.sizeHint(seq);
+        builder.addAll(seq);
+
+        builder.sizeHint(traversable);
+        builder.addAll(traversable);
 
         return builder.build();
     }

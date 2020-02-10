@@ -37,6 +37,10 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E>, Functor<E>
         return -1;
     }
 
+    default boolean sameElements(@NotNull TraversableOnce<?> other) {
+        return this.iterator().sameElements(other);
+    }
+
     @NotNull
     TraversableOnce<E> filter(@NotNull Predicate<? super E> predicate);
 

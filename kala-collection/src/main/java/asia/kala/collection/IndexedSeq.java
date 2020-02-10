@@ -1,7 +1,8 @@
 package asia.kala.collection;
 
 import asia.kala.Option;
-import asia.kala.collection.mutable.Builder;
+import asia.kala.Tuple2;
+import asia.kala.collection.mutable.CollectionBuilder;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +42,16 @@ public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
 
     @NotNull
     @Override
-    <U> Builder<U, ? extends IndexedSeq<U>> newBuilder();
+    <U> CollectionBuilder<U, ? extends IndexedSeq<U>> newBuilder();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    default Tuple2<? extends IndexedSeq<E>, ? extends IndexedSeq<E>> span(@NotNull Predicate<? super E> predicate) {
+        return TraversableOps.span(this, predicate, this.<E>newBuilder(), this.<E>newBuilder());
+    }
 
     //
     // -- TraversableOnce
@@ -61,9 +71,7 @@ public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
     @NotNull
     @Override
     default IndexedSeq<E> filter(@NotNull Predicate<? super E> predicate) {
-        Builder<E, ? extends IndexedSeq<E>> builder = newBuilder();
-        builder.sizeHint(this);
-        return TraversableOps.filter(this, predicate, builder);
+        return TraversableOps.filter(this, predicate, newBuilder());
     }
 
     /**
@@ -72,9 +80,7 @@ public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
     @NotNull
     @Override
     default IndexedSeq<E> filterNot(@NotNull Predicate<? super E> predicate) {
-        Builder<E, ? extends IndexedSeq<E>> builder = newBuilder();
-        builder.sizeHint(this);
-        return TraversableOps.filterNot(this, predicate, builder);
+        return TraversableOps.filterNot(this, predicate, newBuilder());
     }
 
     @Override

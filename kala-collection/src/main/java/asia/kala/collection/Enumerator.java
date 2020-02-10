@@ -135,6 +135,19 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
         return !hasNext();
     }
 
+    @Override
+    default boolean sameElements(@NotNull TraversableOnce<?> other) {
+        Objects.requireNonNull(other);
+        Enumerator<?> it = other.iterator();
+        while (this.hasNext() && it.hasNext()) {
+            if (!Objects.equals(this.next(), it.next())) {
+                return false;
+            }
+        }
+
+        return this.hasNext() == it.hasNext();
+    }
+
     /**
      * {@inheritDoc}
      */

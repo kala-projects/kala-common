@@ -4,14 +4,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
-final class MappedBuilder<E, To, OldTo> implements Builder<E, To> {
+final class MappedCollectionBuilder<E, To, OldTo> implements CollectionBuilder<E, To> {
     @NotNull
-    private final Builder<E, OldTo> source;
+    private final CollectionBuilder<E, OldTo> source;
 
     @NotNull
     private final Function<? super OldTo, ? extends To> mapper;
 
-    MappedBuilder(@NotNull Builder<E, OldTo> source, @NotNull Function<? super OldTo, ? extends To> mapper) {
+    MappedCollectionBuilder(@NotNull CollectionBuilder<E, OldTo> source, @NotNull Function<? super OldTo, ? extends To> mapper) {
         assert source != null;
         assert mapper != null;
 
@@ -20,8 +20,8 @@ final class MappedBuilder<E, To, OldTo> implements Builder<E, To> {
     }
 
     @Override
-    public final void append(E element) {
-        source.append(element);
+    public final void add(E element) {
+        source.add(element);
     }
 
     @Override

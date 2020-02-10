@@ -8,21 +8,23 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.function.Function;
 
-public interface Builder<E, To> extends Growable<E> {
-    @Override
-    void append(E element);
+public interface CollectionBuilder<E, To> extends Growable<E> {
 
+    @Override
+    @Contract(mutates = "this")
+    void add(E element);
+
+    @Contract(mutates = "this")
     void clear();
 
     To build();
 
-    @Contract("_ -> this")
-    default Builder<E, To> addAll(@NotNull Iterable<? extends E> iterable) {
+    @Contract(mutates = "this")
+    default void addAll(@NotNull Iterable<? extends E> iterable) {
         Objects.requireNonNull(iterable);
         for (E e : iterable) {
-            this.append(e);
+            this.add(e);
         }
-        return this;
     }
 
     default void sizeHint(int site) {
@@ -47,8 +49,8 @@ public interface Builder<E, To> extends Growable<E> {
         }
     }
 
-    default <NewTo> Builder<E, NewTo> mapResult(@NotNull Function<? super To, ? extends NewTo> mapper) {
+    default <NewTo> CollectionBuilder<E, NewTo> mapResult(@NotNull Function<? super To, ? extends NewTo> mapper) {
         Objects.requireNonNull(mapper);
-        return new MappedBuilder<>(this, mapper);
+        return new MappedCollectionBuilder<>(this, mapper);
     }
 }

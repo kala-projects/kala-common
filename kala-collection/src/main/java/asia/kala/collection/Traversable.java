@@ -1,6 +1,7 @@
 package asia.kala.collection;
 
-import asia.kala.collection.mutable.Builder;
+import asia.kala.Tuple2;
+import asia.kala.collection.mutable.CollectionBuilder;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +16,12 @@ public interface Traversable<E> extends TraversableOnce<E> {
         return (Traversable<E>) traversable;
     }
 
-    @NotNull <U> Builder<U, ? extends Traversable<U>> newBuilder();
+    @NotNull <U> CollectionBuilder<U, ? extends Traversable<U>> newBuilder();
+
+    @NotNull
+    default Tuple2<? extends Traversable<E>, ? extends Traversable<E>> span(@NotNull Predicate<? super E> predicate) {
+        return TraversableOps.span(this, predicate, newBuilder(), newBuilder());
+    }
 
     default String stringPrefix() {
         return this.getClass().getSimpleName();
