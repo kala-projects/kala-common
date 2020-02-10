@@ -1,6 +1,7 @@
 package asia.kala.collection;
 
 import asia.kala.Option;
+import asia.kala.collection.immutable.IList;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -332,12 +333,12 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
      */
     @Override
     default <U> U foldRight(U zero, @NotNull BiFunction<? super E, ? super U, ? extends U> op) {
-        LinkedList<E> us = new LinkedList<>(); // TODO: replace with kala collection
+        IList<E> list = IList.nil();
         while (hasNext()) {
-            us.addFirst(next());
+            list = list.cons(next());
         }
 
-        for (E u : us) {
+        for (E u : list) {
             zero = op.apply(u, zero);
         }
         return zero;
@@ -365,11 +366,11 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
     @Override
     default Option<E> reduceRightOption(@NotNull BiFunction<? super E, ? super E, ? extends E> op) {
         if (hasNext()) {
-            LinkedList<E> us = new LinkedList<>(); // TODO: replace with kala collection
+            IList<E> list = IList.nil();
             while (hasNext()) {
-                us.addFirst(next());
+                list = list.cons(next());
             }
-            Iterator<E> it = us.iterator();
+            Iterator<E> it = list.iterator();
             E e = it.next();
             if (it.hasNext()) {
                 e = op.apply(it.next(), e);

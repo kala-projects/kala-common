@@ -97,7 +97,7 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E>, Functor<E>
     }
 
     default <A extends Appendable> A joinTo(@NotNull A buffer, @NotNull CharSequence separator) {
-        return joinTo(buffer, "", separator, "");
+        return joinTo(buffer, separator, "", "");
     }
 
     default <A extends Appendable> A joinTo(

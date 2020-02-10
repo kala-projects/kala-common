@@ -6,4 +6,5 @@ module asia.kala.collection {
 
     exports asia.kala.collection;
     exports asia.kala.collection.mutable;
+    exports asia.kala.collection.immutable;
 }

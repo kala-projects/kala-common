@@ -217,9 +217,11 @@ final class Enumerators {
         private int n;
 
         Take(Enumerator<? extends E> source, int n) {
-            this.source = source;
-        }
+            assert source != null;
 
+            this.source = source;
+            this.n = n;
+        }
 
         @Override
         public final boolean hasNext() {

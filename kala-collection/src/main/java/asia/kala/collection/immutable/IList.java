@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -52,6 +53,18 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
         return (IList<E>) list;
     }
 
+    @SafeVarargs
+    public static <E> IList<E> of(E... elements) {
+        Objects.requireNonNull(elements);
+        IList<E> list = nil();
+
+        for (int i = elements.length - 1; i >= 0; i--) {
+            list = list.cons(elements[i]);
+        }
+
+        return list;
+    }
+
     @NotNull
     @SuppressWarnings("unchecked")
     public static <E> IList<E> nil() {
@@ -67,6 +80,12 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
 
     @NotNull
     public abstract Option<IList<E>> tailOption();
+
+    @NotNull
+    @Contract("_ -> new")
+    public final IList<E> cons(E element) {
+        return new ICons<>(element, this);
+    }
 
     //
     // -- Seq
