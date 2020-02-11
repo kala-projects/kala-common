@@ -2,6 +2,7 @@ package asia.kala.collection.mutable;
 
 import asia.kala.Tuple2;
 import asia.kala.collection.*;
+import asia.kala.collection.immutable.IArray;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +19,7 @@ public final class MArray<E> implements MIndexedSeq<E>, Serializable {
     private static final long serialVersionUID = 6278999671163491762L;
     private static final int hashMagic = -822992626;
 
-    public static final Object[] EMPTY_ARRAY = MArray.EMPTY_ARRAY;
+    public static final Object[] EMPTY_ARRAY = IArray.EMPTY_ARRAY;
     public static final MArray<?> EMPTY = new MArray<>(EMPTY_ARRAY);
 
     @NotNull

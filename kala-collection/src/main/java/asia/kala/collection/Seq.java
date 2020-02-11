@@ -85,7 +85,7 @@ public interface Seq<E> extends Traversable<E> {
 
     @NotNull
     default Seq<E> appendedAll(@NotNull TraversableOnce<? extends E> prefix) {
-        return SeqOps.prependedAll(this, prefix, newBuilder());
+        return SeqOps.appendedAll(this, prefix, newBuilder());
     }
 
     default int indexOf(Object element) {
