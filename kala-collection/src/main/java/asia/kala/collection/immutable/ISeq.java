@@ -92,10 +92,6 @@ public interface ISeq<E> extends ITraversable<E>, Seq<E> {
         return TraversableOps.span(this, predicate, this.<E>newBuilder(), this.<E>newBuilder());
     }
 
-    //
-    // -- TraversableOnce
-    //
-
     /**
      * {@inheritDoc}
      */

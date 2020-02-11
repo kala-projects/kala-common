@@ -98,10 +98,6 @@ public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
         return TraversableOps.span(this, predicate, this.<E>newBuilder(), this.<E>newBuilder());
     }
 
-    //
-    // -- TraversableOnce
-    //
-
     /**
      * {@inheritDoc}
      */
@@ -138,10 +134,6 @@ public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
     default int knownSize() {
         return size();
     }
-
-    //
-    // -- Functor
-    //
 
     /**
      * {@inheritDoc}

@@ -339,10 +339,6 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
         }
     }
 
-    //
-    // -- Functor
-    //
-
     /**
      * {@inheritDoc}
      */

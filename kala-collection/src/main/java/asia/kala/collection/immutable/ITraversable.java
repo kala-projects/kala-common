@@ -19,10 +19,6 @@ public interface ITraversable<E> extends Traversable<E> {
     @Override
     <U> CollectionBuilder<U, ? extends ITraversable<U>> newBuilder();
 
-    //
-    // -- TraversableOnce
-    //
-
     /**
      * {@inheritDoc}
      */

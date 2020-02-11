@@ -95,10 +95,6 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
     @Override
     public abstract Tuple2<? extends IList<E>, ? extends IList<E>> span(@NotNull Predicate<? super E> predicate);
 
-
-    //
-    // -- TraversableOnce
-    //
     @Override
     public final String stringPrefix() {
         return "IList";
@@ -221,11 +217,6 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
             return new Tuple2<>(IList.nil(), IList.nil());
         }
 
-
-        //
-        // -- TraversableOnce
-        //
-
         @Override
         public final boolean isEmpty() {
             return true;
@@ -341,10 +332,6 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
         public final Tuple2<? extends IList<E>, ? extends IList<E>> span(@NotNull Predicate<? super E> predicate) {
             return TraversableOps.span(this, predicate, newBuilder(), newBuilder());
         }
-
-        //
-        // -- TraversableOnce
-        //
 
         @Override
         public final boolean isEmpty() {

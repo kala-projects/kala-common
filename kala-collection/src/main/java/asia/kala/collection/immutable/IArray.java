@@ -143,10 +143,6 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
         return new Tuple2<>(ia1, ia2);
     }
 
-    //
-    // -- TraversableOnce
-    //
-
     @Override
     public final String stringPrefix() {
         return "IArray";
@@ -215,10 +211,6 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
     public final <U> IArray<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
         return TraversableOps.flatMap(this, mapper, newBuilder());
     }
-
-    //
-    // -- Functor
-    //
 
     @NotNull
     @Override

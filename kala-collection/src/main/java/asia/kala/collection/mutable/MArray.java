@@ -159,10 +159,6 @@ public final class MArray<E> implements MIndexedSeq<E>, Serializable {
         return new Tuple2<>(ia1, ia2);
     }
 
-    //
-    // -- TraversableOnce
-    //
-
     @Override
     public final String stringPrefix() {
         return "MArray";
@@ -174,11 +170,6 @@ public final class MArray<E> implements MIndexedSeq<E>, Serializable {
         return Enumerator.of((E[]) values);
     }
 
-    @NotNull
-    @Override
-    public final Stream<E> stream() {
-        return Stream.of((E[]) values);
-    }
 
     @NotNull
     @Override
@@ -251,6 +242,11 @@ public final class MArray<E> implements MIndexedSeq<E>, Serializable {
         return new MArray<>(newArr);
     }
 
+    @NotNull
+    @Override
+    public final Stream<E> stream() {
+        return Stream.of((E[]) values);
+    }
 
     //
     // -- Object

@@ -118,10 +118,6 @@ public interface Seq<E> extends Traversable<E> {
         return TraversableOps.span(this, predicate, this.<E>newBuilder(), this.<E>newBuilder());
     }
 
-    //
-    // -- TraversableOnce
-    //
-
     /**
      * {@inheritDoc}
      */
@@ -148,10 +144,6 @@ public interface Seq<E> extends Traversable<E> {
     default <U> Seq<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
         return TraversableOps.flatMap(this, mapper, this.<U>newBuilder());
     }
-
-    //
-    // -- Functor
-    //
 
     /**
      * {@inheritDoc}

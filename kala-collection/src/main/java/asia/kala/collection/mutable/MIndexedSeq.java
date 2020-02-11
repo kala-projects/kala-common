@@ -73,10 +73,6 @@ public interface MIndexedSeq<E> extends MSeq<E>, IndexedSeq<E> {
         return TraversableOps.span(this, predicate, this.<E>newBuilder(), this.<E>newBuilder());
     }
 
-    //
-    // -- TraversableOnce
-    //
-
     /**
      * {@inheritDoc}
      */

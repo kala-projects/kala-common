@@ -75,10 +75,6 @@ public interface IIndexedSeq<E> extends ISeq<E>, IndexedSeq<E> {
         return TraversableOps.span(this, predicate, this.<E>newBuilder(), this.<E>newBuilder());
     }
 
-    //
-    // -- TraversableOnce
-    //
-
     /**
      * {@inheritDoc}
      */
@@ -115,10 +111,6 @@ public interface IIndexedSeq<E> extends ISeq<E>, IndexedSeq<E> {
     default int knownSize() {
         return size();
     }
-
-    //
-    // -- Functor
-    //
 
     /**
      * {@inheritDoc}

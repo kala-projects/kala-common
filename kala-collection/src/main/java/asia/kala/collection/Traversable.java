@@ -27,10 +27,6 @@ public interface Traversable<E> extends TraversableOnce<E> {
         return this.getClass().getSimpleName();
     }
 
-    //
-    // -- TraversableOnce
-    //
-
     /**
      * {@inheritDoc}
      */
@@ -65,10 +61,6 @@ public interface Traversable<E> extends TraversableOnce<E> {
     default <U> TraversableOnce<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
         return TraversableOps.flatMap(this, mapper, this.<U>newBuilder());
     }
-
-    //
-    // -- Functor
-    //
 
     @NotNull
     @Override

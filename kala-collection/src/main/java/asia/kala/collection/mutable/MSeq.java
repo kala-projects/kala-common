@@ -95,10 +95,6 @@ public interface MSeq<E> extends MTraversable<E>, Seq<E> {
         return TraversableOps.span(this, predicate, this.<E>newBuilder(), this.<E>newBuilder());
     }
 
-    //
-    // -- TraversableOnce
-    //
-
     /**
      * {@inheritDoc}
      */

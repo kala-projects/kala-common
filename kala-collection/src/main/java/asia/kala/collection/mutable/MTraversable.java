@@ -17,10 +17,6 @@ public interface MTraversable<E> extends Traversable<E> {
     @Override
     <U> CollectionBuilder<U, ? extends MTraversable<U>> newBuilder();
 
-    //
-    // -- TraversableOnce
-    //
-
     /**
      * {@inheritDoc}
      */
@@ -55,10 +51,6 @@ public interface MTraversable<E> extends Traversable<E> {
     default <U> MTraversable<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
         return TraversableOps.flatMap(this, mapper, this.<U>newBuilder());
     }
-
-    //
-    // -- Functor
-    //
 
     @NotNull
     @Override
