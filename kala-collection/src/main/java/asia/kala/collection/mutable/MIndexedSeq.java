@@ -17,6 +17,12 @@ public interface MIndexedSeq<E> extends MSeq<E>, IndexedSeq<E> {
     //
 
     @NotNull
+    @Override
+    default MIndexedSeq<E> updated(int index, E newValue) {
+        return SeqOps.updated(this, index, newValue, newBuilder());
+    }
+
+    @NotNull
     default MIndexedSeq<E> drop(int n) {
         return SeqOps.drop(this, n, this.<E>newBuilder());
     }

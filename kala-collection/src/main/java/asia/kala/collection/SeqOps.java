@@ -13,6 +13,33 @@ public final class SeqOps {
     private SeqOps() {
     }
 
+    public static <E, T> T updated(
+            @NotNull Seq<? extends E> seq,
+            int index,
+            E newValue,
+            @NotNull CollectionBuilder<? super E, ? extends T> builder
+    ) {
+        assert seq != null;
+        assert builder != null;
+
+        if (index < 0 || index >= seq.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        builder.sizeHint(seq);
+
+        for (E e : seq) {
+            if (index-- == 0) {
+                builder.add(newValue);
+            } else {
+                builder.add(e);
+            }
+        }
+
+
+        return builder.build();
+    }
+
     public static <E, T extends Seq<? extends E>> T drop(
             @NotNull Seq<? extends E> seq,
             int n,

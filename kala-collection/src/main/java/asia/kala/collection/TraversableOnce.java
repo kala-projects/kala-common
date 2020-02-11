@@ -7,9 +7,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.StringJoiner;
 import java.util.function.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -121,7 +118,7 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E>, Functor<E>
         return joinTo(new StringBuilder(), prefix, separator, postfix).toString();
     }
 
-    default E[] toArray(@NotNull IntFunction<? extends E[]> generator) {
+    default <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
         return iterator().toArray(generator);
     }
 

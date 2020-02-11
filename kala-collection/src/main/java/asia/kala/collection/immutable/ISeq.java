@@ -1,10 +1,7 @@
 package asia.kala.collection.immutable;
 
 import asia.kala.Tuple2;
-import asia.kala.collection.Seq;
-import asia.kala.collection.SeqOps;
-import asia.kala.collection.TraversableOnce;
-import asia.kala.collection.TraversableOps;
+import asia.kala.collection.*;
 import asia.kala.collection.mutable.CollectionBuilder;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,6 +14,12 @@ public interface ISeq<E> extends ITraversable<E>, Seq<E> {
     //
     // -- Seq
     //
+
+    @NotNull
+    @Override
+    default ISeq<E> updated(int index, E newValue) {
+        return SeqOps.updated(this, index, newValue, newBuilder());
+    }
 
     /**
      * {@inheritDoc}

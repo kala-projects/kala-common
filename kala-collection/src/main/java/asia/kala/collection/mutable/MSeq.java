@@ -21,6 +21,12 @@ public interface MSeq<E> extends MTraversable<E>, Seq<E> {
     // -- Seq
     //
 
+    @NotNull
+    @Override
+    default MSeq<E> updated(int index, E newValue) {
+        return SeqOps.updated(this, index, newValue, newBuilder());
+    }
+
     /**
      * {@inheritDoc}
      */

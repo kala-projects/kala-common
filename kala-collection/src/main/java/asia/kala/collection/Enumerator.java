@@ -146,13 +146,13 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
     }
 
     @Override
-    default E[] toArray(@NotNull IntFunction<? extends E[]> generator) {
+    default <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
         Objects.requireNonNull(generator);
-        ArrayList<E> list = new ArrayList<>(); // TODO: replace with kala collection
+        ArrayList<U> list = new ArrayList<>(); // TODO: replace with kala collection
         while (hasNext()) {
-            list.add(next());
+            list.add((U) next());
         }
-        E[] arr = generator.apply(list.size());
+        U[] arr = generator.apply(list.size());
         return list.toArray(arr);
     }
 

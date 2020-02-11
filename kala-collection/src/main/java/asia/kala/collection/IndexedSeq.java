@@ -3,7 +3,6 @@ package asia.kala.collection;
 import asia.kala.Option;
 import asia.kala.Tuple2;
 import asia.kala.collection.mutable.CollectionBuilder;
-import asia.kala.collection.mutable.MSeq;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +35,12 @@ public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
             return Option.none();
         }
         return Option.some(get(index));
+    }
+
+    @NotNull
+    @Override
+    default IndexedSeq<E> updated(int index, E newValue) {
+        return SeqOps.updated(this, index, newValue, newBuilder());
     }
 
     @NotNull

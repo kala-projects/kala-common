@@ -18,6 +18,12 @@ public interface IIndexedSeq<E> extends ISeq<E>, IndexedSeq<E> {
     //
 
     @NotNull
+    @Override
+    default IIndexedSeq<E> updated(int index, E newValue) {
+        return SeqOps.updated(this, index, newValue, newBuilder());
+    }
+
+    @NotNull
     default IIndexedSeq<E> drop(int n) {
         return SeqOps.drop(this, n, this.<E>newBuilder());
     }

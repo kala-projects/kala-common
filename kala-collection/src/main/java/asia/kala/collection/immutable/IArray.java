@@ -73,6 +73,17 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
 
     @NotNull
     @Override
+    public final IArray<E> updated(int index, E newValue) {
+        if (index < 0 || index >= values.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        Object[] newValues = values.clone();
+        newValues[index] = newValue;
+        return new IArray<>(newValues);
+    }
+
+    @NotNull
+    @Override
     public final IArray<E> drop(int n) {
         if (n <= 0) {
             return this;
@@ -102,12 +113,64 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
     @NotNull
     @Override
     public final IArray<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
-        return SeqOps.concat(this, traversable, newBuilder());
+        return appendedAll(traversable);
+    }
+
+    @NotNull
+    @Override
+    public final IArray<E> prepended(E element) {
+        Object[] newValues = new Object[values.length + 1];
+        newValues[0] = element;
+        System.arraycopy(values, 0, newValues, 1, values.length);
+
+        return new IArray<>(newValues);
+    }
+
+    @NotNull
+    @Override
+    public final IArray<E> prependedAll(@NotNull TraversableOnce<? extends E> prefix) {
+        Objects.requireNonNull(prefix);
+
+        Object[] data = prefix instanceof IArray<?> ? ((IArray<?>) prefix).values : prefix.toArray(Object[]::new);
+        Object[] newValues = new Object[data.length + values.length];
+
+        System.arraycopy(data, 0, newValues, 0, data.length);
+        System.arraycopy(values, 0, newValues, data.length, values.length);
+
+        return new IArray<>(newValues);
+    }
+
+    @NotNull
+    @Override
+    public final IArray<E> appended(E element) {
+        Object[] newValues = Arrays.copyOf(values, values.length + 1);
+        newValues[values.length] = element;
+
+        return new IArray<>(newValues);
+    }
+
+    @NotNull
+    @Override
+    public final IArray<E> appendedAll(@NotNull TraversableOnce<? extends E> postfix) {
+        Objects.requireNonNull(postfix);
+
+        Object[] data = postfix instanceof IArray<?> ? ((IArray<?>) postfix).values : postfix.toArray(Object[]::new);
+        Object[] newValues = new Object[data.length + values.length];
+
+        System.arraycopy(values, 0, newValues, 0, values.length);
+        System.arraycopy(data, 0, newValues, values.length, data.length);
+
+        return new IArray<>(newValues);
     }
 
     //
     // -- Traversable
     //
+
+    @Override
+    public final String stringPrefix() {
+        return "IArray";
+    }
 
     @NotNull
     @Override
@@ -141,11 +204,6 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
         IArray<E> ia2 = idx2 == 0 ? empty() : new IArray<>(Arrays.copyOf(newArr2, idx2));
 
         return new Tuple2<>(ia1, ia2);
-    }
-
-    @Override
-    public final String stringPrefix() {
-        return "IArray";
     }
 
     @NotNull

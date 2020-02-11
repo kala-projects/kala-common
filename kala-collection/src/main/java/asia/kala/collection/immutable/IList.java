@@ -1,7 +1,6 @@
 package asia.kala.collection.immutable;
 
 import asia.kala.Option;
-import asia.kala.OptionContainer;
 import asia.kala.Tuple2;
 import asia.kala.collection.Enumerator;
 import asia.kala.collection.SeqOps;
@@ -65,6 +64,13 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
     //
     // -- Seq
     //
+
+    @NotNull
+    @Override
+    public final IList<E> updated(int index, E newValue) {
+        return SeqOps.updated(this, index, newValue, newBuilder());
+    }
+
     @NotNull
     @Override
     public abstract IList<E> drop(int n);

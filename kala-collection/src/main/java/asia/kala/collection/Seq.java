@@ -48,6 +48,11 @@ public interface Seq<E> extends Traversable<E> {
     }
 
     @NotNull
+    default Seq<E> updated(int index, E newValue) {
+        return SeqOps.updated(this, index, newValue, newBuilder());
+    }
+
+    @NotNull
     default Seq<E> drop(int n) {
         return SeqOps.drop(this, n, this.<E>newBuilder());
     }
