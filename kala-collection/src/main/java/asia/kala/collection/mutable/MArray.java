@@ -1,10 +1,8 @@
-package asia.kala.collection.immutable;
+package asia.kala.collection.mutable;
 
 import asia.kala.Tuple2;
-import asia.kala.annotations.StaticClass;
 import asia.kala.collection.*;
-import asia.kala.collection.mutable.CollectionBuilder;
-import org.jetbrains.annotations.ApiStatus;
+import asia.kala.collection.immutable.IArray;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,45 +15,63 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
-public final class IArray<E> implements IndexedSeq<E>, Serializable {
-    private static final long serialVersionUID = 1845940935381169058L;
-    private static final int hashMagic = -1300712527;
+public final class MArray<E> implements MIndexedSeq<E>, Serializable {
+    private static final long serialVersionUID = 6278999671163491762L;
+    private static final int hashMagic = -822992626;
 
-    public static final Object[] EMPTY_ARRAY = new Object[0];
-    public static final IArray<?> EMPTY = new IArray<>(EMPTY_ARRAY);
+    public static final Object[] EMPTY_ARRAY = IArray.EMPTY_ARRAY;
+    public static final MArray<?> EMPTY = new MArray<>(EMPTY_ARRAY);
 
     @NotNull
     private final Object[] values;
 
-    IArray(@NotNull Object[] values) {
+    private final boolean isChecked;
+
+    MArray(@NotNull Object[] values) {
+        this(values, false);
+    }
+
+    MArray(@NotNull Object[] values, boolean isChecked) {
         assert values != null;
 
         this.values = values;
+        this.isChecked = isChecked;
     }
 
-    public static <E> IArray<E> empty() {
-        return (IArray<E>) EMPTY;
+    public static <E> MArray<E> empty() {
+        return (MArray<E>) EMPTY;
     }
 
     @NotNull
     @SafeVarargs
     @Contract("_ -> new")
-    public static <E> IArray<E> of(E... elements) {
+    public static <E> MArray<E> of(E... elements) {
         Objects.requireNonNull(elements);
-        return new IArray<>(elements.clone());
+
+        return new MArray<>(elements.clone());
     }
 
-    @StaticClass
-    @ApiStatus.Internal
-    public static final class Unsafe {
-        @NotNull
-        @Contract("_ -> new")
-        public static <E> IArray<E> wrap(@NotNull E[] array) {
-            Objects.requireNonNull(array);
+    @NotNull
+    @Contract("_ -> new")
+    public static <E> MArray<E> wrap(@NotNull E[] array) {
+        Objects.requireNonNull(array);
 
-            return new IArray<>(array);
-        }
+        return new MArray<>(array, true);
     }
+
+    public final boolean isChecked() {
+        return isChecked;
+    }
+
+    //
+    // -- MSeq
+    //
+
+    @Override
+    public final void set(int index, E newValue) {
+        values[index] = newValue;
+    }
+
 
     //
     // -- Seq
@@ -73,7 +89,7 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
 
     @NotNull
     @Override
-    public final IArray<E> drop(int n) {
+    public final MArray<E> drop(int n) {
         if (n <= 0) {
             return this;
         }
@@ -82,12 +98,12 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
             return empty();
         }
 
-        return new IArray<>(Arrays.copyOfRange(values, n, values.length));
+        return new MArray<>(Arrays.copyOfRange(values, n, values.length));
     }
 
     @NotNull
     @Override
-    public final IArray<E> dropWhile(@NotNull Predicate<? super E> predicate) {
+    public final MArray<E> dropWhile(@NotNull Predicate<? super E> predicate) {
         int idx = 0;
         while (idx < values.length && predicate.test((E) values[idx])) {
             ++idx;
@@ -96,12 +112,12 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
         if (idx >= values.length) {
             return empty();
         }
-        return new IArray<>(Arrays.copyOfRange(values, idx, values.length));
+        return new MArray<>(Arrays.copyOfRange(values, idx, values.length));
     }
 
     @NotNull
     @Override
-    public final IArray<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
+    public final MArray<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
         return SeqOps.concat(this, traversable, newBuilder());
     }
 
@@ -111,13 +127,13 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
 
     @NotNull
     @Override
-    public final <U> IArray.Builder<U> newBuilder() {
-        return new IArray.Builder<>();
+    public final <U> MArray.Builder<U> newBuilder() {
+        return new MArray.Builder<>();
     }
 
     @NotNull
     @Override
-    public final Tuple2<? extends IArray<E>, ? extends IArray<E>> span(@NotNull Predicate<? super E> predicate) {
+    public final Tuple2<? extends MArray<E>, ? extends MArray<E>> span(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
 
         if (values.length == 0) {
@@ -137,8 +153,8 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
             }
         }
 
-        IArray<E> ia1 = idx1 == 0 ? empty() : new IArray<>(Arrays.copyOf(newArr1, idx1));
-        IArray<E> ia2 = idx2 == 0 ? empty() : new IArray<>(Arrays.copyOf(newArr2, idx2));
+        MArray<E> ia1 = idx1 == 0 ? empty() : new MArray<>(Arrays.copyOf(newArr1, idx1));
+        MArray<E> ia2 = idx2 == 0 ? empty() : new MArray<>(Arrays.copyOf(newArr2, idx2));
 
         return new Tuple2<>(ia1, ia2);
     }
@@ -149,7 +165,7 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
 
     @Override
     public final String stringPrefix() {
-        return "IArray";
+        return "MArray";
     }
 
     @NotNull
@@ -166,7 +182,7 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
 
     @NotNull
     @Override
-    public final IArray<E> filter(@NotNull Predicate<? super E> predicate) {
+    public final MArray<E> filter(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
         if (values.length == 0) {
             return empty();
@@ -184,12 +200,12 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
         if (idx == 0) {
             return empty();
         }
-        return new IArray<>(Arrays.copyOf(newArr, idx));
+        return new MArray<>(Arrays.copyOf(newArr, idx));
     }
 
     @NotNull
     @Override
-    public final IArray<E> filterNot(@NotNull Predicate<? super E> predicate) {
+    public final MArray<E> filterNot(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
         if (values.length == 0) {
             return empty();
@@ -207,12 +223,12 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
         if (idx == 0) {
             return empty();
         }
-        return new IArray<>(Arrays.copyOf(newArr, idx));
+        return new MArray<>(Arrays.copyOf(newArr, idx));
     }
 
     @NotNull
     @Override
-    public final <U> IArray<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+    public final <U> MArray<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
         return TraversableOps.flatMap(this, mapper, newBuilder());
     }
 
@@ -222,7 +238,7 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
 
     @NotNull
     @Override
-    public final <U> IArray<U> map(@NotNull Function<? super E, ? extends U> mapper) {
+    public final <U> MArray<U> map(@NotNull Function<? super E, ? extends U> mapper) {
         Objects.requireNonNull(mapper);
         if (values.length == 0) {
             return empty();
@@ -232,7 +248,7 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
         for (int i = 0; i < values.length; i++) {
             newArr[i] = mapper.apply((E) values[i]);
         }
-        return new IArray<>(newArr);
+        return new MArray<>(newArr);
     }
 
 
@@ -246,11 +262,11 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
             return true;
         }
 
-        if (!(o instanceof IArray<?>)) {
+        if (!(o instanceof MArray<?>)) {
             return false;
         }
 
-        return Arrays.equals(values, ((IArray<?>) o).values);
+        return Arrays.equals(values, ((MArray<?>) o).values);
     }
 
     @Override
@@ -263,7 +279,7 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
         return TraversableOps.toString(this);
     }
 
-    public static final class Builder<E> implements CollectionBuilder<E, IArray<E>> {
+    public static final class Builder<E> implements CollectionBuilder<E, MArray<E>> {
         private final ArrayList<E> list = new ArrayList<>(); // TODO: use kala collection
 
         @Override
@@ -277,8 +293,8 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
         }
 
         @Override
-        public final IArray<E> build() {
-            return new IArray<>(list.toArray());
+        public final MArray<E> build() {
+            return new MArray<>(list.toArray());
         }
     }
 }

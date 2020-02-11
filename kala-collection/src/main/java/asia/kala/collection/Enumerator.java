@@ -8,10 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 @SuppressWarnings("unchecked")
 public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
@@ -114,6 +111,49 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
     default Enumerator<E> takeWhile(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
         return new Enumerators.TakeWhile<>(this, predicate);
+    }
+
+    default int indexOf(Object element) {
+        int idx = 0;
+        while (hasNext()) {
+            if (Objects.equals(next(), element)) {
+                return idx;
+            }
+            ++idx;
+        }
+        return -1;
+    }
+
+    default int indexOf(Object element, int from) {
+        return drop(from).indexOf(element);
+    }
+
+    default int indexWhere(@NotNull Predicate<? super E> predicate) {
+        Objects.requireNonNull(predicate);
+
+        int idx = 0;
+        while (hasNext()) {
+            if (predicate.test(next())) {
+                return idx;
+            }
+            ++idx;
+        }
+        return -1;
+    }
+
+    default int indexWhere(@NotNull Predicate<? super E> predicate, int from) {
+        return drop(from).indexWhere(predicate);
+    }
+
+    @Override
+    default E[] toArray(@NotNull IntFunction<? extends E[]> generator) {
+        Objects.requireNonNull(generator);
+        ArrayList<E> list = new ArrayList<>(); // TODO: replace with kala collection
+        while (hasNext()) {
+            list.add(next());
+        }
+        E[] arr = generator.apply(list.size());
+        return list.toArray(arr);
     }
 
     //

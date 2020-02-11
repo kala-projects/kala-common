@@ -18,26 +18,68 @@ public interface ISeq<E> extends ITraversable<E>, Seq<E> {
     // -- Seq
     //
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     default ISeq<E> drop(int n) {
         return SeqOps.drop(this, n, this.<E>newBuilder());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     default ISeq<E> dropWhile(@NotNull Predicate<? super E> predicate) {
         return SeqOps.dropWhile(this, predicate, this.<E>newBuilder());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     default ISeq<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
         Objects.requireNonNull(traversable);
         return SeqOps.concat(this, traversable, this.<E>newBuilder());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    default ISeq<E> prepended(E element) {
+        return SeqOps.prepended(this, element, newBuilder());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    default ISeq<E> prependedAll(@NotNull TraversableOnce<? extends E> prefix) {
+        return SeqOps.prependedAll(this, prefix, newBuilder());
+    }
+
+    @NotNull
+    @Override
+    default ISeq<E> appended(E element) {
+        return SeqOps.appended(this, element, newBuilder());
+    }
+
+    @NotNull
+    @Override
+    default ISeq<E> appendedAll(@NotNull TraversableOnce<? extends E> prefix) {
+        return SeqOps.prependedAll(this, prefix, newBuilder());
+    }
+
     //
     // -- Traversable
     //
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     <U> CollectionBuilder<U, ? extends ISeq<U>> newBuilder();

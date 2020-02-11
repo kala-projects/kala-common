@@ -21,26 +21,68 @@ public interface MSeq<E> extends MTraversable<E>, Seq<E> {
     // -- Seq
     //
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     default MSeq<E> drop(int n) {
         return SeqOps.drop(this, n, this.<E>newBuilder());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     default MSeq<E> dropWhile(@NotNull Predicate<? super E> predicate) {
         return SeqOps.dropWhile(this, predicate, this.<E>newBuilder());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     default MSeq<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
         Objects.requireNonNull(traversable);
         return SeqOps.concat(this, traversable, this.<E>newBuilder());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    default MSeq<E> prepended(E element) {
+        return SeqOps.prepended(this, element, newBuilder());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    default MSeq<E> prependedAll(@NotNull TraversableOnce<? extends E> prefix) {
+        return SeqOps.prependedAll(this, prefix, newBuilder());
+    }
+
+    @NotNull
+    @Override
+    default MSeq<E> appended(E element) {
+        return SeqOps.appended(this, element, newBuilder());
+    }
+
+    @NotNull
+    @Override
+    default MSeq<E> appendedAll(@NotNull TraversableOnce<? extends E> prefix) {
+        return SeqOps.prependedAll(this, prefix, newBuilder());
+    }
+
     //
     // -- Traversable
     //
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
     <U> CollectionBuilder<U, ? extends MSeq<U>> newBuilder();

@@ -33,6 +33,31 @@ public interface IIndexedSeq<E> extends ISeq<E>, IndexedSeq<E> {
         return SeqOps.concat(this, traversable, this.<E>newBuilder());
     }
 
+    @NotNull
+    @Override
+    default IIndexedSeq<E> prepended(E element) {
+        return SeqOps.prepended(this, element, newBuilder());
+    }
+
+    @NotNull
+    @Override
+    default IIndexedSeq<E> prependedAll(@NotNull TraversableOnce<? extends E> prefix) {
+        return SeqOps.prependedAll(this, prefix, newBuilder());
+    }
+
+    @NotNull
+    @Override
+    default IIndexedSeq<E> appended(E element) {
+        return SeqOps.appended(this, element, newBuilder());
+    }
+
+    @NotNull
+    @Override
+    default IIndexedSeq<E> appendedAll(@NotNull TraversableOnce<? extends E> prefix) {
+        return SeqOps.prependedAll(this, prefix, newBuilder());
+    }
+
+
     //
     // -- Traversable
     //

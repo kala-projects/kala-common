@@ -18,8 +18,8 @@ public final class SeqOps {
             int n,
             @NotNull CollectionBuilder<? super E, ? extends T> builder
     ) {
-        Objects.requireNonNull(seq);
-        Objects.requireNonNull(builder);
+        assert seq != null;
+        assert builder != null;
 
         if (n <= 0) {
             return (T) seq;
@@ -41,9 +41,10 @@ public final class SeqOps {
             @NotNull Predicate<? super E> predicate,
             @NotNull CollectionBuilder<? super E, ? extends T> builder
     ) {
-        Objects.requireNonNull(seq);
+        assert seq != null;
+        assert builder != null;
+
         Objects.requireNonNull(predicate);
-        Objects.requireNonNull(builder);
 
         builder.addAll(seq.iterator().dropWhile(predicate));
 
@@ -55,15 +56,86 @@ public final class SeqOps {
             @NotNull TraversableOnce<? extends E> traversable,
             @NotNull CollectionBuilder<? super E, ? extends T> builder
     ) {
-        Objects.requireNonNull(seq);
+        assert seq != null;
+        assert builder != null;
+
         Objects.requireNonNull(traversable);
-        Objects.requireNonNull(builder);
 
         builder.sizeHint(seq);
         builder.addAll(seq);
 
         builder.sizeHint(traversable);
         builder.addAll(traversable);
+
+        return builder.build();
+    }
+
+    public static <E, T> T prepended(
+            @NotNull Seq<? extends E> seq,
+            E element,
+            @NotNull CollectionBuilder<? super E, ? extends T> builder
+    ) {
+        assert seq != null;
+        assert builder != null;
+
+        builder.sizeHint(seq, 1);
+
+        builder.add(element);
+        builder.addAll(seq);
+
+        return builder.build();
+    }
+
+    public static <E, T> T prependedAll(
+            @NotNull Seq<? extends E> seq,
+            @NotNull TraversableOnce<? extends E> prefix,
+            @NotNull CollectionBuilder<? super E, ? extends T> builder
+    ) {
+        assert seq != null;
+        assert builder != null;
+
+        Objects.requireNonNull(prefix);
+
+        builder.sizeHint(prefix);
+        builder.addAll(prefix);
+
+        builder.sizeHint(seq);
+        builder.addAll(seq);
+
+        return builder.build();
+    }
+
+    public static <E, T> T appended(
+            @NotNull Seq<? extends E> seq,
+            E element,
+            @NotNull CollectionBuilder<? super E, ? extends T> builder
+    ) {
+        assert seq != null;
+        assert builder != null;
+
+        builder.sizeHint(seq, 1);
+
+        builder.addAll(seq);
+        builder.add(element);
+
+        return builder.build();
+    }
+
+    public static <E, T> T appendedAll(
+            @NotNull Seq<? extends E> seq,
+            @NotNull TraversableOnce<? extends E> postfix,
+            @NotNull CollectionBuilder<? super E, ? extends T> builder
+    ) {
+        assert seq != null;
+        assert builder != null;
+
+        Objects.requireNonNull(postfix);
+
+        builder.sizeHint(seq);
+        builder.addAll(seq);
+
+        builder.sizeHint(postfix);
+        builder.addAll(postfix);
 
         return builder.build();
     }

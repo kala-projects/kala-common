@@ -63,6 +63,42 @@ public interface Seq<E> extends Traversable<E> {
         return SeqOps.concat(this, traversable, this.<E>newBuilder());
     }
 
+    @NotNull
+    default Seq<E> prepended(E element) {
+        return SeqOps.prepended(this, element, newBuilder());
+    }
+
+    @NotNull
+    default Seq<E> prependedAll(@NotNull TraversableOnce<? extends E> prefix) {
+        return SeqOps.prependedAll(this, prefix, newBuilder());
+    }
+
+    @NotNull
+    default Seq<E> appended(E element) {
+        return SeqOps.appended(this, element, newBuilder());
+    }
+
+    @NotNull
+    default Seq<E> appendedAll(@NotNull TraversableOnce<? extends E> prefix) {
+        return SeqOps.prependedAll(this, prefix, newBuilder());
+    }
+
+    default int indexOf(Object element) {
+        return iterator().indexOf(element);
+    }
+
+    default int indexOf(Object element, int from) {
+        return iterator().indexOf(element, from);
+    }
+
+    default int indexWhere(@NotNull Predicate<? super E> predicate) {
+        return iterator().indexWhere(predicate);
+    }
+
+    default int indexWhere(@NotNull Predicate<? super E> predicate, int from) {
+        return iterator().indexWhere(predicate, from);
+    }
+
     //
     // -- Traversable
     //

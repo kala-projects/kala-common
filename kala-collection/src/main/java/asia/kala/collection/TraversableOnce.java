@@ -10,10 +10,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.StringJoiner;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -122,6 +119,10 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E>, Functor<E>
             @NotNull CharSequence prefix,
             @NotNull CharSequence postfix) {
         return joinTo(new StringBuilder(), prefix, separator, postfix).toString();
+    }
+
+    default E[] toArray(@NotNull IntFunction<? extends E[]> generator) {
+        return iterator().toArray(generator);
     }
 
     //
