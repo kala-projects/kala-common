@@ -1,6 +1,5 @@
 package asia.kala.collection.mutable;
 
-import asia.kala.collection.Traversable;
 import asia.kala.collection.TraversableOnce;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -8,9 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.function.Function;
 
-public interface CollectionBuilder<E, To> extends Growable<E> {
+public interface CollectionBuilder<E, To> {
 
-    @Override
     @Contract(mutates = "this")
     void add(E element);
 
@@ -42,7 +40,7 @@ public interface CollectionBuilder<E, To> extends Growable<E> {
         }
     }
 
-    default void sizeHintBounded(int size, @NotNull Traversable<?> boundingColl) {
+    default void sizeHintBounded(int size, @NotNull TraversableOnce<?> boundingColl) {
         int c = boundingColl.knownSize();
         if (c != -1) {
             sizeHint(Integer.min(c, size));

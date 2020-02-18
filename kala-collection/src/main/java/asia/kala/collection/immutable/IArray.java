@@ -2,8 +2,12 @@ package asia.kala.collection.immutable;
 
 import asia.kala.Tuple2;
 import asia.kala.annotations.StaticClass;
-import asia.kala.collection.*;
+import asia.kala.collection.Enumerator;
+import asia.kala.collection.IndexedSeq;
+import asia.kala.collection.TraversableOnce;
 import asia.kala.collection.mutable.CollectionBuilder;
+import asia.kala.function.IndexedConsumer;
+import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -12,28 +16,29 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
-public final class IArray<E> implements IndexedSeq<E>, Serializable {
+public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, Serializable {
     private static final long serialVersionUID = 1845940935381169058L;
     private static final int hashMagic = -1300712527;
 
     public static final Object[] EMPTY_ARRAY = new Object[0];
     public static final IArray<?> EMPTY = new IArray<>(EMPTY_ARRAY);
 
-    @NotNull
     private final Object[] values;
 
-    IArray(@NotNull Object[] values) {
-        assert values != null;
-
+    IArray(Object[] values) {
         this.values = values;
     }
 
     public static <E> IArray<E> empty() {
+        return (IArray<E>) EMPTY;
+    }
+
+    public static <E> IArray<E> of() {
         return (IArray<E>) EMPTY;
     }
 
@@ -50,15 +55,14 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
     public static final class Unsafe {
         @NotNull
         @Contract("_ -> new")
-        public static <E> IArray<E> wrap(@NotNull E[] array) {
-            Objects.requireNonNull(array);
-
-            return new IArray<>(array);
+        public static <E> IArray<E> wrap(@NotNull E[] values) {
+            Objects.requireNonNull(values);
+            return new IArray<>(values);
         }
     }
 
     //
-    // -- Seq
+    // -- ISeq
     //
 
     @Override
@@ -108,6 +112,43 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
             return empty();
         }
         return new IArray<>(Arrays.copyOfRange(values, idx, values.length));
+    }
+
+    @NotNull
+    @Override
+    public final IArray<E> take(int n) {
+        if (n <= 0) {
+            return empty();
+        }
+
+        if (n >= values.length) {
+            return this;
+        }
+
+        Object[] newValues = new Object[n];
+        System.arraycopy(values, 0, newValues, 0, n);
+
+        return new IArray<>(newValues);
+    }
+
+    @NotNull
+    @Override
+    public final IArray<E> takeWhile(@NotNull Predicate<? super E> predicate) {
+        Objects.requireNonNull(predicate);
+        if (values.length == 0) {
+            return empty();
+        }
+
+        int count = 0;
+        while (count < values.length && predicate.test((E) values[count])) {
+            ++count;
+        }
+
+        if (count == 0) {
+            return empty();
+        }
+
+        return new IArray<>(Arrays.copyOf(values, count));
     }
 
     @NotNull
@@ -163,24 +204,38 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
         return new IArray<>(newValues);
     }
 
+    @NotNull
+    @Override
+    public final <U> IArray<U> mapIndexed(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
+        Objects.requireNonNull(mapper);
+        Object[] newValues = new Object[values.length];
+        for (int i = 0; i < values.length; i++) {
+            newValues[i] = mapper.apply(i, (E) values[i]);
+        }
+        return new IArray<>(newValues);
+    }
+
+    @Override
+    public void forEachIndexed(@NotNull IndexedConsumer<? super E> action) {
+        Objects.requireNonNull(action);
+
+        for (int i = 0; i < values.length; i++) {
+            action.accept(i, (E) values[i]);
+        }
+    }
+
     //
-    // -- Traversable
+    // -- ICollection
     //
 
     @Override
-    public final String stringPrefix() {
+    public final String className() {
         return "IArray";
     }
 
     @NotNull
     @Override
-    public final <U> IArray.Builder<U> newBuilder() {
-        return new IArray.Builder<>();
-    }
-
-    @NotNull
-    @Override
-    public final Tuple2<? extends IArray<E>, ? extends IArray<E>> span(@NotNull Predicate<? super E> predicate) {
+    public final Tuple2<IArray<E>, IArray<E>> span(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
 
         if (values.length == 0) {
@@ -208,83 +263,32 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
 
     @NotNull
     @Override
+    public final <U> IArray.Builder<U> newBuilder() {
+        return new Builder<>();
+    }
+
+    @NotNull
+    @Override
     public final Enumerator<E> iterator() {
-        return Enumerator.of((E[]) values);
+        return (Enumerator<E>) Enumerator.ofArray(values);
     }
 
-    @NotNull
     @Override
-    public final Stream<E> stream() {
-        return Stream.of((E[]) values);
+    @SuppressWarnings("SuspiciousSystemArraycopy")
+    public <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
+        U[] newValues = generator.apply(values.length);
+        System.arraycopy(values, 0, newValues, 0, values.length);
+        return newValues;
     }
 
-    @NotNull
     @Override
-    public final IArray<E> filter(@NotNull Predicate<? super E> predicate) {
-        Objects.requireNonNull(predicate);
-        if (values.length == 0) {
-            return empty();
-        }
+    public void forEach(@NotNull Consumer<? super E> action) {
+        Objects.requireNonNull(action);
 
-        Object[] newArr = new Object[values.length];
-        int idx = 0;
-
-        for (Object e : values) {
-            if (predicate.test((E) e)) {
-                newArr[idx++] = e;
-            }
+        for (Object value : values) {
+            action.accept((E) value);
         }
-
-        if (idx == 0) {
-            return empty();
-        }
-        return new IArray<>(Arrays.copyOf(newArr, idx));
     }
-
-    @NotNull
-    @Override
-    public final IArray<E> filterNot(@NotNull Predicate<? super E> predicate) {
-        Objects.requireNonNull(predicate);
-        if (values.length == 0) {
-            return empty();
-        }
-
-        Object[] newArr = new Object[values.length];
-        int idx = 0;
-
-        for (Object e : values) {
-            if (!predicate.test((E) e)) {
-                newArr[idx++] = e;
-            }
-        }
-
-        if (idx == 0) {
-            return empty();
-        }
-        return new IArray<>(Arrays.copyOf(newArr, idx));
-    }
-
-    @NotNull
-    @Override
-    public final <U> IArray<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
-        return TraversableOps.flatMap(this, mapper, newBuilder());
-    }
-
-    @NotNull
-    @Override
-    public final <U> IArray<U> map(@NotNull Function<? super E, ? extends U> mapper) {
-        Objects.requireNonNull(mapper);
-        if (values.length == 0) {
-            return empty();
-        }
-
-        Object[] newArr = new Object[values.length];
-        for (int i = 0; i < values.length; i++) {
-            newArr[i] = mapper.apply((E) values[i]);
-        }
-        return new IArray<>(newArr);
-    }
-
 
     //
     // -- Object
@@ -295,7 +299,6 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
         if (this == o) {
             return true;
         }
-
         if (!(o instanceof IArray<?>)) {
             return false;
         }
@@ -308,13 +311,8 @@ public final class IArray<E> implements IndexedSeq<E>, Serializable {
         return Arrays.hashCode(values) + hashMagic;
     }
 
-    @Override
-    public final String toString() {
-        return TraversableOps.toString(this);
-    }
-
     public static final class Builder<E> implements CollectionBuilder<E, IArray<E>> {
-        private final ArrayList<E> list = new ArrayList<>(); // TODO: use kala collection
+        private final ArrayList<E> list = new ArrayList<>(); // TODO
 
         @Override
         public final void add(E element) {

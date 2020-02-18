@@ -1,21 +1,20 @@
 package asia.kala.collection.mutable;
 
-import asia.kala.Tuple2;
-import asia.kala.collection.*;
+import asia.kala.collection.Enumerator;
+import asia.kala.collection.IndexedSeq;
 import asia.kala.collection.immutable.IArray;
-import org.jetbrains.annotations.Contract;
+import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.function.IntFunction;
 
 @SuppressWarnings("unchecked")
-public final class MArray<E> implements MIndexedSeq<E>, Serializable {
+public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, Serializable {
     private static final long serialVersionUID = 6278999671163491762L;
     private static final int hashMagic = -822992626;
 
@@ -24,7 +23,6 @@ public final class MArray<E> implements MIndexedSeq<E>, Serializable {
 
     @NotNull
     private final Object[] values;
-
     private final boolean isChecked;
 
     MArray(@NotNull Object[] values) {
@@ -32,8 +30,6 @@ public final class MArray<E> implements MIndexedSeq<E>, Serializable {
     }
 
     MArray(@NotNull Object[] values, boolean isChecked) {
-        assert values != null;
-
         this.values = values;
         this.isChecked = isChecked;
     }
@@ -42,21 +38,30 @@ public final class MArray<E> implements MIndexedSeq<E>, Serializable {
         return (MArray<E>) EMPTY;
     }
 
-    @NotNull
-    @SafeVarargs
-    @Contract("_ -> new")
-    public static <E> MArray<E> of(E... elements) {
-        Objects.requireNonNull(elements);
-
-        return new MArray<>(elements.clone());
+    public static <E> MArray<E> of() {
+        return (MArray<E>) EMPTY;
     }
 
     @NotNull
-    @Contract("_ -> new")
+    public static <E> MArray<E> of(@NotNull E... values) {
+        Objects.requireNonNull(values);
+        if (values.length == 0) {
+            return empty();
+        }
+
+        Object[] newValues = new Object[values.length];
+        System.arraycopy(values, 0, newValues, 0, values.length);
+        return new MArray<>(newValues);
+    }
+
+    @NotNull
     public static <E> MArray<E> wrap(@NotNull E[] array) {
         Objects.requireNonNull(array);
-
         return new MArray<>(array, true);
+    }
+
+    public final Object[] getArray() {
+        return values;
     }
 
     public final boolean isChecked() {
@@ -67,19 +72,13 @@ public final class MArray<E> implements MIndexedSeq<E>, Serializable {
     // -- MSeq
     //
 
+    public final E get(int index) {
+        return (E) values[index];
+    }
+
     @Override
     public final void set(int index, E newValue) {
         values[index] = newValue;
-    }
-
-
-    //
-    // -- Seq
-    //
-
-    @Override
-    public final E get(int index) {
-        return (E) values[index];
     }
 
     @Override
@@ -87,224 +86,54 @@ public final class MArray<E> implements MIndexedSeq<E>, Serializable {
         return values.length;
     }
 
-    @NotNull
     @Override
-    public final MArray<E> updated(int index, E newValue) {
-        if (index < 0 || index >= values.length) {
-            throw new IndexOutOfBoundsException();
+    public final void mapInPlace(@NotNull Function<? super E, ? extends E> mapper) {
+        for (int i = 0; i < values.length; i++) {
+            values[i] = mapper.apply((E) values[i]);
         }
-        Object[] newValues = values.clone();
-        newValues[index] = newValue;
-        return new MArray<>(newValues);
     }
 
-    @NotNull
     @Override
-    public final MArray<E> drop(int n) {
-        if (n <= 0) {
-            return this;
+    public void forEachIndexed(@NotNull IndexedConsumer<? super E> action) {
+        Objects.requireNonNull(action);
+
+        for (int i = 0; i < values.length; i++) {
+            action.accept(i, (E) values[i]);
         }
-
-        if (n >= values.length) {
-            return empty();
-        }
-
-        return new MArray<>(Arrays.copyOfRange(values, n, values.length));
     }
 
-    @NotNull
-    @Override
-    public final MArray<E> dropWhile(@NotNull Predicate<? super E> predicate) {
-        int idx = 0;
-        while (idx < values.length && predicate.test((E) values[idx])) {
-            ++idx;
-        }
-
-        if (idx >= values.length) {
-            return empty();
-        }
-        return new MArray<>(Arrays.copyOfRange(values, idx, values.length));
-    }
-
-    @NotNull
-    @Override
-    public final MArray<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
-        return SeqOps.concat(this, traversable, newBuilder());
-    }
-
-    @NotNull
-    @Override
-    public final MArray<E> prepended(E element) {
-        Object[] newValues = new Object[values.length + 1];
-        newValues[0] = element;
-        System.arraycopy(values, 0, newValues, 1, values.length);
-
-        return new MArray<>(newValues);
-    }
-
-    @NotNull
-    @Override
-    public final MArray<E> prependedAll(@NotNull TraversableOnce<? extends E> prefix) {
-        Objects.requireNonNull(prefix);
-
-        Object[] data = prefix instanceof MArray<?> ? ((MArray<?>) prefix).values : prefix.toArray(Object[]::new);
-        Object[] newValues = new Object[data.length + values.length];
-
-        System.arraycopy(data, 0, newValues, 0, data.length);
-        System.arraycopy(values, 0, newValues, data.length, values.length);
-
-        return new MArray<>(newValues);
-    }
-
-    @NotNull
-    @Override
-    public final MArray<E> appended(E element) {
-        Object[] newValues = Arrays.copyOf(values, values.length + 1);
-        newValues[values.length] = element;
-
-        return new MArray<>(newValues);
-    }
-
-    @NotNull
-    @Override
-    public final MArray<E> appendedAll(@NotNull TraversableOnce<? extends E> postfix) {
-        Objects.requireNonNull(postfix);
-
-        Object[] data = postfix instanceof MArray<?> ? ((MArray<?>) postfix).values : postfix.toArray(Object[]::new);
-        Object[] newValues = new Object[data.length + values.length];
-
-        System.arraycopy(values, 0, newValues, 0, values.length);
-        System.arraycopy(data, 0, newValues, values.length, data.length);
-
-        return new MArray<>(newValues);
-    }
-    
     //
     // -- Traversable
     //
 
     @Override
-    public final String stringPrefix() {
+    public final String className() {
         return "MArray";
     }
 
     @NotNull
     @Override
-    public final <U> MArray.Builder<U> newBuilder() {
-        return new MArray.Builder<>();
+    public final Enumerator<E> iterator() {
+        return (Enumerator<E>) Enumerator.ofArray(values);
     }
 
-    @NotNull
     @Override
-    public final Tuple2<? extends MArray<E>, ? extends MArray<E>> span(@NotNull Predicate<? super E> predicate) {
-        Objects.requireNonNull(predicate);
+    @SuppressWarnings("SuspiciousSystemArraycopy")
+    public <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
+        U[] newValues = generator.apply(values.length);
+        System.arraycopy(values, 0, newValues, 0, values.length);
+        return newValues;
+    }
 
-        if (values.length == 0) {
-            return new Tuple2<>(empty(), empty());
-        }
-
-        Object[] newArr1 = new Object[values.length];
-        Object[] newArr2 = new Object[values.length];
-        int idx1 = 0;
-        int idx2 = 0;
+    @Override
+    public void forEach(@NotNull Consumer<? super E> action) {
+        Objects.requireNonNull(action);
 
         for (Object value : values) {
-            if (predicate.test((E) value)) {
-                newArr1[idx1++] = value;
-            } else {
-                newArr2[idx2++] = value;
-            }
+            action.accept((E) value);
         }
-
-        MArray<E> ia1 = idx1 == 0 ? empty() : new MArray<>(Arrays.copyOf(newArr1, idx1));
-        MArray<E> ia2 = idx2 == 0 ? empty() : new MArray<>(Arrays.copyOf(newArr2, idx2));
-
-        return new Tuple2<>(ia1, ia2);
     }
 
-    @NotNull
-    @Override
-    public final Enumerator<E> iterator() {
-        return Enumerator.of((E[]) values);
-    }
-
-
-    @NotNull
-    @Override
-    public final MArray<E> filter(@NotNull Predicate<? super E> predicate) {
-        Objects.requireNonNull(predicate);
-        if (values.length == 0) {
-            return empty();
-        }
-
-        Object[] newArr = new Object[values.length];
-        int idx = 0;
-
-        for (Object e : values) {
-            if (predicate.test((E) e)) {
-                newArr[idx++] = e;
-            }
-        }
-
-        if (idx == 0) {
-            return empty();
-        }
-        return new MArray<>(Arrays.copyOf(newArr, idx));
-    }
-
-    @NotNull
-    @Override
-    public final MArray<E> filterNot(@NotNull Predicate<? super E> predicate) {
-        Objects.requireNonNull(predicate);
-        if (values.length == 0) {
-            return empty();
-        }
-
-        Object[] newArr = new Object[values.length];
-        int idx = 0;
-
-        for (Object e : values) {
-            if (!predicate.test((E) e)) {
-                newArr[idx++] = e;
-            }
-        }
-
-        if (idx == 0) {
-            return empty();
-        }
-        return new MArray<>(Arrays.copyOf(newArr, idx));
-    }
-
-    @NotNull
-    @Override
-    public final <U> MArray<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
-        return TraversableOps.flatMap(this, mapper, newBuilder());
-    }
-
-    //
-    // -- Functor
-    //
-
-    @NotNull
-    @Override
-    public final <U> MArray<U> map(@NotNull Function<? super E, ? extends U> mapper) {
-        Objects.requireNonNull(mapper);
-        if (values.length == 0) {
-            return empty();
-        }
-
-        Object[] newArr = new Object[values.length];
-        for (int i = 0; i < values.length; i++) {
-            newArr[i] = mapper.apply((E) values[i]);
-        }
-        return new MArray<>(newArr);
-    }
-
-    @NotNull
-    @Override
-    public final Stream<E> stream() {
-        return Stream.of((E[]) values);
-    }
 
     //
     // -- Object
@@ -315,7 +144,6 @@ public final class MArray<E> implements MIndexedSeq<E>, Serializable {
         if (this == o) {
             return true;
         }
-
         if (!(o instanceof MArray<?>)) {
             return false;
         }
@@ -326,29 +154,5 @@ public final class MArray<E> implements MIndexedSeq<E>, Serializable {
     @Override
     public final int hashCode() {
         return Arrays.hashCode(values) + hashMagic;
-    }
-
-    @Override
-    public final String toString() {
-        return TraversableOps.toString(this);
-    }
-
-    public static final class Builder<E> implements CollectionBuilder<E, MArray<E>> {
-        private final ArrayList<E> list = new ArrayList<>(); // TODO: use kala collection
-
-        @Override
-        public final void add(E element) {
-            list.add(element);
-        }
-
-        @Override
-        public final void clear() {
-            list.clear();
-        }
-
-        @Override
-        public final MArray<E> build() {
-            return new MArray<>(list.toArray());
-        }
     }
 }

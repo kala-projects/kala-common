@@ -1,137 +1,113 @@
 package asia.kala.collection.immutable;
 
 import asia.kala.Tuple2;
-import asia.kala.collection.*;
+import asia.kala.collection.Seq;
+import asia.kala.collection.TraversableOnce;
 import asia.kala.collection.mutable.CollectionBuilder;
+import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface ISeq<E> extends ITraversable<E>, Seq<E> {
-
-    //
-    // -- Seq
-    //
-
+public interface ISeq<E> extends ICollection<E>, Seq<E> {
     @NotNull
-    @Override
     default ISeq<E> updated(int index, E newValue) {
-        return SeqOps.updated(this, index, newValue, newBuilder());
+        return AbstractISeq.updated(this, index, newValue, newBuilder());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     default ISeq<E> drop(int n) {
-        return SeqOps.drop(this, n, this.<E>newBuilder());
+        return AbstractISeq.drop(this, n, this.<E>newBuilder());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     default ISeq<E> dropWhile(@NotNull Predicate<? super E> predicate) {
-        return SeqOps.dropWhile(this, predicate, this.<E>newBuilder());
+        return AbstractISeq.dropWhile(this, predicate, this.<E>newBuilder());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @NotNull
+    default ISeq<E> take(int n) {
+        return AbstractISeq.take(this, n, this.<E>newBuilder());
+    }
+
+    @NotNull
+    default ISeq<E> takeWhile(@NotNull Predicate<? super E> predicate) {
+        return AbstractISeq.takeWhile(this, predicate, this.<E>newBuilder());
+    }
+
     @NotNull
     default ISeq<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
         Objects.requireNonNull(traversable);
-        return SeqOps.concat(this, traversable, this.<E>newBuilder());
+        return AbstractISeq.concat(this, traversable, this.<E>newBuilder());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
-    @Override
     default ISeq<E> prepended(E element) {
-        return SeqOps.prepended(this, element, newBuilder());
+        return AbstractISeq.prepended(this, element, newBuilder());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
-    @Override
     default ISeq<E> prependedAll(@NotNull TraversableOnce<? extends E> prefix) {
-        return SeqOps.prependedAll(this, prefix, newBuilder());
+        return AbstractISeq.prependedAll(this, prefix, newBuilder());
     }
 
     @NotNull
-    @Override
     default ISeq<E> appended(E element) {
-        return SeqOps.appended(this, element, newBuilder());
+        return AbstractISeq.appended(this, element, newBuilder());
     }
 
     @NotNull
-    @Override
-    default ISeq<E> appendedAll(@NotNull TraversableOnce<? extends E> prefix) {
-        return SeqOps.prependedAll(this, prefix, newBuilder());
+    default ISeq<E> appendedAll(@NotNull TraversableOnce<? extends E> postfix) {
+        return AbstractISeq.prependedAll(this, postfix, newBuilder());
+    }
+
+    @NotNull
+    default <U> ISeq<U> mapIndexed(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
+        return AbstractISeq.mapIndexed(this, mapper, this.<U>newBuilder());
     }
 
     //
-    // -- Traversable
+    // -- ICollection
     //
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    default String className() {
+        return "ISeq";
+    }
+
     @NotNull
     @Override
     <U> CollectionBuilder<U, ? extends ISeq<U>> newBuilder();
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    default Tuple2<? extends ISeq<E>, ? extends ISeq<E>> span(@NotNull Predicate<? super E> predicate) {
-        return TraversableOps.span(this, predicate, this.<E>newBuilder(), this.<E>newBuilder());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    default ISeq<E> filter(@NotNull Predicate<? super E> predicate) {
-        return TraversableOps.filter(this, predicate, newBuilder());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    default ISeq<E> filterNot(@NotNull Predicate<? super E> predicate) {
-        return TraversableOps.filterNot(this, predicate, newBuilder());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    default <U> ISeq<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
-        return TraversableOps.flatMap(this, mapper, this.<U>newBuilder());
-    }
-
-    //
-    // -- Functor
-    //
-
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
     default <U> ISeq<U> map(@NotNull Function<? super E, ? extends U> mapper) {
-        return TraversableOps.map(this, mapper, this.<U>newBuilder());
+        return AbstractICollection.map(this, mapper, this.<U>newBuilder());
+    }
+
+    @NotNull
+    @Override
+    default ISeq<E> filter(@NotNull Predicate<? super E> predicate) {
+        return AbstractICollection.filter(this, predicate, newBuilder());
+    }
+
+    @NotNull
+    @Override
+    default ISeq<E> filterNot(@NotNull Predicate<? super E> predicate) {
+        return AbstractICollection.filterNot(this, predicate, newBuilder());
+    }
+
+    @NotNull
+    @Override
+    default <U> ISeq<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+        return AbstractICollection.flatMap(this, mapper, this.newBuilder());
+    }
+
+    @NotNull
+    @Override
+    default Tuple2<? extends ISeq<E>, ? extends ISeq<E>> span(@NotNull Predicate<? super E> predicate) {
+        return AbstractICollection.span(this, predicate, newBuilder(), newBuilder());
     }
 }

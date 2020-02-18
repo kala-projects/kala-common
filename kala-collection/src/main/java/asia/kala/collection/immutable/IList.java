@@ -3,10 +3,9 @@ package asia.kala.collection.immutable;
 import asia.kala.Option;
 import asia.kala.Tuple2;
 import asia.kala.collection.Enumerator;
-import asia.kala.collection.SeqOps;
 import asia.kala.collection.TraversableOnce;
-import asia.kala.collection.TraversableOps;
 import asia.kala.collection.mutable.CollectionBuilder;
+import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +15,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public abstract class IList<E> implements ISeq<E>, Serializable {
+public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Serializable {
     IList() {
     }
 
@@ -26,8 +25,20 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
         return (IList<E>) list;
     }
 
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <E> IList<E> nil() {
+        return (IList<E>) Nil.INSTANCE;
+    }
+
+    @NotNull
+    public static <E> IList<E> of() {
+        return nil();
+    }
+
+    @NotNull
     @SafeVarargs
-    public static <E> IList<E> of(E... elements) {
+    public static <E> IList<E> of(@NotNull E... elements) {
         Objects.requireNonNull(elements);
         IList<E> list = nil();
 
@@ -36,12 +47,6 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
         }
 
         return list;
-    }
-
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <E> IList<E> nil() {
-        return (IList<E>) Nil.INSTANCE;
     }
 
     public abstract E head();
@@ -62,13 +67,13 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
 
 
     //
-    // -- Seq
+    // -- ISeq
     //
 
     @NotNull
     @Override
     public final IList<E> updated(int index, E newValue) {
-        return SeqOps.updated(this, index, newValue, newBuilder());
+        return updatedImpl(index, newValue);
     }
 
     @NotNull
@@ -87,10 +92,22 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
     @Override
     public abstract <U> IList<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper);
 
+    @NotNull
+    @Override
+    public final <U> IList<U> mapIndexed(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
+        return mapIndexedImpl(mapper);
+    }
+
 
     //
-    // -- Traversable
+    // -- ICollection
     //
+
+    @Override
+    public final String className() {
+        return "IList";
+    }
+
     @NotNull
     @Override
     public final <U> IList.Builder<U> newBuilder() {
@@ -99,12 +116,7 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
 
     @NotNull
     @Override
-    public abstract Tuple2<? extends IList<E>, ? extends IList<E>> span(@NotNull Predicate<? super E> predicate);
-
-    @Override
-    public final String stringPrefix() {
-        return "IList";
-    }
+    public abstract Tuple2<IList<E>, IList<E>> span(@NotNull Predicate<? super E> predicate);
 
     @NotNull
     @Override
@@ -140,7 +152,9 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
 
         @Override
         public final IList<E> build() {
-            return first;
+            IList<E> ans = first;
+            clear();
+            return ans;
         }
     }
 
@@ -173,7 +187,7 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
         }
 
         //
-        // -- Seq
+        // -- ISeq
         //
 
         @Override
@@ -219,7 +233,7 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
 
         @NotNull
         @Override
-        public final Tuple2<? extends IList<Object>, ? extends IList<Object>> span(@NotNull Predicate<? super Object> predicate) {
+        public final Tuple2<IList<Object>, IList<Object>> span(@NotNull Predicate<? super Object> predicate) {
             return new Tuple2<>(IList.nil(), IList.nil());
         }
 
@@ -284,8 +298,6 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
     }
 
     public static abstract class Cons<E> extends IList<E> {
-
-
         Cons() {
         }
 
@@ -326,17 +338,17 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
         @NotNull
         @Override
         public final IList<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
-            return SeqOps.concat(this, traversable, newBuilder());
+            return concatImpl(traversable);
         }
 
         //
-        // -- Traversable
+        // -- ICollection
         //
 
         @NotNull
         @Override
-        public final Tuple2<? extends IList<E>, ? extends IList<E>> span(@NotNull Predicate<? super E> predicate) {
-            return TraversableOps.span(this, predicate, newBuilder(), newBuilder());
+        public final Tuple2<IList<E>, IList<E>> span(@NotNull Predicate<? super E> predicate) {
+            return spanImpl(predicate);
         }
 
         @Override
@@ -347,25 +359,25 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
         @NotNull
         @Override
         public final <U> IList<U> map(@NotNull Function<? super E, ? extends U> mapper) {
-            return TraversableOps.map(this, mapper, newBuilder());
+            return mapImpl(mapper);
         }
 
         @NotNull
         @Override
         public final <U> IList<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
-            return TraversableOps.flatMap(this, mapper, newBuilder());
+            return flatMapImpl(mapper);
         }
 
         @NotNull
         @Override
         public final IList<E> filter(@NotNull Predicate<? super E> predicate) {
-            return TraversableOps.filter(this, predicate, newBuilder());
+            return filterImpl(predicate);
         }
 
         @NotNull
         @Override
         public final IList<E> filterNot(@NotNull Predicate<? super E> predicate) {
-            return TraversableOps.filterNot(this, predicate, newBuilder());
+            return filterNotImpl(predicate);
         }
 
         @NotNull
@@ -407,11 +419,6 @@ public abstract class IList<E> implements ISeq<E>, Serializable {
                 list2 = list2.tail();
             }
             return list1 == list2;
-        }
-
-        @Override
-        public final String toString() {
-            return joinToString(", ", "IList[", "]");
         }
     }
 

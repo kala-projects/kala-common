@@ -1,7 +1,8 @@
 package asia.kala.collection;
 
 import asia.kala.Option;
-import asia.kala.collection.immutable.IList;
+import asia.kala.Tuple2;
+import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,7 +12,13 @@ import java.util.*;
 import java.util.function.*;
 
 @SuppressWarnings("unchecked")
-public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
+public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E>, Transformable<E> {
+
+    @Contract("_ -> param1")
+    @SuppressWarnings("unchecked")
+    static <E> Enumerator<E> narrow(Enumerator<? extends E> enumerator) {
+        return (Enumerator<E>) enumerator;
+    }
 
     @NotNull
     static <E> Enumerator<E> fromJava(@NotNull Iterator<E> iterator) {
@@ -33,7 +40,7 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
     @NotNull
     @Contract(value = "_ -> new", pure = true)
     static <E> Enumerator<E> of(E element) {
-        return new Enumerators.Single<>(element);
+        return new Enumerators.Id<>(element);
     }
 
     @NotNull
@@ -44,8 +51,14 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
             return empty();
         }
         if (l == 1) {
-            return new Enumerators.Single<>(elements[0]);
+            return new Enumerators.Id<>(elements[0]);
         }
+        return new Enumerators.OfArray<>(elements, 0, elements.length);
+    }
+
+    @NotNull
+    static <E> Enumerator<E> ofArray(@NotNull E[] elements) {
+        Objects.requireNonNull(elements);
         return new Enumerators.OfArray<>(elements, 0, elements.length);
     }
 
@@ -111,6 +124,11 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
     default Enumerator<E> takeWhile(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
         return new Enumerators.TakeWhile<>(this, predicate);
+    }
+
+    @NotNull
+    default Enumerator<E> updated(int n, E newValue) {
+        return new Enumerators.Updated<>(this, n, newValue);
     }
 
     default int indexOf(Object element) {
@@ -192,26 +210,27 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
     /**
      * {@inheritDoc}
      */
-    @Override
     @NotNull
+    @Override
     default Enumerator<E> filter(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
-        return new Enumerators.Filtered<>(this, predicate);
+        return new Enumerators.Filter<>(this, predicate);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
     @NotNull
+    @Override
     default Enumerator<E> filterNot(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
-        return new Enumerators.Filtered<>(this, predicate.negate());
+        return new Enumerators.Filter<>(this, predicate.negate());
     }
 
     /**
      * {@inheritDoc}
      */
+    @NotNull
     @Override
     default <U> Enumerator<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
         Objects.requireNonNull(mapper);
@@ -219,29 +238,24 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
         return new Enumerators.Concat<>(this.map(mapper).map(TraversableOnce::iterator).iterator());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    default E max() {
-        return maxOption().getOrThrow(NoSuchElementException::new);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
-    default Option<E> maxOption() {
-        return maxByOption((Comparator<E>) Comparator.naturalOrder());
-    }
+    default Tuple2<? extends Enumerator<E>, ? extends Enumerator<E>> span(@NotNull Predicate<? super E> predicate) {
+        // TODO
+        Objects.requireNonNull(predicate);
+        LinkedList<E> list1 = new LinkedList<>();
+        LinkedList<E> list2 = new LinkedList<>();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    default E maxBy(@NotNull Comparator<? super E> comparator) {
-        return maxByOption(comparator).getOrThrow(NoSuchElementException::new);
+        while (hasNext()) {
+            E e = next();
+            if (predicate.test(e)) {
+                list1.add(e);
+            } else {
+                list2.add(e);
+            }
+        }
+
+        return new Tuple2<>(Enumerator.fromJava(list1.iterator()), Enumerator.fromJava(list2.iterator()));
     }
 
     /**
@@ -265,31 +279,6 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
         }
 
         return Option.some(e);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    default E min() {
-        return minOption().getOrThrow(NoSuchElementException::new);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    default Option<E> minOption() {
-        return minByOption((Comparator<E>) Comparator.naturalOrder());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    default E minBy(@NotNull Comparator<? super E> comparator) {
-        return minByOption(comparator).getOrThrow(NoSuchElementException::new);
     }
 
     /**
@@ -369,9 +358,9 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
      */
     @Override
     default <U> U foldRight(U zero, @NotNull BiFunction<? super E, ? super U, ? extends U> op) {
-        IList<E> list = IList.nil();
+        LinkedList<E> list = new LinkedList<>(); // TODO
         while (hasNext()) {
-            list = list.cons(next());
+            list.addFirst(next());
         }
 
         for (E u : list) {
@@ -402,9 +391,9 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
     @Override
     default Option<E> reduceRightOption(@NotNull BiFunction<? super E, ? super E, ? extends E> op) {
         if (hasNext()) {
-            IList<E> list = IList.nil();
+            LinkedList<E> list = new LinkedList<>(); // TODO
             while (hasNext()) {
-                list = list.cons(next());
+                list.addFirst(next());
             }
             Iterator<E> it = list.iterator();
             E e = it.next();
@@ -501,6 +490,14 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
         return Option.none();
     }
 
+    default void forEachIndexed(@NotNull IndexedConsumer<? super E> action) {
+        Objects.requireNonNull(action);
+        int idx = 0;
+        while (hasNext()) {
+            action.accept(idx++, next());
+        }
+    }
+
     //
     // -- Iterable
     //
@@ -511,7 +508,7 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E> {
     @Override
     default void forEach(@NotNull Consumer<? super E> action) {
         Objects.requireNonNull(action);
-        if (hasNext()) {
+        while (hasNext()) {
             action.accept(next());
         }
     }

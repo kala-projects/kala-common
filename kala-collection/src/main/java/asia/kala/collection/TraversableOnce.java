@@ -1,23 +1,29 @@
 package asia.kala.collection;
 
 import asia.kala.Foldable;
-import asia.kala.Functor;
 import asia.kala.Option;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
-import java.util.function.*;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
 
-public interface TraversableOnce<E> extends Iterable<E>, Foldable<E>, Functor<E> {
-
+@SuppressWarnings("unchecked")
+public interface TraversableOnce<E> extends Iterable<E>, Foldable<E> {
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")
     static <E> TraversableOnce<E> narrow(TraversableOnce<? extends E> traversable) {
         return (TraversableOnce<E>) traversable;
     }
+
+    @NotNull
+    @Override
+    Enumerator<E> iterator();
 
     default boolean isTraversableAgain() {
         return false;
@@ -32,59 +38,67 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E>, Functor<E>
     }
 
     default boolean sameElements(@NotNull TraversableOnce<?> other) {
-        return this.iterator().sameElements(other);
+        return iterator().sameElements(other);
     }
 
-    @NotNull
-    TraversableOnce<E> filter(@NotNull Predicate<? super E> predicate);
-
-    @NotNull
-    default TraversableOnce<E> filterNot(@NotNull Predicate<? super E> predicate) {
-        return filter(predicate.negate());
-    }
-
-    <U> TraversableOnce<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper);
-
+    /**
+     * {@inheritDoc}
+     */
     default E max() {
-        return iterator().max();
+        return maxOption().getOrThrow(NoSuchElementException::new);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     default Option<E> maxOption() {
-        return iterator().maxOption();
+        return maxByOption((Comparator<E>) Comparator.naturalOrder());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     default E maxBy(@NotNull Comparator<? super E> comparator) {
-        return iterator().maxBy(comparator);
+        return maxByOption(comparator).getOrThrow(NoSuchElementException::new);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     default Option<E> maxByOption(@NotNull Comparator<? super E> comparator) {
         return iterator().maxByOption(comparator);
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     default E min() {
-        return iterator().min();
+        return minOption().getOrThrow(NoSuchElementException::new);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     default Option<E> minOption() {
-        return iterator().minOption();
+        return minByOption((Comparator<E>) Comparator.naturalOrder());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     default E minBy(@NotNull Comparator<? super E> comparator) {
-        return iterator().minBy(comparator);
+        return minByOption(comparator).getOrThrow(NoSuchElementException::new);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     default Option<E> minByOption(@NotNull Comparator<? super E> comparator) {
-        return iterator().minByOption(comparator);
-    }
-
-    @NotNull
-    default Stream<E> stream() {
-        return StreamSupport.stream(spliterator(), false);
+        return iterator().maxByOption(comparator);
     }
 
     default <A extends Appendable> A joinTo(@NotNull A buffer) {
@@ -122,12 +136,10 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E>, Functor<E>
         return iterator().toArray(generator);
     }
 
-    //
-    // -- Functor
-    //
-
     @Override
-    @NotNull <U> TraversableOnce<U> map(@NotNull Function<? super E, ? extends U> mapper);
+    default void forEach(@NotNull Consumer<? super E> action) {
+        iterator().forEach(action);
+    }
 
     //
     // -- Foldable
@@ -214,24 +226,5 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E>, Functor<E>
     @Override
     default Option<E> find(@NotNull Predicate<? super E> predicate) {
         return iterator().find(predicate);
-    }
-
-    //
-    // -- Iterable
-    //
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
-    Enumerator<E> iterator();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    default void forEach(@NotNull Consumer<? super E> action) {
-        iterator().forEach(action);
     }
 }

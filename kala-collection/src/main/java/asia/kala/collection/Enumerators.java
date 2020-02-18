@@ -15,7 +15,7 @@ final class Enumerators {
     static final Object TAG = new Object();
 
 
-    static final class IteratorWrapper<E> implements Enumerator<E> {
+    static final class IteratorWrapper<E> extends AbstractEnumerator<E> {
         @NotNull
         private final Iterator<? extends E> iterator;
 
@@ -36,8 +36,8 @@ final class Enumerators {
         }
     }
 
-    static final class Empty implements Enumerator<Object> {
-        static final Enumerators.Empty INSTANCE = new Enumerators.Empty();
+    static final class Empty extends AbstractEnumerator<Object> {
+        static final Empty INSTANCE = new Empty();
 
         private Empty() {
         }
@@ -51,18 +51,13 @@ final class Enumerators {
         public final Object next() {
             throw new NoSuchElementException("Enumerators.Empty.next()");
         }
-
-        @Override
-        public final String toString() {
-            return "Enumerators.Empty";
-        }
     }
 
-    static final class Single<T> implements Enumerator<T> {
+    static final class Id<T> extends AbstractEnumerator<T> {
 
         private Object value;
 
-        Single(Object value) {
+        Id(Object value) {
             this.value = value;
         }
 
@@ -83,7 +78,7 @@ final class Enumerators {
         }
     }
 
-    static final class Mapped<E, S> implements Enumerator<E> {
+    static final class Mapped<E, S> extends AbstractEnumerator<E> {
         @NotNull
         private final Enumerator<? extends S> source;
 
@@ -109,7 +104,7 @@ final class Enumerators {
         }
     }
 
-    static final class Filtered<E> implements Enumerator<E> {
+    static final class Filter<E> extends AbstractEnumerator<E> {
         @NotNull
         private final Iterator<? extends E> source;
         @NotNull
@@ -117,7 +112,7 @@ final class Enumerators {
 
         private Object nextValue = TAG;
 
-        Filtered(@NotNull Iterator<? extends E> source, @NotNull Predicate<? super E> predicate) {
+        Filter(@NotNull Iterator<? extends E> source, @NotNull Predicate<? super E> predicate) {
             assert source != null;
             assert predicate != null;
 
@@ -162,7 +157,7 @@ final class Enumerators {
         }
     }
 
-    static final class DropWhile<E> implements Enumerator<E> {
+    static final class DropWhile<E> extends AbstractEnumerator<E> {
         @NotNull
         private final Iterator<? extends E> source;
 
@@ -212,7 +207,7 @@ final class Enumerators {
         }
     }
 
-    static final class Take<E> implements Enumerator<E> {
+    static final class Take<E> extends AbstractEnumerator<E> {
         private final Enumerator<? extends E> source;
         private int n;
 
@@ -238,7 +233,7 @@ final class Enumerators {
         }
     }
 
-    static final class TakeWhile<E> implements Enumerator<E> {
+    static final class TakeWhile<E> extends AbstractEnumerator<E> {
         @NotNull
         private Iterator<? extends E> source;
 
@@ -282,7 +277,7 @@ final class Enumerators {
         }
     }
 
-    static final class Concat<E> implements Enumerator<E> {
+    static final class Concat<E> extends AbstractEnumerator<E> {
         @NotNull
         private final Iterator<? extends Iterator<? extends E>> iterators;
 
@@ -309,7 +304,37 @@ final class Enumerators {
         }
     }
 
-    static final class OfArray<E> implements Enumerator<E> {
+    static final class Updated<E> extends AbstractEnumerator<E> {
+        @NotNull
+        private final Iterator<? extends E> source;
+
+        private final int n;
+        private final E newValue;
+
+        private int idx = 0;
+
+        Updated(@NotNull Iterator<? extends E> source, int n, E newValue) {
+            this.source = source;
+            this.n = n;
+            this.newValue = newValue;
+        }
+
+        @Override
+        public final boolean hasNext() {
+            return source.hasNext();
+        }
+
+        @Override
+        public final E next() {
+            if (idx++ == n) {
+                source.next();
+                return newValue;
+            }
+            return source.next();
+        }
+    }
+
+    static final class OfArray<E> extends AbstractEnumerator<E> {
         @NotNull
         private final E[] array;
         private final int end;
