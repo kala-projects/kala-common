@@ -5,6 +5,7 @@ import asia.kala.collection.Seq;
 import asia.kala.collection.TraversableOnce;
 import asia.kala.collection.mutable.CollectionBuilder;
 import asia.kala.function.IndexedFunction;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -12,6 +13,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface ISeq<E> extends ICollection<E>, Seq<E> {
+
+    @Contract("_ -> param1")
+    @SuppressWarnings("unchecked")
+    static <E> ISeq<E> narrow(ISeq<? extends E> seq) {
+        return (ISeq<E>) seq;
+    }
+
     @NotNull
     default ISeq<E> updated(int index, E newValue) {
         return AbstractISeq.updated(this, index, newValue, newBuilder());

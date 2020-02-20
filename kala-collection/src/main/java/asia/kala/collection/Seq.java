@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Predicate;
 
 public interface Seq<E> extends Traversable<E> {
+
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")
     static <E> Seq<E> narrow(Seq<? extends E> seq) {

@@ -34,6 +34,12 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
         this.values = values;
     }
 
+    @Contract("_ -> param1")
+    @SuppressWarnings("unchecked")
+    static <E> IArray<E> narrow(IArray<? extends E> array) {
+        return (IArray<E>) array;
+    }
+
     public static <E> IArray<E> empty() {
         return (IArray<E>) EMPTY;
     }

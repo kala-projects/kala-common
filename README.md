@@ -34,14 +34,14 @@ Maven:
 ```xml
 <dependency>
   <groupId>asia.kala</groupId>
-  <artifactId>kala-base</artifactId>
-  <version>0.1.0</version>
+  <artifactId>kala-common</artifactId>
+  <version>0.2.0</version>
   <type>pom</type>
 </dependency>
 ```
 
 Gradle:
 ```groovy
-implementation group: 'asia.kala', name: 'kala-base', version: '0.1.0'
+implementation group: 'asia.kala', name: 'kala-common', version: '0.2.0'
 ```
 

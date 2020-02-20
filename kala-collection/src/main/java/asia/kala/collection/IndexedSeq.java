@@ -1,11 +1,19 @@
 package asia.kala.collection;
 
 import asia.kala.Option;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.RandomAccess;
 
 public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
+
+    @Contract("_ -> param1")
+    @SuppressWarnings("unchecked")
+    static <E> IndexedSeq<E> narrow(IndexedSeq<? extends E> seq) {
+        return (IndexedSeq<E>) seq;
+    }
+
     @Override
     E get(int index);
 

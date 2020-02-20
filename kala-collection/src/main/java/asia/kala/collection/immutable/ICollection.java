@@ -5,12 +5,20 @@ import asia.kala.collection.Transformable;
 import asia.kala.collection.Traversable;
 import asia.kala.collection.TraversableOnce;
 import asia.kala.collection.mutable.CollectionBuilder;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface ICollection<E> extends Traversable<E>, Transformable<E> {
+
+    @Contract("_ -> param1")
+    @SuppressWarnings("unchecked")
+    static <E> ICollection<E> narrow(ICollection<? extends E> collection) {
+        return (ICollection<E>) collection;
+    }
+
     @Override
     default String className() {
         return "ICollection";
