@@ -1,8 +1,8 @@
-# Kala common
+# kala common
 
 ## Adding Kala common to your build
 
-First, add the Glavo Maven repository to your project configuration file:
+First, add the jcenter repository to your project configuration file:
 
 Maven:
 ```xml
@@ -10,9 +10,8 @@ Maven:
 ...
   <repositories>
     <repository>
-      <id>glavo</id>
-      <name>Glavo maven repo</name>
-      <url>https://dl.bintray.com/glavo/maven</url>
+      <id>jcenter</id>
+      <url>https://jcenter.bintray.com</url>
     </repository>
   </repositories>
 ...
@@ -22,9 +21,7 @@ Maven:
 Gradle:
 ```groovy
 repositories {
-    maven { 
-        url 'https://dl.bintray.com/glavo/maven' 
-    }
+    jcenter()
 }
 ```
 

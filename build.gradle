@@ -13,7 +13,7 @@ buildscript {
 
 allprojects {
     group 'asia.kala'
-    version '0.2.0'
+    version '0.2.1-SHAPSHOT'
 }
 
 subprojects {
@@ -143,7 +143,7 @@ subprojects {
             name = project.name
             licenses = ['Apache-2.0']
             publicDownloadNumbers = true
-            vcsUrl = 'git@github.com:kala-projects/kala-common.git'
+            vcsUrl = 'https://github.com/kala-projects/kala-common.git'
             version {
                 name = project.version
                 desc = "${project.name} ${project.version}"
