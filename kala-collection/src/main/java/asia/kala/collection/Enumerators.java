@@ -334,6 +334,66 @@ final class Enumerators {
         }
     }
 
+    static final class Prepended<E> extends AbstractEnumerator<E> {
+        @NotNull
+        private final Iterator<? extends E> source;
+
+        private final E value;
+
+        private boolean flag = true;
+
+        Prepended(@NotNull Iterator<? extends E> source, E value) {
+            this.source = source;
+            this.value = value;
+        }
+
+        @Override
+        public final boolean hasNext() {
+            return flag || source.hasNext();
+        }
+
+        @Override
+        public final E next() {
+            if (flag) {
+                flag = false;
+                return value;
+            }
+
+            return source.next();
+        }
+    }
+
+    static final class Appended<E> extends AbstractEnumerator<E> {
+        @NotNull
+        private final Iterator<? extends E> source;
+
+        private final E value;
+
+        private boolean flag = true;
+
+        Appended(@NotNull Iterator<? extends E> source, E value) {
+            this.source = source;
+            this.value = value;
+        }
+
+        @Override
+        public final boolean hasNext() {
+            return source.hasNext() || flag;
+        }
+
+        @Override
+        public final E next() {
+            if (source.hasNext()) {
+                return source.next();
+            }
+            if (flag) {
+                flag = false;
+                return value;
+            }
+            throw new NoSuchElementException();
+        }
+    }
+
     static final class OfArray<E> extends AbstractEnumerator<E> {
         @NotNull
         private final E[] array;

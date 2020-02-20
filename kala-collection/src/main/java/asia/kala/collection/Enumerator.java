@@ -44,7 +44,7 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E>, Transfor
     }
 
     @NotNull
-    static <E> Enumerator<E> of(@NotNull E... elements) {
+    static <E> Enumerator<E> of(E... elements) {
         Objects.requireNonNull(elements);
         int l = elements.length;
         if (l == 0) {
@@ -60,6 +60,34 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E>, Transfor
     static <E> Enumerator<E> ofArray(@NotNull E[] elements) {
         Objects.requireNonNull(elements);
         return new Enumerators.OfArray<>(elements, 0, elements.length);
+    }
+
+    @NotNull
+    static <E> Enumerator<E> ofArray(@NotNull E[] elements, int start, int length) {
+        Objects.requireNonNull(elements);
+        if (start < 0 || start >= elements.length) {
+            throw new IndexOutOfBoundsException("Index: " + start);
+        }
+        if (length < 0 || length + start > elements.length) {
+            throw new IndexOutOfBoundsException("Index: " + length + start);
+        }
+        return new Enumerators.OfArray<>(elements, start, start + length);
+    }
+
+    @NotNull
+    @SafeVarargs
+    static <E> Enumerator<E> concat(@NotNull Enumerator<? extends E>... enumerators) {
+        Objects.requireNonNull(enumerators);
+
+        if (enumerators.length == 0) {
+            return empty();
+        }
+
+        if (enumerators.length == 1) {
+            return narrow(enumerators[0]);
+        }
+
+        return new Enumerators.Concat<>(ofArray(enumerators));
     }
 
     /**
@@ -161,6 +189,14 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E>, Transfor
 
     default int indexWhere(@NotNull Predicate<? super E> predicate, int from) {
         return drop(from).indexWhere(predicate);
+    }
+
+    default Enumerator<E> prepended(E value) {
+        return new Enumerators.Prepended<>(this, value);
+    }
+
+    default Enumerator<E> appended(E value) {
+        return new Enumerators.Appended<>(this, value);
     }
 
     @Override

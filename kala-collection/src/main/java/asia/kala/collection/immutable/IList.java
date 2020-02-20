@@ -78,19 +78,37 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
-    public abstract IList<E> drop(int n);
+    public final IList<E> drop(int n) {
+        IList<E> list = this;
+        while (list != Nil.INSTANCE && n-- > 0) {
+            list = list.tail();
+        }
+        return list;
+    }
+
 
     @NotNull
     @Override
-    public abstract IList<E> dropWhile(@NotNull Predicate<? super E> predicate);
+    public final IList<E> dropWhile(@NotNull Predicate<? super E> predicate) {
+        IList<E> list = this;
+        while (list != Nil.INSTANCE && predicate.test(list.head())) {
+            list = list.tail();
+        }
+        return list;
+    }
 
     @NotNull
     @Override
-    public abstract IList<E> concat(@NotNull TraversableOnce<? extends E> traversable);
+    public final IList<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
+        return concatImpl(traversable);
+    }
 
     @NotNull
     @Override
-    public abstract <U> IList<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper);
+    public final <U> IList<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+        return flatMapImpl(mapper);
+    }
+
 
     @NotNull
     @Override
@@ -120,15 +138,21 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
-    public abstract <U> IList<U> map(@NotNull Function<? super E, ? extends U> mapper);
+    public final <U> IList<U> map(@NotNull Function<? super E, ? extends U> mapper) {
+        return mapImpl(mapper);
+    }
 
     @NotNull
     @Override
-    public abstract IList<E> filter(@NotNull Predicate<? super E> predicate);
+    public final IList<E> filter(@NotNull Predicate<? super E> predicate) {
+        return filterImpl(predicate);
+    }
 
     @NotNull
     @Override
-    public abstract IList<E> filterNot(@NotNull Predicate<? super E> predicate);
+    public final IList<E> filterNot(@NotNull Predicate<? super E> predicate) {
+        return filterNotImpl(predicate);
+    }
 
     public static final class Builder<E> implements CollectionBuilder<E, IList<E>> {
         private MCons<E> first = null;
@@ -201,32 +225,6 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
             return Option.none();
         }
 
-        @NotNull
-        @Override
-        public final IList<Object> drop(int n) {
-            return IList.nil();
-        }
-
-        @NotNull
-        @Override
-        public final IList<Object> dropWhile(@NotNull Predicate<? super Object> predicate) {
-            return IList.nil();
-        }
-
-        @NotNull
-        @Override
-        @SuppressWarnings("unchecked")
-        public final IList<Object> concat(@NotNull TraversableOnce<?> traversable) {
-            if (traversable instanceof IList<?>) {
-                return (IList<Object>) traversable;
-            }
-
-            Builder<Object> builder = new Builder<>();
-            builder.addAll(traversable);
-
-            return builder.build();
-        }
-
         //
         // -- Traversable
         //
@@ -245,30 +243,6 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         @Override
         public final int knownSize() {
             return 0;
-        }
-
-        @NotNull
-        @Override
-        public final <U> IList<U> map(@NotNull Function<? super Object, ? extends U> mapper) {
-            return IList.nil();
-        }
-
-        @NotNull
-        @Override
-        public final <U> IList<U> flatMap(@NotNull Function<? super Object, ? extends TraversableOnce<? extends U>> mapper) {
-            return IList.nil();
-        }
-
-        @NotNull
-        @Override
-        public final IList<Object> filter(@NotNull Predicate<? super Object> predicate) {
-            return IList.nil();
-        }
-
-        @NotNull
-        @Override
-        public final IList<Object> filterNot(@NotNull Predicate<? super Object> predicate) {
-            return IList.nil();
         }
 
         @NotNull
@@ -313,35 +287,6 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
 
         //
-        // -- Seq
-        //
-        @NotNull
-        @Override
-        public final IList<E> drop(int n) {
-            IList<E> list = this;
-            while (list != Nil.INSTANCE && n-- > 0) {
-                list = list.tail();
-            }
-            return list;
-        }
-
-        @NotNull
-        @Override
-        public final IList<E> dropWhile(@NotNull Predicate<? super E> predicate) {
-            IList<E> list = this;
-            while (list != Nil.INSTANCE && predicate.test(list.head())) {
-                list = list.tail();
-            }
-            return list;
-        }
-
-        @NotNull
-        @Override
-        public final IList<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
-            return concatImpl(traversable);
-        }
-
-        //
         // -- ICollection
         //
 
@@ -356,29 +301,7 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
             return false;
         }
 
-        @NotNull
-        @Override
-        public final <U> IList<U> map(@NotNull Function<? super E, ? extends U> mapper) {
-            return mapImpl(mapper);
-        }
 
-        @NotNull
-        @Override
-        public final <U> IList<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
-            return flatMapImpl(mapper);
-        }
-
-        @NotNull
-        @Override
-        public final IList<E> filter(@NotNull Predicate<? super E> predicate) {
-            return filterImpl(predicate);
-        }
-
-        @NotNull
-        @Override
-        public final IList<E> filterNot(@NotNull Predicate<? super E> predicate) {
-            return filterNotImpl(predicate);
-        }
 
         @NotNull
         @Override

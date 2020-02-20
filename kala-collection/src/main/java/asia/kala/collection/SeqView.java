@@ -1,6 +1,7 @@
 package asia.kala.collection;
 
 import asia.kala.Tuple2;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -8,6 +9,55 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface SeqView<E> extends Seq<E>, View<E> {
+
+    @Contract("_ -> param1")
+    @SuppressWarnings("unchecked")
+    static <E> SeqView<E> narrow(SeqView<? extends E> view) {
+        return (SeqView<E>) view;
+    }
+
+    @NotNull
+    default SeqView<E> updated(int index, E newValue) {
+        return new SeqViews.Updated<>(this, index, newValue);
+    }
+
+    @NotNull
+    default SeqView<E> drop(int n) {
+        return new SeqViews.Drop<>(this, n);
+    }
+
+    @NotNull
+    default SeqView<E> dropWhile(@NotNull Predicate<? super E> predicate) {
+        Objects.requireNonNull(predicate);
+
+        return new SeqViews.DropWhile<>(this, predicate);
+    }
+
+    @NotNull
+    default SeqView<E> take(int n) {
+        return new SeqViews.Take<>(this, n);
+    }
+
+    @NotNull
+    default SeqView<E> takeWhile(@NotNull Predicate<? super E> predicate) {
+        Objects.requireNonNull(predicate);
+
+        return new SeqViews.TakeWhile<>(this, predicate);
+    }
+
+    default SeqView<E> concat(@NotNull Seq<? extends E> other) {
+        Objects.requireNonNull(other);
+
+        return new SeqViews.Concat<>(this, narrow(other.view()));
+    }
+
+    default SeqView<E> prepended(E value) {
+        return new SeqViews.Prepended<>(this, value);
+    }
+
+    default SeqView<E> appended(E value) {
+        return new SeqViews.Appended<>(this, value);
+    }
 
     //
     // -- View

@@ -27,4 +27,10 @@ public interface MSeq<E> extends MCollection<E>, Seq<E> {
     default String className() {
         return "MSeq";
     }
+
+    @NotNull
+    @Override
+    default MSeqEditor<E, ? extends MSeq<E>> edit() {
+        return new MSeqEditor<>(this);
+    }
 }

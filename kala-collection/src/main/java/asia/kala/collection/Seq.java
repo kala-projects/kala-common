@@ -72,4 +72,10 @@ public interface Seq<E> extends Traversable<E> {
     default String className() {
         return "Seq";
     }
+
+    @NotNull
+    @Override
+    default SeqView<E> view() {
+        return new SeqViews.Of<>(this);
+    }
 }
