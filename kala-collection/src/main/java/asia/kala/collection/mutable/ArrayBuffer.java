@@ -2,6 +2,7 @@ package asia.kala.collection.mutable;
 
 import asia.kala.collection.Enumerator;
 import asia.kala.collection.IndexedSeq;
+import asia.kala.collection.KalaCollectionUtils;
 import asia.kala.collection.TraversableOnce;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +12,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.RandomAccess;
+import java.util.function.IntFunction;
 
 @SuppressWarnings("unchecked")
 public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSeq<E>, Serializable {
@@ -76,7 +80,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
             return new Object[Math.max(DEFAULT_CAPACITY, minCapacity)];
         }
 
-        int newCapacity = Math.max(Math.max(oldCapacity, minCapacity), oldCapacity + oldCapacity >> 1);
+        int newCapacity = Math.max(Math.max(oldCapacity, minCapacity), oldCapacity + (oldCapacity >> 1));
         return new Object[newCapacity];
     }
 
@@ -99,12 +103,19 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     }
 
     @Override
-    public final void appendAll(@NotNull TraversableOnce<? extends E> collection) {
+    public final void appendAll(@NotNull Iterable<? extends E> collection) {
         Objects.requireNonNull(collection);
 
-        int ks = collection.knownSize();
-        if (ks > 0 && size + ks > elements.length) {
-            grow(size + ks);
+        if (collection instanceof TraversableOnce<?>) {
+            int ks = ((TraversableOnce<?>) collection).knownSize();
+            if (ks > 0 && size + ks > elements.length) {
+                grow(size + ks);
+            }
+        } else if (collection instanceof List<?> && collection instanceof RandomAccess) {
+            int s = ((List<?>) collection).size();
+            if (size + s > elements.length) {
+                grow(size + s);
+            }
         }
         for (E e : collection) {
             this.append(e);
@@ -124,25 +135,26 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     }
 
     @Override
-    public final void prependAll(@NotNull TraversableOnce<? extends E> collection) {
+    public final void prependAll(@NotNull Iterable<? extends E> collection) {
         Objects.requireNonNull(collection);
         if (collection instanceof IndexedSeq<?>) {
             IndexedSeq<?> seq = (IndexedSeq<?>) collection;
             int s = seq.size();
             Object[] values = elements;
-            if (values.length <= size + s) {
+            if (values.length < size + s) {
                 values = growArray(size + s);
             }
+            System.arraycopy(elements, 0, values, s, size);
             for (int i = 0; i < s; i++) {
                 values[i] = seq.get(i);
             }
-            System.arraycopy(elements, 0, values, s, size);
             elements = values;
             size += s;
             return;
         }
 
-        Object[] cv = collection.toArray(Object[]::new);
+
+        Object[] cv = KalaCollectionUtils.asArray(collection);
         if (cv.length == 0) {
             return;
         }
@@ -156,6 +168,24 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         System.arraycopy(cv, 0, values, 0, cv.length);
         elements = values;
         size += cv.length;
+    }
+
+    @Override
+    public final void insert(int index, E element) {
+        int size = this.size;
+        if (index < 0 && index > size) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (index == size) {
+            append(element);
+        }
+        if (elements.length == size) {
+            grow();
+        }
+
+        System.arraycopy(elements, index, elements, index + 1, size - index);
+        elements[index] = element;
+        ++this.size;
     }
 
     @Override
@@ -218,6 +248,15 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     @Override
     public final Enumerator<E> iterator() {
         return (Enumerator<E>) Enumerator.ofArray(elements, 0, size);
+    }
+
+    @Override
+    @SuppressWarnings("SuspiciousSystemArraycopy")
+    public final <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
+        Objects.requireNonNull(generator);
+        U[] arr = generator.apply(size);
+        System.arraycopy(elements, 0, arr, 0, size);
+        return arr;
     }
 
     //

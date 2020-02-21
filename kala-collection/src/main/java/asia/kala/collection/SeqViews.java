@@ -41,8 +41,29 @@ final class SeqViews {
             return collection.indexWhere(predicate, from);
         }
 
+        public int lastIndexOf(Object element) {
+            return collection.lastIndexOf(element);
+        }
+
+        public int lastIndexOf(Object element, int end) {
+            return collection.lastIndexOf(element, end);
+        }
+
+        public int lastIndexWhere(@NotNull Predicate<? super E> predicate) {
+            return collection.lastIndexWhere(predicate);
+        }
+
+        public int lastIndexWhere(@NotNull Predicate<? super E> predicate, int end) {
+            return collection.lastIndexWhere(predicate, end);
+        }
+
         public void forEachIndexed(@NotNull IndexedConsumer<? super E> action) {
             collection.forEachIndexed(action);
+        }
+
+        @Override
+        public Enumerator<E> reverseIterator() {
+            return collection.reverseIterator();
         }
     }
 

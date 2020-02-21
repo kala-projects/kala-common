@@ -4,7 +4,11 @@ import asia.kala.Option;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.RandomAccess;
+import java.util.function.IntFunction;
 
 public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
 
@@ -35,6 +39,52 @@ public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
         return size();
     }
 
+    @NotNull
+    @Override
+    default Enumerator<E> iterator() {
+        int size = size();
+        if (size == 0) {
+            return Enumerator.empty();
+        }
+
+        return new AbstractEnumerator<E>() {
+            private int idx = 0;
+
+            @Override
+            public boolean hasNext() {
+                return idx < size;
+            }
+
+            @Override
+            public E next() {
+                if (idx >= size) {
+                    throw new NoSuchElementException();
+                }
+                return get(idx++);
+            }
+        };
+    }
+
+    @Override
+    default Enumerator<E> reverseIterator() {
+        return new AbstractEnumerator<E>() {
+            private int idx = size() - 1;
+
+            @Override
+            public final boolean hasNext() {
+                return idx >= 0;
+            }
+
+            @Override
+            public final E next() {
+                if (idx < 0) {
+                    throw new NoSuchElementException();
+                }
+                return get(idx--);
+            }
+        };
+    }
+
     //
     // -- Traversable
     //
@@ -43,5 +93,18 @@ public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
     @NotNull
     default IndexedSeqView<E> view() {
         return new IndexedSeqViews.Of<>(this);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    default <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
+        Objects.requireNonNull(generator);
+
+        int size = size();
+        U[] arr = generator.apply(size);
+        for (int i = 0; i < size; i++) {
+            arr[i] = (U) get(i);
+        }
+        return arr;
     }
 }

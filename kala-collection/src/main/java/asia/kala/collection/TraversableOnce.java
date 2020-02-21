@@ -25,6 +25,10 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E> {
     @Override
     Enumerator<E> iterator();
 
+    default Iterable<E> asJava() {
+        return this;
+    }
+
     default boolean isTraversableAgain() {
         return false;
     }

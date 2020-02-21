@@ -2,6 +2,7 @@ package asia.kala.collection;
 
 import asia.kala.Option;
 import asia.kala.Tuple2;
+import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -159,38 +160,6 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E>, Transfor
         return new Enumerators.Updated<>(this, n, newValue);
     }
 
-    default int indexOf(Object element) {
-        int idx = 0;
-        while (hasNext()) {
-            if (Objects.equals(next(), element)) {
-                return idx;
-            }
-            ++idx;
-        }
-        return -1;
-    }
-
-    default int indexOf(Object element, int from) {
-        return drop(from).indexOf(element);
-    }
-
-    default int indexWhere(@NotNull Predicate<? super E> predicate) {
-        Objects.requireNonNull(predicate);
-
-        int idx = 0;
-        while (hasNext()) {
-            if (predicate.test(next())) {
-                return idx;
-            }
-            ++idx;
-        }
-        return -1;
-    }
-
-    default int indexWhere(@NotNull Predicate<? super E> predicate, int from) {
-        return drop(from).indexWhere(predicate);
-    }
-
     default Enumerator<E> prepended(E value) {
         return new Enumerators.Prepended<>(this, value);
     }
@@ -202,12 +171,13 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E>, Transfor
     @Override
     default <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
         Objects.requireNonNull(generator);
-        ArrayList<U> list = new ArrayList<>(); // TODO: replace with kala collection
+
+        ArrayBuffer<E> buffer = new ArrayBuffer<>();
         while (hasNext()) {
-            list.add((U) next());
+            buffer.append(next());
         }
-        U[] arr = generator.apply(list.size());
-        return list.toArray(arr);
+
+        return buffer.toArray(generator);
     }
 
     //
