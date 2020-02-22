@@ -3,8 +3,8 @@ package asia.kala.collection.immutable;
 import asia.kala.Option;
 import asia.kala.Tuple2;
 import asia.kala.collection.Enumerator;
+import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.TraversableOnce;
-import asia.kala.collection.mutable.CollectionBuilder;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -19,10 +19,17 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
     IList() {
     }
 
+    public static final IList.Factory<?> FACTORY = new Factory<>();
+
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")
     public static <E> IList<E> narrow(IList<? extends E> list) {
         return (IList<E>) list;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <E> IList.Factory<E> factory() {
+        return (Factory<E>) FACTORY;
     }
 
     @NotNull
@@ -38,7 +45,12 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @SafeVarargs
-    public static <E> IList<E> of(@NotNull E... elements) {
+    public static <E> IList<E> of(E... elements) {
+        return from(elements);
+    }
+
+    @NotNull
+    public static <E> IList<E> from(@NotNull E[] elements) {
         Objects.requireNonNull(elements);
         IList<E> list = nil();
 
@@ -47,6 +59,11 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
 
         return list;
+    }
+
+    public static <E> IList<E> from(@NotNull Iterable<? extends E> iterable) {
+        Objects.requireNonNull(iterable);
+        return IList.<E>factory().from(iterable);
     }
 
     public abstract E head();
@@ -128,8 +145,8 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
-    public final <U> IList.Builder<U> newBuilder() {
-        return new IList.Builder<>();
+    public <U> IList.Factory<U> iterableFactory() {
+        return factory();
     }
 
     @NotNull
@@ -154,33 +171,6 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         return filterNotImpl(predicate);
     }
 
-    public static final class Builder<E> implements CollectionBuilder<E, IList<E>> {
-        private MCons<E> first = null;
-        private MCons<E> last = null;
-
-        @Override
-        public final void add(E element) {
-            MCons<E> i = new MCons<>(element, IList.nil());
-            if (last == null) {
-                first = i;
-            } else {
-                last.tail = i;
-            }
-            last = i;
-        }
-
-        @Override
-        public final void clear() {
-            first = last = null;
-        }
-
-        @Override
-        public final IList<E> build() {
-            IList<E> ans = first;
-            clear();
-            return ans;
-        }
-    }
 
     public static final class Nil extends IList<Object> {
         private static final long serialVersionUID = -7963313933036451568L;
@@ -302,7 +292,6 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
 
 
-
         @NotNull
         @Override
         public final Enumerator<E> iterator() {
@@ -392,6 +381,64 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         @Override
         public final IList<E> tail() {
             return IList.narrow(tail);
+        }
+    }
+
+    public static final class Builder<E> {
+        MCons<E> first = null;
+        MCons<E> last = null;
+
+        public final void add(E element) {
+            MCons<E> i = new MCons<>(element, IList.nil());
+            if (last == null) {
+                first = i;
+            } else {
+                last.tail = i;
+            }
+            last = i;
+        }
+
+        public final void clear() {
+            first = last = null;
+        }
+
+        public final IList<E> build() {
+            IList<E> ans = first;
+            clear();
+            return ans;
+        }
+    }
+
+    public static final class Factory<E> implements CollectionFactory<E, Builder<E>, IList<E>> {
+
+        @Override
+        public IList<E> empty() {
+            return nil();
+        }
+
+        @Override
+        public Builder<E> newBuilder() {
+            return new Builder<>();
+        }
+
+        @Override
+        public void addToBuilder(@NotNull Builder<E> builder, E value) {
+            builder.add(value);
+        }
+
+        @Override
+        public Builder<E> mergeBuilder(@NotNull Builder<E> builder1, @NotNull Builder<E> builder2) {
+            if (builder2.first != null) {
+                for (E e : builder2.first) {
+                    builder1.add(e);
+                }
+            }
+            return builder1;
+        }
+
+        @Override
+        public IList<E> build(@NotNull Builder<E> builder) {
+            return builder.build();
         }
     }
 }

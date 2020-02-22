@@ -1,5 +1,6 @@
 package asia.kala.collection;
 
+import asia.kala.collection.immutable.IArray;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,5 +24,10 @@ public interface Traversable<E> extends TraversableOnce<E> {
     @Override
     default boolean isTraversableAgain() {
         return true;
+    }
+
+    @NotNull
+    default <U> CollectionFactory<U, ?, ? extends Traversable<U>> iterableFactory() {
+        return IArray.factory(); //TODO
     }
 }

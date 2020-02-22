@@ -1,9 +1,6 @@
 package asia.kala.collection.mutable;
 
-import asia.kala.collection.Enumerator;
-import asia.kala.collection.IndexedSeq;
-import asia.kala.collection.KalaCollectionUtils;
-import asia.kala.collection.TraversableOnce;
+import asia.kala.collection.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,6 +20,8 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     private static final int hashMagic = -1142720889;
 
     private static final int DEFAULT_CAPACITY = 16;
+
+    public static final ArrayBuffer.Factory<?> FACTORY = new Factory<>();
 
     @NotNull
     private Object[] elements;
@@ -48,10 +47,21 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         this.size = 0;
     }
 
+    public static <E> ArrayBuffer.Factory<E> factory() {
+        return (Factory<E>) FACTORY;
+    }
+
     @NotNull
     @Contract("_ -> new")
     public static <E> ArrayBuffer<E> of(E... elements) {
+        return from(elements);
+    }
+
+    @NotNull
+    @Contract("_ -> new")
+    public static <E> ArrayBuffer<E> from(@NotNull E[] elements) {
         Objects.requireNonNull(elements);
+
         int length = elements.length;
         if (length == 0) {
             return new ArrayBuffer<>(MArray.EMPTY_ARRAY, 0);
@@ -61,6 +71,12 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         return new ArrayBuffer<>(newValues, length);
     }
 
+    @NotNull
+    public static <E> ArrayBuffer<E> from(@NotNull Iterable<? extends E> iterable) {
+        ArrayBuffer<E> buffer = new ArrayBuffer<>();
+        buffer.appendAll(iterable);
+        return buffer;
+    }
 
     private void grow() {
         grow(size + 1);
@@ -87,6 +103,15 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     private void checkInBound(int index) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Index out of range: " + index);
+        }
+    }
+
+    public void sizeHint(int s) {
+        int len = elements.length;
+        int size = this.size;
+
+        if (s > 0 && s + size > len) {
+            grow(size + s);
         }
     }
 
@@ -239,6 +264,12 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         return "ArrayBuffer";
     }
 
+    @NotNull
+    @Override
+    public final <U> ArrayBuffer.Factory<U> iterableFactory() {
+        return factory();
+    }
+
     @Override
     public int size() {
         return size;
@@ -304,5 +335,34 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     @Override
     public final int hashCode() {
         return Arrays.hashCode(elements) + hashMagic;
+    }
+
+    public static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, ArrayBuffer<E>> {
+
+        @Override
+        public final ArrayBuffer<E> newBuilder() {
+            return new ArrayBuffer<>();
+        }
+
+        @Override
+        public final void addToBuilder(@NotNull ArrayBuffer<E> buffer, E value) {
+            buffer.append(value);
+        }
+
+        @Override
+        public void sizeHint(@NotNull ArrayBuffer<E> buffer, int size) {
+            buffer.sizeHint(size);
+        }
+
+        @Override
+        public final ArrayBuffer<E> mergeBuilder(@NotNull ArrayBuffer<E> builder1, @NotNull ArrayBuffer<E> builder2) {
+            builder1.appendAll(builder2);
+            return builder1;
+        }
+
+        @Override
+        public final ArrayBuffer<E> build(@NotNull ArrayBuffer<E> buffer) {
+            return buffer;
+        }
     }
 }

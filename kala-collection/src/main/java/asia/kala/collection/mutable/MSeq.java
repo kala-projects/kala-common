@@ -1,5 +1,6 @@
 package asia.kala.collection.mutable;
 
+import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.IndexedSeq;
 import asia.kala.collection.Seq;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,12 @@ public interface MSeq<E> extends MCollection<E>, Seq<E> {
     @Override
     default String className() {
         return "MSeq";
+    }
+
+    @NotNull
+    @Override
+    default <U> CollectionFactory<U, ?, ? extends MSeq<U>> iterableFactory() {
+        return MArray.factory(); // TODO
     }
 
     @NotNull

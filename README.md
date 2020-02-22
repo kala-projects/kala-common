@@ -1,8 +1,10 @@
 # kala common
+
 Project on Github: [kala-projects/kala-common](https://github.com/kala-projects/kala-common)
 
 Project on Gitee: [Glavo/kala-common](https://gitee.com/glavo-gitee/kala-common)
 
+**Note: The project is in preview stage, please do not use it in production environment.**
 
 ## Adding Kala common to your build
 

@@ -73,6 +73,12 @@ public interface Buffer<E> extends MSeq<E> {
         return "Buffer";
     }
 
+    @Override
+    @NotNull
+    default <U> CollectionFactory<U, ?, ? extends Buffer<U>> iterableFactory() {
+        return ArrayBuffer.factory();
+    }
+
     @NotNull
     @Override
     default BufferEditor<E, ? extends Buffer<E>> edit() {

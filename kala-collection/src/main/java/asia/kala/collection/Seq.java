@@ -1,6 +1,7 @@
 package asia.kala.collection;
 
 import asia.kala.Option;
+import asia.kala.collection.immutable.IArray;
 import asia.kala.collection.immutable.IList;
 import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.Contract;
@@ -174,6 +175,12 @@ public interface Seq<E> extends Traversable<E> {
     @Override
     default SeqView<E> view() {
         return new SeqViews.Of<>(this);
+    }
+
+    @NotNull
+    @Override
+    default <U> CollectionFactory<U, ?, ? extends Seq<U>> iterableFactory() {
+        return IArray.factory(); // TODO
     }
 
     @Override

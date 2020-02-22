@@ -1,7 +1,7 @@
 package asia.kala.collection.immutable;
 
+import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.TraversableOnce;
-import asia.kala.collection.mutable.CollectionBuilder;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,77 +10,87 @@ import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractISeq<E> extends AbstractICollection<E> implements ISeq<E> {
-    static <E, T> T updated(
+    static <E, T, Builder> T updated(
             @NotNull ISeq<? extends E> seq,
             int index,
             E newValue,
-            @NotNull CollectionBuilder<? super E, ? extends T> builder
+            @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
-        assert builder != null;
+        assert factory != null;
 
-        if (index < 0 || index >= seq.size()) {
+        int s = seq.size();
+
+        if (index < 0 || index >= s) {
             throw new IndexOutOfBoundsException();
         }
 
-        builder.sizeHint(seq);
+        Builder builder = factory.newBuilder();
+
+        factory.sizeHint(builder, s);
 
         for (E e : seq) {
             if (index-- == 0) {
-                builder.add(newValue);
+                factory.addToBuilder(builder, newValue);
             } else {
-                builder.add(e);
+                factory.addToBuilder(builder, e);
             }
         }
 
-        return builder.build();
+        return factory.build(builder);
     }
 
-    static <E, T extends ISeq<? extends E>> T drop(
+    static <E, T extends ISeq<? extends E>, Builder> T drop(
             @NotNull ISeq<? extends E> seq,
             int n,
-            @NotNull CollectionBuilder<? super E, ? extends T> builder
+            @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
-        assert builder != null;
+        assert factory != null;
+
+        Builder builder = factory.newBuilder();
 
         int s = seq.knownSize();
         if (s != -1) {
-            builder.sizeHint(Integer.max(s - n, 0));
+            factory.sizeHint(builder, Integer.max(s - n, 0));
         }
 
         for (E e : seq.iterator().drop(n)) {
-            builder.add(e);
+            factory.addToBuilder(builder, e);
         }
-        return builder.build();
+        return factory.build(builder);
     }
 
-    static <E, T extends ISeq<? extends E>> T dropWhile(
+    static <E, T extends ISeq<? extends E>, Builder> T dropWhile(
             @NotNull ISeq<? extends E> seq,
             @NotNull Predicate<? super E> predicate,
-            @NotNull CollectionBuilder<? super E, ? extends T> builder
+            @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
-        assert builder != null;
+        assert factory != null;
 
         Objects.requireNonNull(predicate);
 
-        builder.addAll(seq.iterator().dropWhile(predicate));
+        Builder builder = factory.newBuilder();
 
-        return builder.build();
+        factory.addAllToBuilder(builder, seq.iterator().dropWhile(predicate));
+
+        return factory.build(builder);
     }
 
-    static <E, T extends ISeq<? extends E>> T take(
+    static <E, T extends ISeq<? extends E>, Builder> T take(
             @NotNull ISeq<? extends E> seq,
             int n,
-            @NotNull CollectionBuilder<? super E, ? extends T> builder
+            @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
-        assert builder != null;
+        assert factory != null;
+
+        Builder builder = factory.newBuilder();
 
         int s = seq.knownSize();
         if (s != -1) {
-            builder.sizeHint(Integer.min(s, n));
+            factory.sizeHint(builder, Integer.min(s, n));
         }
 
         int count = 0;
@@ -88,192 +98,204 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
             if (++count > n) {
                 break;
             }
-            builder.add(e);
+            factory.addToBuilder(builder, e);
         }
 
-        return builder.build();
+        return factory.build(builder);
     }
 
-    static <E, T extends ISeq<? extends E>> T takeWhile(
+    static <E, T extends ISeq<? extends E>, Builder> T takeWhile(
             @NotNull ISeq<? extends E> seq,
             @NotNull Predicate<? super E> predicate,
-            @NotNull CollectionBuilder<? super E, ? extends T> builder
+            @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
-        assert builder != null;
+        assert factory != null;
 
         Objects.requireNonNull(predicate);
+
+        Builder builder = factory.newBuilder();
 
         for (E e : seq) {
             if (!predicate.test(e)) {
                 break;
             }
-            builder.add(e);
+            factory.addToBuilder(builder, e);
         }
 
-        return builder.build();
+        return factory.build(builder);
     }
 
-    static <E, T extends ISeq<? extends E>> T concat(
+    static <E, T extends ISeq<? extends E>, Builder> T concat(
             @NotNull ISeq<? extends E> seq,
             @NotNull TraversableOnce<? extends E> traversable,
-            @NotNull CollectionBuilder<? super E, ? extends T> builder
+            @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
-        assert builder != null;
+        assert factory != null;
 
         Objects.requireNonNull(traversable);
 
-        builder.sizeHint(seq);
-        builder.addAll(seq);
+        Builder builder = factory.newBuilder();
 
-        builder.sizeHint(traversable);
-        builder.addAll(traversable);
+        factory.sizeHint(builder, seq);
+        factory.addAllToBuilder(builder, seq);
 
-        return builder.build();
+        factory.sizeHint(builder, traversable);
+        factory.addAllToBuilder(builder, traversable);
+
+        return factory.build(builder);
     }
 
-    static <E, T> T prepended(
+    static <E, T, Builder> T prepended(
             @NotNull ISeq<? extends E> seq,
             E element,
-            @NotNull CollectionBuilder<? super E, ? extends T> builder
+            @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
-        assert builder != null;
+        assert factory != null;
 
-        builder.sizeHint(seq, 1);
+        Builder builder = factory.newBuilder();
 
-        builder.add(element);
-        builder.addAll(seq);
+        factory.sizeHint(builder, seq, 1);
 
-        return builder.build();
+        factory.addToBuilder(builder, element);
+        factory.addAllToBuilder(builder, seq);
+
+        return factory.build(builder);
     }
 
-    static <E, T> T prependedAll(
+    static <E, T, Builder> T prependedAll(
             @NotNull ISeq<? extends E> seq,
             @NotNull TraversableOnce<? extends E> prefix,
-            @NotNull CollectionBuilder<? super E, ? extends T> builder
+            @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
-        assert builder != null;
-
+        assert factory != null;
         Objects.requireNonNull(prefix);
 
-        builder.sizeHint(prefix);
-        builder.addAll(prefix);
+        Builder builder = factory.newBuilder();
 
-        builder.sizeHint(seq);
-        builder.addAll(seq);
+        factory.sizeHint(builder, prefix);
+        factory.addAllToBuilder(builder, prefix);
 
-        return builder.build();
+        factory.sizeHint(builder, seq);
+        factory.addAllToBuilder(builder, seq);
+
+        return factory.build(builder);
     }
 
-    static <E, T> T appended(
+    static <E, T, Builder> T appended(
             @NotNull ISeq<? extends E> seq,
             E element,
-            @NotNull CollectionBuilder<? super E, ? extends T> builder
+            @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
-        assert builder != null;
+        assert factory != null;
 
-        builder.sizeHint(seq, 1);
+        Builder builder = factory.newBuilder();
 
-        builder.addAll(seq);
-        builder.add(element);
+        factory.sizeHint(builder, seq, 1);
 
-        return builder.build();
+        factory.addAllToBuilder(builder, seq);
+        factory.addToBuilder(builder, element);
+
+
+        return factory.build(builder);
     }
 
-    static <E, T> T appendedAll(
+    static <E, T, Builder> T appendedAll(
             @NotNull ISeq<? extends E> seq,
             @NotNull TraversableOnce<? extends E> postfix,
-            @NotNull CollectionBuilder<? super E, ? extends T> builder
+            @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
-        assert builder != null;
-
+        assert factory != null;
         Objects.requireNonNull(postfix);
 
-        builder.sizeHint(seq);
-        builder.addAll(seq);
+        Builder builder = factory.newBuilder();
 
-        builder.sizeHint(postfix);
-        builder.addAll(postfix);
+        factory.sizeHint(builder, seq);
+        factory.addAllToBuilder(builder, seq);
 
-        return builder.build();
+        factory.sizeHint(builder, postfix);
+        factory.addAllToBuilder(builder, postfix);
+
+        return factory.build(builder);
     }
 
-    static <E, U, T> T mapIndexed(
+    static <E, U, T, Builder> T mapIndexed(
             @NotNull ISeq<? extends E> Seq,
             @NotNull IndexedFunction<? super E, ? extends U> mapper,
-            @NotNull CollectionBuilder<? super U, ? extends T> builder
+            @NotNull CollectionFactory<? super U, Builder, ? extends T> factory
     ) {
         assert Seq != null;
-        assert builder != null;
-
+        assert factory != null;
         Objects.requireNonNull(mapper);
 
-        builder.sizeHint(Seq);
+        Builder builder = factory.newBuilder();
+
+        factory.sizeHint(builder, Seq);
 
         int idx = 0;
         for (E e : Seq) {
-            builder.add(mapper.apply(idx++, e));
+            factory.addToBuilder(builder, mapper.apply(idx++, e));
         }
-        return builder.build();
+        return factory.build(builder);
     }
 
     @NotNull
     protected final <To extends ISeq<E>> To updatedImpl(int index, E newValue) {
-        return (To) AbstractISeq.updated(this, index, newValue, newBuilder());
+        return (To) AbstractISeq.updated(this, index, newValue, iterableFactory());
     }
 
     @NotNull
     protected final <To extends ISeq<E>> To dropImpl(int n) {
-        return (To) AbstractISeq.drop(this, n, newBuilder());
+        return (To) AbstractISeq.drop(this, n, iterableFactory());
     }
 
     @NotNull
     protected final <To extends ISeq<E>> To dropWhileImpl(@NotNull Predicate<? super E> predicate) {
-        return (To) AbstractISeq.dropWhile(this, predicate, newBuilder());
+        return (To) AbstractISeq.dropWhile(this, predicate, iterableFactory());
     }
 
     @NotNull
     protected final <To extends ISeq<E>> To takeImpl(int n) {
-        return (To) AbstractISeq.take(this, n, newBuilder());
+        return (To) AbstractISeq.take(this, n, iterableFactory());
     }
 
     @NotNull
     protected final <To extends ISeq<E>> To takeWhileImpl(@NotNull Predicate<? super E> predicate) {
-        return (To) AbstractISeq.takeWhile(this, predicate, newBuilder());
+        return (To) AbstractISeq.takeWhile(this, predicate, iterableFactory());
     }
 
     @NotNull
     protected final <To extends ISeq<E>> To concatImpl(@NotNull TraversableOnce<? extends E> traversable) {
-        return (To) AbstractISeq.concat(this, traversable, newBuilder());
+        return (To) AbstractISeq.concat(this, traversable, iterableFactory());
     }
 
     @NotNull
     protected final <To extends ISeq<E>> To prependedImpl(E element) {
-        return (To) AbstractISeq.prepended(this, element, newBuilder());
+        return (To) AbstractISeq.prepended(this, element, iterableFactory());
     }
 
     @NotNull
     protected final <To extends ISeq<E>> To prependedAllImpl(@NotNull TraversableOnce<? extends E> prefix) {
-        return (To) AbstractISeq.prependedAll(this, prefix, newBuilder());
+        return (To) AbstractISeq.prependedAll(this, prefix, iterableFactory());
     }
 
     @NotNull
     protected final <To extends ISeq<E>> To appendedImpl(E element) {
-        return (To) AbstractISeq.prepended(this, element, newBuilder());
+        return (To) AbstractISeq.prepended(this, element, iterableFactory());
     }
 
     @NotNull
     protected final <To extends ISeq<E>> To appendedAllImpl(@NotNull TraversableOnce<? extends E> postfix) {
-        return (To) AbstractISeq.appendedAll(this, postfix, newBuilder());
+        return (To) AbstractISeq.appendedAll(this, postfix, iterableFactory());
     }
 
     @NotNull
     protected final <U, To extends ISeq<U>> To mapIndexedImpl(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
-        return (To) AbstractISeq.mapIndexed(this, mapper, this.<U>newBuilder());
+        return (To) AbstractISeq.mapIndexed(this, mapper, iterableFactory());
     }
 }

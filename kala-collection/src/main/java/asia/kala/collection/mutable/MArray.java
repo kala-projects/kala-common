@@ -1,5 +1,6 @@
 package asia.kala.collection.mutable;
 
+import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Enumerator;
 import asia.kala.collection.IndexedSeq;
 import asia.kala.collection.immutable.IArray;
@@ -21,6 +22,8 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
     public static final Object[] EMPTY_ARRAY = IArray.EMPTY_ARRAY;
     public static final MArray<?> EMPTY = new MArray<>(EMPTY_ARRAY);
 
+    public static final MArray.Factory<?> FACTORY = new Factory<>();
+
     @NotNull
     private final Object[] values;
     private final boolean isChecked;
@@ -32,6 +35,10 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
     MArray(@NotNull Object[] values, boolean isChecked) {
         this.values = values;
         this.isChecked = isChecked;
+    }
+
+    public static <E> MArray.Factory<E> factory() {
+        return (Factory<E>) FACTORY;
     }
 
     public static <E> MArray<E> empty() {
@@ -113,6 +120,12 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
 
     @NotNull
     @Override
+    public final <U> MArray.Factory<U> iterableFactory() {
+        return factory();
+    }
+
+    @NotNull
+    @Override
     public final Enumerator<E> iterator() {
         return (Enumerator<E>) Enumerator.ofArray(values);
     }
@@ -154,5 +167,34 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
     @Override
     public final int hashCode() {
         return Arrays.hashCode(values) + hashMagic;
+    }
+
+    public static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, MArray<E>> {
+
+        @Override
+        public ArrayBuffer<E> newBuilder() {
+            return new ArrayBuffer<>();
+        }
+
+        @Override
+        public void addToBuilder(@NotNull ArrayBuffer<E> buffer, E value) {
+            buffer.append(value);
+        }
+
+        @Override
+        public void sizeHint(@NotNull ArrayBuffer<E> buffer, int size) {
+            buffer.sizeHint(size);
+        }
+
+        @Override
+        public ArrayBuffer<E> mergeBuilder(@NotNull ArrayBuffer<E> builder1, @NotNull ArrayBuffer<E> builder2) {
+            builder1.appendAll(builder2);
+            return builder1;
+        }
+
+        @Override
+        public MArray<E> build(@NotNull ArrayBuffer<E> buffer) {
+            return new MArray<>(buffer.toArray(Object[]::new));
+        }
     }
 }

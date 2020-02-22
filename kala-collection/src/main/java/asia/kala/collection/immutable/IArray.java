@@ -2,10 +2,11 @@ package asia.kala.collection.immutable;
 
 import asia.kala.Tuple2;
 import asia.kala.annotations.StaticClass;
+import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Enumerator;
 import asia.kala.collection.IndexedSeq;
 import asia.kala.collection.TraversableOnce;
-import asia.kala.collection.mutable.CollectionBuilder;
+import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.function.IndexedConsumer;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.ApiStatus;
@@ -28,6 +29,8 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
     public static final Object[] EMPTY_ARRAY = new Object[0];
     public static final IArray<?> EMPTY = new IArray<>(EMPTY_ARRAY);
 
+    public static final IArray.Factory<?> FACTORY = new Factory<>();
+
     private final Object[] values;
 
     IArray(Object[] values) {
@@ -35,9 +38,12 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
     }
 
     @Contract("_ -> param1")
-    @SuppressWarnings("unchecked")
-    static <E> IArray<E> narrow(IArray<? extends E> array) {
+    public static <E> IArray<E> narrow(IArray<? extends E> array) {
         return (IArray<E>) array;
+    }
+
+    public static <E> IArray.Factory<E> factory() {
+        return (Factory<E>) FACTORY;
     }
 
     public static <E> IArray<E> empty() {
@@ -52,8 +58,21 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
     @SafeVarargs
     @Contract("_ -> new")
     public static <E> IArray<E> of(E... elements) {
+        return from(elements);
+    }
+
+    @NotNull
+    @Contract("_ -> new")
+    public static <E> IArray<E> from(@NotNull E[] elements) {
         Objects.requireNonNull(elements);
+        if (elements.length == 0) {
+            return empty();
+        }
         return new IArray<>(elements.clone());
+    }
+
+    public static <E> IArray<E> from(@NotNull Iterable<? extends E> iterable) {
+        return IArray.<E>factory().from(iterable);
     }
 
     @StaticClass
@@ -269,8 +288,8 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
 
     @NotNull
     @Override
-    public final <U> IArray.Builder<U> newBuilder() {
-        return new Builder<>();
+    public <U> IArray.Factory<U> iterableFactory() {
+        return factory();
     }
 
     @NotNull
@@ -317,22 +336,37 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
         return Arrays.hashCode(values) + hashMagic;
     }
 
-    public static final class Builder<E> implements CollectionBuilder<E, IArray<E>> {
-        private final ArrayList<E> list = new ArrayList<>(); // TODO
+    public static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, IArray<E>> {
 
         @Override
-        public final void add(E element) {
-            list.add(element);
+        public IArray<E> empty() {
+            return IArray.empty();
         }
 
         @Override
-        public final void clear() {
-            list.clear();
+        public ArrayBuffer<E> newBuilder() {
+            return new ArrayBuffer<>();
         }
 
         @Override
-        public final IArray<E> build() {
-            return new IArray<>(list.toArray());
+        public void addToBuilder(@NotNull ArrayBuffer<E> buffer, E value) {
+            buffer.append(value);
+        }
+
+        @Override
+        public void sizeHint(@NotNull ArrayBuffer<E> buffer, int size) {
+            buffer.sizeHint(size);
+        }
+
+        @Override
+        public ArrayBuffer<E> mergeBuilder(@NotNull ArrayBuffer<E> buffer1, @NotNull ArrayBuffer<E> buffer2) {
+            buffer1.appendAll(buffer2);
+            return buffer1;
+        }
+
+        @Override
+        public IArray<E> build(@NotNull ArrayBuffer<E> buffer) {
+            return new IArray<>(buffer.toArray(Object[]::new));
         }
     }
 }
