@@ -14,6 +14,23 @@ import java.util.function.Predicate;
 
 public interface ISeq<E> extends ICollection<E>, Seq<E> {
 
+    static <E> CollectionFactory<E, ?, ? extends ISeq<E>> factory() {
+        return IArray.factory();
+    }
+
+    @SafeVarargs
+    static <E> ISeq<E> of(E... elements) {
+        return ISeq.<E>factory().from(elements);
+    }
+
+    static <E> ISeq<E> from(@NotNull E[] elements) {
+        return ISeq.<E>factory().from(elements);
+    }
+
+    static <E> ISeq<E> from(@NotNull Iterable<? extends E> iterable) {
+        return ISeq.<E>factory().from(iterable);
+    }
+
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")
     static <E> ISeq<E> narrow(ISeq<? extends E> seq) {
@@ -88,7 +105,7 @@ public interface ISeq<E> extends ICollection<E>, Seq<E> {
     @NotNull
     @Override
     default <U> CollectionFactory<U, ?, ? extends ISeq<U>> iterableFactory() {
-        return IArray.factory(); // TODO
+        return factory();
     }
 
     @NotNull

@@ -1,16 +1,33 @@
 package asia.kala.collection;
 
 import asia.kala.Option;
+import asia.kala.collection.immutable.IArray;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.RandomAccess;
 import java.util.function.IntFunction;
 
 public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
+
+    static <E> CollectionFactory<E, ?, ? extends IndexedSeq<E>> factory() {
+        return IArray.factory();
+    }
+
+    @SafeVarargs
+    static <E> IndexedSeq<E> of(E... elements) {
+        return IndexedSeq.<E>factory().from(elements);
+    }
+
+    static <E> IndexedSeq<E> from(@NotNull E[] elements) {
+        return IndexedSeq.<E>factory().from(elements);
+    }
+
+    static <E> IndexedSeq<E> from(@NotNull Iterable<? extends E> iterable) {
+        return IndexedSeq.<E>factory().from(iterable);
+    }
 
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")

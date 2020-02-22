@@ -42,6 +42,12 @@ subprojects {
         testImplementation group: 'org.jetbrains', name: 'annotations', version: '18.0.0'
 
         testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.2'
+
+        testImplementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: kotlinVersion
+
+        testImplementation group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: kotlinVersion
+
+        testImplementation group: 'org.jetbrains.kotlin', name: 'kotlin-annotations-jvm', version: kotlinVersion
     }
 
     if (project.name.endsWith('kotlin') && (project != project(':kala-common-kotlin'))) {

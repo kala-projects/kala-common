@@ -3,6 +3,7 @@ package asia.kala.collection;
 import asia.kala.Option;
 import asia.kala.collection.immutable.IArray;
 import asia.kala.collection.immutable.IList;
+import asia.kala.collection.immutable.ISeq;
 import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,23 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 public interface Seq<E> extends Traversable<E> {
+
+    static <E> CollectionFactory<E, ?, ? extends Seq<E>> factory() {
+        return ISeq.factory();
+    }
+
+    @SafeVarargs
+    static <E> Seq<E> of(E... elements) {
+        return Seq.<E>factory().from(elements);
+    }
+
+    static <E> Seq<E> from(@NotNull E[] elements) {
+        return Seq.<E>factory().from(elements);
+    }
+
+    static <E> Seq<E> from(@NotNull Iterable<? extends E> iterable) {
+        return Seq.<E>factory().from(iterable);
+    }
 
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")
@@ -180,7 +198,7 @@ public interface Seq<E> extends Traversable<E> {
     @NotNull
     @Override
     default <U> CollectionFactory<U, ?, ? extends Seq<U>> iterableFactory() {
-        return IArray.factory(); // TODO
+        return factory();
     }
 
     @Override

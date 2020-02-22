@@ -5,7 +5,10 @@ import asia.kala.Tuple2;
 import asia.kala.collection.Enumerator;
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.TraversableOnce;
+import asia.kala.collection.mutable.AbstractBuffer;
+import asia.kala.collection.mutable.LinkedBuffer;
 import asia.kala.function.IndexedFunction;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -171,6 +174,11 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         return filterNotImpl(predicate);
     }
 
+
+    @Override
+    public final IList<E> toIList() {
+        return this;
+    }
 
     public static final class Nil extends IList<Object> {
         private static final long serialVersionUID = -7963313933036451568L;
@@ -384,28 +392,204 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
     }
 
-    public static final class Builder<E> {
+    /**
+     * Internal implementation of {@link LinkedBuffer}.
+     *
+     * @see LinkedBuffer
+     */
+    @ApiStatus.Internal
+    public static abstract class Builder<E> extends AbstractBuffer<E> {
         MCons<E> first = null;
         MCons<E> last = null;
 
-        public final void add(E element) {
-            MCons<E> i = new MCons<>(element, IList.nil());
-            if (last == null) {
+        int len = 0;
+
+        private boolean aliased = false;
+
+        private void ensureUnaliased() {
+            if (aliased) {
+                Builder<E> buffer = new LinkedBuffer<>();
+                buffer.appendAll(this);
+                this.first = buffer.first;
+                this.last = buffer.last;
+                aliased = false;
+            }
+        }
+
+        @Override
+        public final void append(E value) {
+            MCons<E> i = new MCons<>(value, IList.nil());
+            if (len == 0) {
                 first = i;
             } else {
                 last.tail = i;
             }
             last = i;
+            ++len;
+        }
+
+
+        @Override
+        public final void prepend(E value) {
+            ensureUnaliased();
+            if (len == 0) {
+                append(value);
+                return;
+            }
+            first = new MCons<>(value, first);
+            ++len;
+        }
+
+        @Override
+        public void insert(int index, E element) {
+            ensureUnaliased();
+            if (index < 0 || index > len) {
+                throw new IndexOutOfBoundsException("Index out of range: " + index);
+            }
+            if (index == len) {
+                append(element);
+                return;
+            }
+
+            if (index == 0) {
+                prepend(element);
+                return;
+            }
+            ensureUnaliased();
+            IList<E> i = first;
+            int c = 1;
+
+            while (c++ != index) {
+                i = i.tail();
+            }
+
+            ((MCons<E>) i).tail = new MCons<>(element, i.tail());
+            ++len;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public final E remove(int index) {
+            if (index < 0 || index >= len) {
+                throw new IndexOutOfBoundsException("Index out of range: " + index);
+            }
+
+            if (index == 0) {
+                E v = first.head;
+                if (len == 1) {
+                    first = last = null;
+                    aliased = false;
+                } else {
+                    first = (MCons<E>) first.tail;
+                }
+                --len;
+                return v;
+            }
+
+            ensureUnaliased();
+            IList<E> i = first;
+            int c = 1;
+
+            while (c++ != index) {
+                i = i.tail();
+            }
+            E v = i.tail().head();
+            ((MCons<E>) i).tail = i.tail().tail();
+            --len;
+            return v;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public final void remove(int index, int count) {
+            if (count < 0) {
+                throw new IllegalArgumentException("count: " + count);
+            }
+            if (index < 0 || index + count > len) {
+                throw new IndexOutOfBoundsException(String.format("%d to %d is out of bounds", index, index + count));
+            }
+
+            if (count == 0) {
+                return;
+            }
+            if (count == 1) {
+                remove(index);
+                return;
+            }
+            if (count == len) {
+                clear();
+                return;
+            }
+            if (index == 0) {
+                int c = count;
+                while (c-- > 0) {
+                    first = (MCons<E>) first.tail;
+                }
+                len -= count;
+                return;
+            }
+
+            ensureUnaliased();
+            IList<E> i = first;
+            int c = 1;
+            while (c++ != index) {
+                i = i.tail();
+            }
+
+            IList<E> t = i.tail();
+            c = count;
+            while (c-- > 0) {
+                t = t.tail();
+            }
+
+            ((MCons<E>) i).tail = t;
+            len -= count;
         }
 
         public final void clear() {
             first = last = null;
+            len = 0;
+            aliased = false;
         }
 
-        public final IList<E> build() {
-            IList<E> ans = first;
-            clear();
-            return ans;
+        @Override
+        public final IList<E> toIList() {
+            aliased = true;
+            return first;
+        }
+
+        @Override
+        public final void set(int index, E newValue) {
+            int len = this.len;
+            if (index < 0 || index >= len) {
+                throw new IndexOutOfBoundsException("Index out of range: " + index);
+            }
+
+            ensureUnaliased();
+            if (index == len - 1) {
+                last.head = newValue;
+                return;
+            }
+
+            IList<E> l = first;
+            while (--index >= 0) {
+                l = l.tail();
+            }
+            ((MCons<E>) l).head = newValue;
+        }
+
+        @Override
+        public final int size() {
+            return len;
+        }
+
+        @NotNull
+        @Override
+        public final Enumerator<E> iterator() {
+            if (len == 0) {
+                return Enumerator.empty();
+            }
+            return first.iterator();
         }
     }
 
@@ -417,20 +601,20 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
 
         @Override
-        public Builder<E> newBuilder() {
-            return new Builder<>();
+        public LinkedBuffer<E> newBuilder() {
+            return new LinkedBuffer<>();
         }
 
         @Override
         public void addToBuilder(@NotNull Builder<E> builder, E value) {
-            builder.add(value);
+            builder.append(value);
         }
 
         @Override
         public Builder<E> mergeBuilder(@NotNull Builder<E> builder1, @NotNull Builder<E> builder2) {
             if (builder2.first != null) {
                 for (E e : builder2.first) {
-                    builder1.add(e);
+                    builder1.append(e);
                 }
             }
             return builder1;
@@ -438,7 +622,7 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
         @Override
         public IList<E> build(@NotNull Builder<E> builder) {
-            return builder.build();
+            return builder.toIList();
         }
     }
 }

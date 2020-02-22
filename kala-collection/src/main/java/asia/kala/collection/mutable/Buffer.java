@@ -3,12 +3,28 @@ package asia.kala.collection.mutable;
 import asia.kala.collection.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.RandomAccess;
 
 public interface Buffer<E> extends MSeq<E> {
+
+    static <E> CollectionFactory<E, ?, ? extends Buffer<E>> factory() {
+        return ArrayBuffer.factory();
+    }
+
+    @SafeVarargs
+    static <E> Buffer<E> of(E... elements) {
+        return Buffer.<E>factory().from(elements);
+    }
+
+    static <E> Buffer<E> from(@NotNull E[] elements) {
+        return Buffer.<E>factory().from(elements);
+    }
+
+    static <E> Buffer<E> from(@NotNull Iterable<? extends E> iterable) {
+        return Buffer.<E>factory().from(iterable);
+    }
 
     void append(E value);
 
@@ -60,7 +76,11 @@ public interface Buffer<E> extends MSeq<E> {
 
     E remove(int index);
 
-    void remove(int index, int count);
+    default void remove(int index, int count) {
+        for (int i = 0; i < count; i++) {
+            remove(index);
+        }
+    }
 
     void clear();
 
@@ -76,7 +96,7 @@ public interface Buffer<E> extends MSeq<E> {
     @Override
     @NotNull
     default <U> CollectionFactory<U, ?, ? extends Buffer<U>> iterableFactory() {
-        return ArrayBuffer.factory();
+        return factory();
     }
 
     @NotNull

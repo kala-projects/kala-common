@@ -40,6 +40,20 @@ public class BufferEditor<E, C extends Buffer<E>> extends MSeqEditor<E, C> {
     }
 
     @NotNull
+    @Contract("_, _ -> this")
+    public BufferEditor<E, C> insert(int index, E element) {
+        source.insert(index, element);
+        return this;
+    }
+
+    @NotNull
+    @Contract("_, _ -> this")
+    public BufferEditor<E, C> insertAll(int index, @NotNull Iterable<? extends E> elements) {
+        source.insertAll(index, elements);
+        return this;
+    }
+
+    @NotNull
     @Contract("_ -> this")
     public BufferEditor<E, C> remove(int index) {
         source.remove(index);

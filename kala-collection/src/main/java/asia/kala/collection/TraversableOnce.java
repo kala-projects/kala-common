@@ -2,6 +2,7 @@ package asia.kala.collection;
 
 import asia.kala.Foldable;
 import asia.kala.Option;
+import asia.kala.collection.immutable.IList;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -143,6 +144,10 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E> {
     @Override
     default void forEach(@NotNull Consumer<? super E> action) {
         iterator().forEach(action);
+    }
+
+    default IList<E> toIList() {
+        return IList.from(this);
     }
 
     //

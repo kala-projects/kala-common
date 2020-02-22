@@ -277,6 +277,12 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
 
     @NotNull
     @Override
+    public final BufferEditor<E, ArrayBuffer<E>> edit() {
+        return new BufferEditor<>(this);
+    }
+
+    @NotNull
+    @Override
     public final Enumerator<E> iterator() {
         return (Enumerator<E>) Enumerator.ofArray(elements, 0, size);
     }
@@ -337,32 +343,15 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         return Arrays.hashCode(elements) + hashMagic;
     }
 
-    public static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, ArrayBuffer<E>> {
-
+    public static final class Factory<E> extends AbstractBufferFactory<E, ArrayBuffer<E>> {
         @Override
         public final ArrayBuffer<E> newBuilder() {
             return new ArrayBuffer<>();
         }
 
         @Override
-        public final void addToBuilder(@NotNull ArrayBuffer<E> buffer, E value) {
-            buffer.append(value);
-        }
-
-        @Override
         public void sizeHint(@NotNull ArrayBuffer<E> buffer, int size) {
             buffer.sizeHint(size);
-        }
-
-        @Override
-        public final ArrayBuffer<E> mergeBuilder(@NotNull ArrayBuffer<E> builder1, @NotNull ArrayBuffer<E> builder2) {
-            builder1.appendAll(builder2);
-            return builder1;
-        }
-
-        @Override
-        public final ArrayBuffer<E> build(@NotNull ArrayBuffer<E> buffer) {
-            return buffer;
         }
     }
 }

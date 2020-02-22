@@ -5,6 +5,23 @@ import asia.kala.collection.Traversable;
 import org.jetbrains.annotations.NotNull;
 
 public interface MCollection<E> extends Traversable<E> {
+    static <E> CollectionFactory<E, ?, ? extends MCollection<E>> factory() {
+        return MSeq.factory();
+    }
+
+    @SafeVarargs
+    static <E> MCollection<E> of(E... elements) {
+        return MCollection.<E>factory().from(elements);
+    }
+
+    static <E> MCollection<E> from(@NotNull E[] elements) {
+        return MCollection.<E>factory().from(elements);
+    }
+
+    static <E> MCollection<E> from(@NotNull Iterable<? extends E> iterable) {
+        return MCollection.<E>factory().from(iterable);
+    }
+
     @Override
     default String className() {
         return "MCollection";
@@ -13,7 +30,7 @@ public interface MCollection<E> extends Traversable<E> {
     @NotNull
     @Override
     default <U> CollectionFactory<U, ?, ? extends MCollection<U>> iterableFactory() {
-        return MArray.factory();
+        return factory();
     }
 
     @NotNull

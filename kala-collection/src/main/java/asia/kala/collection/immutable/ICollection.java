@@ -5,6 +5,8 @@ import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Transformable;
 import asia.kala.collection.Traversable;
 import asia.kala.collection.TraversableOnce;
+import asia.kala.collection.mutable.MCollection;
+import asia.kala.collection.mutable.MSeq;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,6 +14,22 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface ICollection<E> extends Traversable<E>, Transformable<E> {
+    static <E> CollectionFactory<E, ?, ? extends ICollection<E>> factory() {
+        return ISeq.factory();
+    }
+
+    @SafeVarargs
+    static <E> ICollection<E> of(E... elements) {
+        return ICollection.<E>factory().from(elements);
+    }
+
+    static <E> ICollection<E> from(@NotNull E[] elements) {
+        return ICollection.<E>factory().from(elements);
+    }
+
+    static <E> ICollection<E> from(@NotNull Iterable<? extends E> iterable) {
+        return ICollection.<E>factory().from(iterable);
+    }
 
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")
@@ -27,7 +45,7 @@ public interface ICollection<E> extends Traversable<E>, Transformable<E> {
     @NotNull
     @Override
     default <U> CollectionFactory<U, ?, ? extends ICollection<U>> iterableFactory() {
-        return IArray.factory(); // TODO
+        return factory();
     }
 
     @NotNull

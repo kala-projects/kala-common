@@ -11,6 +11,24 @@ import java.util.function.Function;
 
 public interface MSeq<E> extends MCollection<E>, Seq<E> {
 
+    static <E> CollectionFactory<E, ?, ? extends MSeq<E>> factory() {
+        return MArray.factory();
+    }
+
+    @SafeVarargs
+    static <E> MSeq<E> of(E... elements) {
+        return MSeq.<E>factory().from(elements);
+    }
+
+    static <E> MSeq<E> from(@NotNull E[] elements) {
+        return MSeq.<E>factory().from(elements);
+    }
+
+    static <E> MSeq<E> from(@NotNull Iterable<? extends E> iterable) {
+        return MSeq.<E>factory().from(iterable);
+    }
+
+
     void set(int index, E newValue);
 
     default void mapInPlace(@NotNull Function<? super E, ? extends E> mapper) {
@@ -34,7 +52,7 @@ public interface MSeq<E> extends MCollection<E>, Seq<E> {
     @NotNull
     @Override
     default <U> CollectionFactory<U, ?, ? extends MSeq<U>> iterableFactory() {
-        return MArray.factory(); // TODO
+        return factory();
     }
 
     @NotNull

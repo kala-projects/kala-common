@@ -65,6 +65,20 @@ public interface CollectionFactory<E, Builder, R> extends Collector<E, Builder, 
         return build(builder);
     }
 
+    default R from(@NotNull E[] elements) {
+        Objects.requireNonNull(elements);
+        if (elements.length == 0) {
+            return empty();
+        }
+
+        Builder builder = newBuilder();
+        sizeHint(builder, elements.length);
+        for (E element : elements) {
+            addToBuilder(builder, element);
+        }
+        return build(builder);
+    }
+
     default <U> CollectionFactory<E, Builder, U> mapResult(@NotNull Function<? super R, ? extends U> mapper) {
         CollectionFactory<E, Builder, R> source = this;
         return new CollectionFactory<E, Builder, U>() {
