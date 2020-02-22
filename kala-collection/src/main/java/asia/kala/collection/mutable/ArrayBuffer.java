@@ -340,7 +340,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
 
     @Override
     public final int hashCode() {
-        return Arrays.hashCode(elements) + hashMagic;
+        return KalaCollectionUtils.hash(elements, 0, size) + hashMagic;
     }
 
     public static final class Factory<E> extends AbstractBufferFactory<E, ArrayBuffer<E>> {

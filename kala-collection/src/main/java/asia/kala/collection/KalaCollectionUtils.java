@@ -7,6 +7,8 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Objects;
 
 @StaticClass
 @ApiStatus.Internal
@@ -27,5 +29,23 @@ public final class KalaCollectionUtils {
             buffer.append(o);
         }
         return buffer.toArray(Object[]::new);
+    }
+
+    public static int hash(@NotNull Iterator<?> it) {
+        assert it != null;
+
+        int ans = 0;
+        while (it.hasNext()) {
+            ans = ans * 31 + Objects.hashCode(it.next());
+        }
+        return ans;
+    }
+
+    public static int hash(@NotNull Object[] arr, int start, int count) {
+        int ans = 0;
+        for (int i = start; i < start + count; i++) {
+            ans = 31 * ans + Objects.hashCode(arr[i]);
+        }
+        return ans;
     }
 }

@@ -1,11 +1,18 @@
 package asia.kala.collection.mutable;
 
+import asia.kala.collection.KalaCollectionUtils;
 import asia.kala.collection.immutable.IList;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.function.IntFunction;
 
-public final class LinkedBuffer<E> extends IList.Builder<E> {
+
+public final class LinkedBuffer<E> extends IList.Builder<E> implements Serializable {
     private static final long serialVersionUID = 1621067498993048170L;
     private static final int hashMagic = -1383198749;
 
@@ -55,6 +62,17 @@ public final class LinkedBuffer<E> extends IList.Builder<E> {
         return new BufferEditor<>(this);
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public final <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
+        U[] arr = generator.apply(size());
+        int i = 0;
+        for (E e : this) {
+            arr[i++] = (U) e;
+        }
+        return arr;
+    }
+
     //
     // -- Object
     //
@@ -76,6 +94,27 @@ public final class LinkedBuffer<E> extends IList.Builder<E> {
         }
 
         return this.sameElements((LinkedBuffer<?>) obj);
+    }
+
+    @Override
+    public final int hashCode() {
+        return KalaCollectionUtils.hash(iterator()) + hashMagic;
+    }
+
+    //
+    // -- Serializable
+    //
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeObject(toArray(Object[]::new));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        Object[] values = (Object[]) in.readObject();
+        for (Object e : values) {
+            this.append((E) e);
+        }
     }
 
     public static final class Factory<E> extends AbstractBufferFactory<E, LinkedBuffer<E>> {
