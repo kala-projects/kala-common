@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
@@ -73,17 +74,6 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
 
     public static <E> IArray<E> from(@NotNull Iterable<? extends E> iterable) {
         return IArray.<E>factory().from(iterable);
-    }
-
-    @StaticClass
-    @ApiStatus.Internal
-    public static final class Unsafe {
-        @NotNull
-        @Contract("_ -> new")
-        public static <E> IArray<E> wrap(@NotNull E[] values) {
-            Objects.requireNonNull(values);
-            return new IArray<>(values);
-        }
     }
 
     //
@@ -260,6 +250,25 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
 
     @NotNull
     @Override
+    public final <U> IArray<U> map(@NotNull Function<? super E, ? extends U> mapper) {
+        Object[] values = this.values;
+        int length = values.length;
+
+        if (length == 0) {
+            return empty();
+        }
+
+        Object[] newValues = new Object[values.length];
+
+        for (int i = 0; i < length; i++) {
+            newValues[i] = mapper.apply((E) values[i]);
+        }
+
+        return new IArray<>(newValues);
+    }
+
+    @NotNull
+    @Override
     public final Tuple2<IArray<E>, IArray<E>> span(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
 
@@ -366,6 +375,9 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
 
         @Override
         public IArray<E> build(@NotNull ArrayBuffer<E> buffer) {
+            if (buffer.isEmpty()) {
+                return empty();
+            }
             return new IArray<>(buffer.toArray(Object[]::new));
         }
     }

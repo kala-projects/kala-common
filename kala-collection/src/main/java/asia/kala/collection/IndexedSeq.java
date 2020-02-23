@@ -56,6 +56,11 @@ public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
         return size();
     }
 
+    @Override
+    default boolean isEmpty() {
+        return size() == 0;
+    }
+
     @NotNull
     @Override
     default Enumerator<E> iterator() {

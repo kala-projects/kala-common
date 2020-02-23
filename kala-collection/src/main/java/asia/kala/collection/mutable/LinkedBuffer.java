@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.util.function.IntFunction;
 
 
-public final class LinkedBuffer<E> extends IList.Builder<E> implements Serializable {
+public final class LinkedBuffer<E> extends IList.BufferImpl<E> implements Serializable {
     private static final long serialVersionUID = 1621067498993048170L;
     private static final int hashMagic = -1383198749;
 

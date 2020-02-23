@@ -137,4 +137,10 @@ public final class JDKConverters {
             return Enumerator.fromJava(list.iterator());
         }
     }
+
+    public static class RandomAccessListWrapper<E> extends ListWrapper<E> implements IndexedSeq<E> {
+        public RandomAccessListWrapper(@NotNull List<E> list) {
+            super(list);
+        }
+    }
 }

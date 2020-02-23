@@ -398,7 +398,7 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
      * @see LinkedBuffer
      */
     @ApiStatus.Internal
-    public static abstract class Builder<E> extends AbstractBuffer<E> {
+    public static abstract class BufferImpl<E> extends AbstractBuffer<E> {
         MCons<E> first = null;
         MCons<E> last = null;
 
@@ -408,12 +408,37 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
         private void ensureUnaliased() {
             if (aliased) {
-                Builder<E> buffer = new LinkedBuffer<>();
+                BufferImpl<E> buffer = new LinkedBuffer<>();
                 buffer.appendAll(this);
                 this.first = buffer.first;
                 this.last = buffer.last;
                 aliased = false;
             }
+        }
+
+        @Override
+        public final E get(int index) {
+            if (index < 0 || index >= len) {
+                throw new IndexOutOfBoundsException("Index out of range: " + index);
+            }
+            if (index == len - 1) {
+                return last.head;
+            }
+
+            return first.get(index);
+        }
+
+        @NotNull
+        @Override
+        public final Option<E> getOption(int index) {
+            if (index < 0 || index >= len) {
+                return Option.none();
+            }
+            if (index == len - 1) {
+                return Option.some(last.head);
+            }
+
+            return Option.some(first.get(index));
         }
 
         @Override
@@ -593,7 +618,7 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
     }
 
-    public static final class Factory<E> implements CollectionFactory<E, Builder<E>, IList<E>> {
+    public static final class Factory<E> implements CollectionFactory<E, LinkedBuffer<E>, IList<E>> {
 
         @Override
         public IList<E> empty() {
@@ -606,14 +631,14 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
 
         @Override
-        public void addToBuilder(@NotNull Builder<E> builder, E value) {
+        public void addToBuilder(@NotNull LinkedBuffer<E> builder, E value) {
             builder.append(value);
         }
 
         @Override
-        public Builder<E> mergeBuilder(@NotNull Builder<E> builder1, @NotNull Builder<E> builder2) {
-            if (builder2.first != null) {
-                for (E e : builder2.first) {
+        public LinkedBuffer<E> mergeBuilder(@NotNull LinkedBuffer<E> builder1, @NotNull LinkedBuffer<E> builder2) {
+            if (((BufferImpl<E>) builder2).first != null) {
+                for (E e : ((BufferImpl<E>) builder2).first) {
                     builder1.append(e);
                 }
             }
@@ -621,7 +646,7 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
 
         @Override
-        public IList<E> build(@NotNull Builder<E> builder) {
+        public IList<E> build(@NotNull LinkedBuffer<E> builder) {
             return builder.toIList();
         }
     }

@@ -166,6 +166,31 @@ public interface Seq<E> extends Traversable<E> {
         return -1;
     }
 
+    default int copyToArray(@NotNull Object[] array) {
+        return copyToArray(array, 0);
+    }
+
+    default int copyToArray(@NotNull Object[] array, int start) {
+        int arrayLength = array.length;
+        Enumerator<E> it = iterator();
+
+        int i = start;
+        while (i < arrayLength && it.hasNext()) {
+            array[i++] = it.next();
+        }
+        return i - start;
+    }
+
+    default int copyToArray(@NotNull Object[] array, int start, int length) {
+        Enumerator<E> it = iterator();
+        int i = start;
+        int end = start + Math.min(length, array.length - start);
+        while (i < end && it.hasNext()) {
+            array[i++] = it.next();
+        }
+        return i - start;
+    }
+
     default void forEachIndexed(@NotNull IndexedConsumer<? super E> action) {
         iterator().forEachIndexed(action);
     }
