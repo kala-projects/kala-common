@@ -1,7 +1,6 @@
 package asia.kala.collection.mutable;
 
 import asia.kala.collection.KalaCollectionUtils;
-import asia.kala.collection.immutable.IList;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +11,8 @@ import java.io.Serializable;
 import java.util.function.IntFunction;
 
 
-public final class LinkedBuffer<E> extends IList.BufferImpl<E> implements Serializable {
+public final class LinkedBuffer<E> extends asia.kala.collection.immutable.Internal.LinkedBufferImpl<E>
+        implements Serializable {
     private static final long serialVersionUID = 1621067498993048170L;
     private static final int hashMagic = -1383198749;
 
@@ -21,6 +21,12 @@ public final class LinkedBuffer<E> extends IList.BufferImpl<E> implements Serial
     @SuppressWarnings("unchecked")
     public static <E> LinkedBuffer.Factory<E> factory() {
         return (LinkedBuffer.Factory<E>) FACTORY;
+    }
+
+    @NotNull
+    @Contract(" -> new")
+    public static <E> LinkedBuffer<E> of() {
+        return new LinkedBuffer<>();
     }
 
     @NotNull
@@ -118,6 +124,9 @@ public final class LinkedBuffer<E> extends IList.BufferImpl<E> implements Serial
     }
 
     public static final class Factory<E> extends AbstractBufferFactory<E, LinkedBuffer<E>> {
+        Factory() {
+        }
+
         @Override
         public final LinkedBuffer<E> newBuilder() {
             return new LinkedBuffer<>();

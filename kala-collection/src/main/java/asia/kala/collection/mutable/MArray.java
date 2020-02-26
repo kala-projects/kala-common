@@ -170,6 +170,8 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
     }
 
     public static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, MArray<E>> {
+        Factory() {
+        }
 
         @Override
         public ArrayBuffer<E> newBuilder() {

@@ -1,6 +1,7 @@
 package asia.kala.collection.immutable;
 
 import asia.kala.collection.CollectionFactory;
+import asia.kala.collection.Seq;
 import asia.kala.collection.TraversableOnce;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.NotNull;
@@ -86,6 +87,10 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
         assert seq != null;
         assert factory != null;
 
+        if (n <= 0) {
+            return factory.empty();
+        }
+
         Builder builder = factory.newBuilder();
 
         int s = seq.knownSize();
@@ -128,21 +133,21 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
 
     static <E, T extends ISeq<? extends E>, Builder> T concat(
             @NotNull ISeq<? extends E> seq,
-            @NotNull TraversableOnce<? extends E> traversable,
+            @NotNull Seq<? extends E> other,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
         assert factory != null;
 
-        Objects.requireNonNull(traversable);
+        Objects.requireNonNull(other);
 
         Builder builder = factory.newBuilder();
 
         factory.sizeHint(builder, seq);
         factory.addAllToBuilder(builder, seq);
 
-        factory.sizeHint(builder, traversable);
-        factory.addAllToBuilder(builder, traversable);
+        factory.sizeHint(builder, other);
+        factory.addAllToBuilder(builder, other);
 
         return factory.build(builder);
     }
@@ -167,7 +172,7 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
 
     static <E, T, Builder> T prependedAll(
             @NotNull ISeq<? extends E> seq,
-            @NotNull TraversableOnce<? extends E> prefix,
+            @NotNull Iterable<? extends E> prefix,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
@@ -206,7 +211,7 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
 
     static <E, T, Builder> T appendedAll(
             @NotNull ISeq<? extends E> seq,
-            @NotNull TraversableOnce<? extends E> postfix,
+            @NotNull Iterable<? extends E> postfix,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
@@ -270,8 +275,8 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To concatImpl(@NotNull TraversableOnce<? extends E> traversable) {
-        return (To) AbstractISeq.concat(this, traversable, iterableFactory());
+    protected final <To extends ISeq<E>> To concatImpl(@NotNull Seq<? extends E> other) {
+        return (To) AbstractISeq.concat(this, other, iterableFactory());
     }
 
     @NotNull
@@ -280,7 +285,7 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To prependedAllImpl(@NotNull TraversableOnce<? extends E> prefix) {
+    protected final <To extends ISeq<E>> To prependedAllImpl(@NotNull Iterable<? extends E> prefix) {
         return (To) AbstractISeq.prependedAll(this, prefix, iterableFactory());
     }
 
@@ -290,7 +295,7 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To appendedAllImpl(@NotNull TraversableOnce<? extends E> postfix) {
+    protected final <To extends ISeq<E>> To appendedAllImpl(@NotNull Iterable<? extends E> postfix) {
         return (To) AbstractISeq.appendedAll(this, postfix, iterableFactory());
     }
 

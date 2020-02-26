@@ -28,7 +28,6 @@ public interface MSeq<E> extends MCollection<E>, Seq<E> {
         return MSeq.<E>factory().from(iterable);
     }
 
-
     void set(int index, E newValue);
 
     default void mapInPlace(@NotNull Function<? super E, ? extends E> mapper) {

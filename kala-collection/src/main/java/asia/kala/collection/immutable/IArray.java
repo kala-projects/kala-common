@@ -2,10 +2,7 @@ package asia.kala.collection.immutable;
 
 import asia.kala.Tuple2;
 import asia.kala.annotations.StaticClass;
-import asia.kala.collection.CollectionFactory;
-import asia.kala.collection.Enumerator;
-import asia.kala.collection.IndexedSeq;
-import asia.kala.collection.TraversableOnce;
+import asia.kala.collection.*;
 import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.function.IndexedConsumer;
 import asia.kala.function.IndexedFunction;
@@ -168,8 +165,8 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
 
     @NotNull
     @Override
-    public final IArray<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
-        return appendedAll(traversable);
+    public final IArray<E> concat(@NotNull Seq<? extends E> other) {
+        return appendedAll(other);
     }
 
     @NotNull
@@ -184,10 +181,10 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
 
     @NotNull
     @Override
-    public final IArray<E> prependedAll(@NotNull TraversableOnce<? extends E> prefix) {
+    public final IArray<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
         Objects.requireNonNull(prefix);
 
-        Object[] data = prefix instanceof IArray<?> ? ((IArray<?>) prefix).values : prefix.toArray(Object[]::new);
+        Object[] data = prefix instanceof IArray<?> ? ((IArray<?>) prefix).values : KalaCollectionUtils.asArray(prefix);
         Object[] newValues = new Object[data.length + values.length];
 
         System.arraycopy(data, 0, newValues, 0, data.length);
@@ -207,10 +204,10 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
 
     @NotNull
     @Override
-    public final IArray<E> appendedAll(@NotNull TraversableOnce<? extends E> postfix) {
+    public final IArray<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
         Objects.requireNonNull(postfix);
 
-        Object[] data = postfix instanceof IArray<?> ? ((IArray<?>) postfix).values : postfix.toArray(Object[]::new);
+        Object[] data = postfix instanceof IArray<?> ? ((IArray<?>) postfix).values : KalaCollectionUtils.asArray(postfix);
         Object[] newValues = new Object[data.length + values.length];
 
         System.arraycopy(values, 0, newValues, 0, values.length);
@@ -346,6 +343,8 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
     }
 
     public static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, IArray<E>> {
+        Factory() {
+        }
 
         @Override
         public IArray<E> empty() {

@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+@SuppressWarnings("unchecked")
 @StaticClass
 @ApiStatus.Internal
 public final class KalaCollectionUtils {
@@ -30,7 +31,6 @@ public final class KalaCollectionUtils {
         return buffer.toArray(Object[]::new);
     }
 
-    @SuppressWarnings("unchecked")
     public static <E> IndexedSeq<E> asIndexedSeq(Object collection) {
         if (collection instanceof IndexedSeq<?>) {
             return (IndexedSeq<E>) collection;
@@ -41,6 +41,39 @@ public final class KalaCollectionUtils {
         if (collection instanceof TraversableOnce<?>) {
             return (MArray<E>) MArray.wrap(((TraversableOnce<?>) collection).toArray(Object[]::new));
         }
+        if (collection instanceof Object[]) {
+            return MArray.wrap(((E[]) collection));
+        }
+
+        if (collection instanceof Collection<?>) {
+            return (MArray<E>) MArray.wrap(((Collection<?>) collection).toArray());
+        }
+        if (collection instanceof Iterable<?>) {
+            return IArray.from(((Iterable<E>) collection));
+        }
+        if (collection instanceof Iterator<?>) {
+            return IArray.from(Enumerator.fromJava(((Iterator<E>) collection)));
+        }
+
+        throw new IllegalArgumentException();
+    }
+
+    public static <E> Seq<E> asSeq(Object collection) {
+        if (collection instanceof Seq<?>) {
+            return ((Seq<E>) collection);
+        }
+
+        if (collection instanceof java.util.List<?>) {
+            if (collection instanceof RandomAccess) {
+                return new JDKConverters.RandomAccessListWrapper<>((List<E>) collection);
+            }
+            return new JDKConverters.ListWrapper<>((List<E>) collection);
+        }
+
+        if (collection instanceof Object[]) {
+            return MArray.wrap(((E[]) collection));
+        }
+
         if (collection instanceof Collection<?>) {
             return (MArray<E>) MArray.wrap(((Collection<?>) collection).toArray());
         }
@@ -70,5 +103,16 @@ public final class KalaCollectionUtils {
             ans = 31 * ans + Objects.hashCode(arr[i]);
         }
         return ans;
+    }
+
+    public static int knowSize(@NotNull Object collection) {
+        if (collection instanceof TraversableOnce<?>) {
+            return ((TraversableOnce<?>) collection).knownSize();
+        }
+        if (collection instanceof Collection<?>) {
+            return ((Collection<?>) collection).size();
+        }
+
+        return -1;
     }
 }

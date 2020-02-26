@@ -6,6 +6,7 @@ import asia.kala.collection.immutable.IList;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -136,6 +137,11 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E> {
             @NotNull CharSequence postfix) {
         return joinTo(new StringBuilder(), prefix, separator, postfix).toString();
     }
+
+    default E[] toArray(@NotNull Class<E> type) {
+        return toArray(size -> (E[]) Array.newInstance(type, size));
+    }
+
 
     default <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
         return iterator().toArray(generator);

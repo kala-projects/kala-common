@@ -4,11 +4,10 @@ import asia.kala.Option;
 import asia.kala.Tuple2;
 import asia.kala.collection.Enumerator;
 import asia.kala.collection.CollectionFactory;
+import asia.kala.collection.Seq;
 import asia.kala.collection.TraversableOnce;
-import asia.kala.collection.mutable.AbstractBuffer;
 import asia.kala.collection.mutable.LinkedBuffer;
 import asia.kala.function.IndexedFunction;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -119,8 +118,20 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
-    public final IList<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
-        return concatImpl(traversable);
+    public final IList<E> take(int n) {
+        return takeImpl(n);
+    }
+
+    @NotNull
+    @Override
+    public final ISeq<E> takeWhile(@NotNull Predicate<? super E> predicate) {
+        return takeWhileImpl(predicate);
+    }
+
+    @NotNull
+    @Override
+    public final IList<E> concat(@NotNull Seq<? extends E> other) {
+        return concatImpl(other);
     }
 
     @NotNull
@@ -128,7 +139,6 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
     public final <U> IList<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
         return flatMapImpl(mapper);
     }
-
 
     @NotNull
     @Override
@@ -392,233 +402,9 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
     }
 
-    /**
-     * Internal implementation of {@link LinkedBuffer}.
-     *
-     * @see LinkedBuffer
-     */
-    @ApiStatus.Internal
-    public static abstract class BufferImpl<E> extends AbstractBuffer<E> {
-        MCons<E> first = null;
-        MCons<E> last = null;
-
-        int len = 0;
-
-        private boolean aliased = false;
-
-        private void ensureUnaliased() {
-            if (aliased) {
-                BufferImpl<E> buffer = new LinkedBuffer<>();
-                buffer.appendAll(this);
-                this.first = buffer.first;
-                this.last = buffer.last;
-                aliased = false;
-            }
-        }
-
-        @Override
-        public final E get(int index) {
-            if (index < 0 || index >= len) {
-                throw new IndexOutOfBoundsException("Index out of range: " + index);
-            }
-            if (index == len - 1) {
-                return last.head;
-            }
-
-            return first.get(index);
-        }
-
-        @NotNull
-        @Override
-        public final Option<E> getOption(int index) {
-            if (index < 0 || index >= len) {
-                return Option.none();
-            }
-            if (index == len - 1) {
-                return Option.some(last.head);
-            }
-
-            return Option.some(first.get(index));
-        }
-
-        @Override
-        public final void append(E value) {
-            MCons<E> i = new MCons<>(value, IList.nil());
-            if (len == 0) {
-                first = i;
-            } else {
-                last.tail = i;
-            }
-            last = i;
-            ++len;
-        }
-
-
-        @Override
-        public final void prepend(E value) {
-            ensureUnaliased();
-            if (len == 0) {
-                append(value);
-                return;
-            }
-            first = new MCons<>(value, first);
-            ++len;
-        }
-
-        @Override
-        public void insert(int index, E element) {
-            ensureUnaliased();
-            if (index < 0 || index > len) {
-                throw new IndexOutOfBoundsException("Index out of range: " + index);
-            }
-            if (index == len) {
-                append(element);
-                return;
-            }
-
-            if (index == 0) {
-                prepend(element);
-                return;
-            }
-            ensureUnaliased();
-            IList<E> i = first;
-            int c = 1;
-
-            while (c++ != index) {
-                i = i.tail();
-            }
-
-            ((MCons<E>) i).tail = new MCons<>(element, i.tail());
-            ++len;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public final E remove(int index) {
-            if (index < 0 || index >= len) {
-                throw new IndexOutOfBoundsException("Index out of range: " + index);
-            }
-
-            if (index == 0) {
-                E v = first.head;
-                if (len == 1) {
-                    first = last = null;
-                    aliased = false;
-                } else {
-                    first = (MCons<E>) first.tail;
-                }
-                --len;
-                return v;
-            }
-
-            ensureUnaliased();
-            IList<E> i = first;
-            int c = 1;
-
-            while (c++ != index) {
-                i = i.tail();
-            }
-            E v = i.tail().head();
-            ((MCons<E>) i).tail = i.tail().tail();
-            --len;
-            return v;
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public final void remove(int index, int count) {
-            if (count < 0) {
-                throw new IllegalArgumentException("count: " + count);
-            }
-            if (index < 0 || index + count > len) {
-                throw new IndexOutOfBoundsException(String.format("%d to %d is out of bounds", index, index + count));
-            }
-
-            if (count == 0) {
-                return;
-            }
-            if (count == 1) {
-                remove(index);
-                return;
-            }
-            if (count == len) {
-                clear();
-                return;
-            }
-            if (index == 0) {
-                int c = count;
-                while (c-- > 0) {
-                    first = (MCons<E>) first.tail;
-                }
-                len -= count;
-                return;
-            }
-
-            ensureUnaliased();
-            IList<E> i = first;
-            int c = 1;
-            while (c++ != index) {
-                i = i.tail();
-            }
-
-            IList<E> t = i.tail();
-            c = count;
-            while (c-- > 0) {
-                t = t.tail();
-            }
-
-            ((MCons<E>) i).tail = t;
-            len -= count;
-        }
-
-        public final void clear() {
-            first = last = null;
-            len = 0;
-            aliased = false;
-        }
-
-        @Override
-        public final IList<E> toIList() {
-            aliased = true;
-            return first;
-        }
-
-        @Override
-        public final void set(int index, E newValue) {
-            int len = this.len;
-            if (index < 0 || index >= len) {
-                throw new IndexOutOfBoundsException("Index out of range: " + index);
-            }
-
-            ensureUnaliased();
-            if (index == len - 1) {
-                last.head = newValue;
-                return;
-            }
-
-            IList<E> l = first;
-            while (--index >= 0) {
-                l = l.tail();
-            }
-            ((MCons<E>) l).head = newValue;
-        }
-
-        @Override
-        public final int size() {
-            return len;
-        }
-
-        @NotNull
-        @Override
-        public final Enumerator<E> iterator() {
-            if (len == 0) {
-                return Enumerator.empty();
-            }
-            return first.iterator();
-        }
-    }
-
     public static final class Factory<E> implements CollectionFactory<E, LinkedBuffer<E>, IList<E>> {
+        Factory() {
+        }
 
         @Override
         public IList<E> empty() {
@@ -637,8 +423,8 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
         @Override
         public LinkedBuffer<E> mergeBuilder(@NotNull LinkedBuffer<E> builder1, @NotNull LinkedBuffer<E> builder2) {
-            if (((BufferImpl<E>) builder2).first != null) {
-                for (E e : ((BufferImpl<E>) builder2).first) {
+            if (((Internal.LinkedBufferImpl<E>) builder2).first != null) {
+                for (E e : ((Internal.LinkedBufferImpl<E>) builder2).first) {
                     builder1.append(e);
                 }
             }

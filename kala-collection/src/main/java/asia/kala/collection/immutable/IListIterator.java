@@ -1,11 +1,12 @@
 package asia.kala.collection.immutable;
 
+import asia.kala.collection.AbstractEnumerator;
 import asia.kala.collection.Enumerator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.NoSuchElementException;
 
-final class IListIterator<E> implements Enumerator<E> {
+final class IListIterator<E> extends AbstractEnumerator<E> implements Enumerator<E> {
     @NotNull
     private IList<? extends E> list;
 

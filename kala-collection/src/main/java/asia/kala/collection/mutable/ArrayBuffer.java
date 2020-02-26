@@ -344,6 +344,9 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     }
 
     public static final class Factory<E> extends AbstractBufferFactory<E, ArrayBuffer<E>> {
+        Factory() {
+        }
+
         @Override
         public final ArrayBuffer<E> newBuilder() {
             return new ArrayBuffer<>();

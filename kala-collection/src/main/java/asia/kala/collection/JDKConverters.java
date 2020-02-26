@@ -136,6 +136,23 @@ public final class JDKConverters {
         public final Enumerator<E> iterator() {
             return Enumerator.fromJava(list.iterator());
         }
+
+        @Override
+        public Enumerator<E> reverseIterator() {
+            return new AbstractEnumerator<E>() {
+                private final ListIterator<E> it = list.listIterator(list.size());
+
+                @Override
+                public final boolean hasNext() {
+                    return it.hasPrevious();
+                }
+
+                @Override
+                public final E next() {
+                    return it.previous();
+                }
+            };
+        }
     }
 
     public static class RandomAccessListWrapper<E> extends ListWrapper<E> implements IndexedSeq<E> {

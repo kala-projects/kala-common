@@ -4,7 +4,9 @@ import asia.kala.Tuple2;
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Seq;
 import asia.kala.collection.TraversableOnce;
+import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.function.IndexedFunction;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,9 +15,17 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface ISeq<E> extends ICollection<E>, Seq<E> {
+    @ApiStatus.Internal
+    ISeq.Factory<?> FACTORY = new Factory<>();
 
+    @NotNull
+    @SuppressWarnings("unchecked")
     static <E> CollectionFactory<E, ?, ? extends ISeq<E>> factory() {
-        return IArray.factory();
+        return (CollectionFactory<E, ?, ? extends ISeq<E>>) FACTORY;
+    }
+
+    static <E> ISeq<E> empty() {
+        return ISeq.<E>factory().empty();
     }
 
     @SafeVarargs
@@ -63,9 +73,8 @@ public interface ISeq<E> extends ICollection<E>, Seq<E> {
     }
 
     @NotNull
-    default ISeq<E> concat(@NotNull TraversableOnce<? extends E> traversable) {
-        Objects.requireNonNull(traversable);
-        return AbstractISeq.concat(this, traversable, iterableFactory());
+    default ISeq<E> concat(@NotNull Seq<? extends E> other) {
+        return AbstractISeq.concat(this, other, iterableFactory());
     }
 
     @NotNull
@@ -74,7 +83,7 @@ public interface ISeq<E> extends ICollection<E>, Seq<E> {
     }
 
     @NotNull
-    default ISeq<E> prependedAll(@NotNull TraversableOnce<? extends E> prefix) {
+    default ISeq<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
         return AbstractISeq.prependedAll(this, prefix, iterableFactory());
     }
 
@@ -84,7 +93,7 @@ public interface ISeq<E> extends ICollection<E>, Seq<E> {
     }
 
     @NotNull
-    default ISeq<E> appendedAll(@NotNull TraversableOnce<? extends E> postfix) {
+    default ISeq<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
         return AbstractISeq.prependedAll(this, postfix, iterableFactory());
     }
 
@@ -136,5 +145,51 @@ public interface ISeq<E> extends ICollection<E>, Seq<E> {
     @Override
     default Tuple2<? extends ISeq<E>, ? extends ISeq<E>> span(@NotNull Predicate<? super E> predicate) {
         return AbstractICollection.span(this, predicate, iterableFactory());
+    }
+
+    class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, ISeq<E>> {
+        Factory() {
+        }
+
+        @Override
+        public final ArrayBuffer<E> newBuilder() {
+            return new ArrayBuffer<>();
+        }
+
+        @Override
+        public final void addToBuilder(@NotNull ArrayBuffer<E> buffer, E value) {
+            buffer.append(value);
+        }
+
+        @Override
+        public final ArrayBuffer<E> mergeBuilder(@NotNull ArrayBuffer<E> builder1, @NotNull ArrayBuffer<E> builder2) {
+            builder1.appendAll(builder2);
+            return builder1;
+        }
+
+        @Override
+        public final void sizeHint(@NotNull ArrayBuffer<E> buffer, int size) {
+            buffer.sizeHint(size);
+        }
+
+        @Override
+        public final ISeq<E> build(@NotNull ArrayBuffer<E> buffer) {
+            switch (buffer.size()) {
+                case 0:
+                    return ISeq0.instance();
+                case 1:
+                    return new ISeq1<>(buffer.get(0));
+                case 2:
+                    return new ISeq2<>(buffer.get(0), buffer.get(1));
+                case 3:
+                    return new ISeq3<>(buffer.get(0), buffer.get(1), buffer.get(2));
+                case 4:
+                    return new ISeq4<>(buffer.get(0), buffer.get(1), buffer.get(2), buffer.get(3));
+                case 5:
+                    return new ISeq5<>(buffer.get(0), buffer.get(1), buffer.get(2), buffer.get(3), buffer.get(4));
+                default:
+                    return IVector.from(buffer);
+            }
+        }
     }
 }
