@@ -8,12 +8,11 @@ import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
 public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, Serializable {
@@ -135,6 +134,24 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
     @Override
     public final Enumerator<E> iterator() {
         return (Enumerator<E>) Enumerator.ofArray(values);
+    }
+
+    @NotNull
+    @Override
+    public final Stream<E> stream() {
+        return Arrays.stream((E[]) values);
+    }
+
+    @NotNull
+    @Override
+    public final Stream<E> parallelStream() {
+        return stream().parallel();
+    }
+
+    @NotNull
+    @Override
+    public final Spliterator<E> spliterator() {
+        return Spliterators.spliterator(values, 0);
     }
 
     @NotNull

@@ -1,5 +1,6 @@
 package asia.kala.collection;
 
+import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -55,7 +56,7 @@ public interface CollectionFactory<E, Builder, R> extends Collector<E, Builder, 
         return build(newBuilder());
     }
 
-    default R from(@NotNull Iterable<? extends E> iterable) {
+    default R from(@NotNull @ReadOnly Iterable<? extends E> iterable) {
         Builder builder = newBuilder();
         sizeHint(builder, iterable);
 

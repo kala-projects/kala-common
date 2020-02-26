@@ -44,6 +44,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         this.size = 0;
     }
 
+    @NotNull
     public static <E> ArrayBuffer.Factory<E> factory() {
         return (Factory<E>) FACTORY;
     }
@@ -182,7 +183,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         }
 
         Object[] values = elements;
-        if (values.length <= size + cv.length) {
+        if (values.length < size + cv.length) {
             values = growArray(size + cv.length);
         }
 
@@ -195,7 +196,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     @Override
     public final void insert(int index, E element) {
         int size = this.size;
-        if (index < 0 && index > size) {
+        if (index < 0 || index > size) {
             throw new IndexOutOfBoundsException();
         }
         if (index == size) {
@@ -208,6 +209,53 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         System.arraycopy(elements, index, elements, index + 1, size - index);
         elements[index] = element;
         ++this.size;
+    }
+
+    @Override
+    public final void insertAll(int index, @NotNull Iterable<? extends E> elements) {
+        Objects.requireNonNull(elements);
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index out of range: " + index);
+        }
+
+        IndexedSeq<Object> seq = KalaCollectionUtils.asIndexedSeq(elements);
+        int seqSize = seq.size();
+
+        Object[] values = this.elements;
+        if (values.length < size + seqSize) {
+            values = growArray(size + seqSize);
+        }
+        System.arraycopy(this.elements, 0, values, 0, index);
+        System.arraycopy(this.elements, index, values, index + seqSize, size - index);
+
+        for (int i = 0; i < seqSize; i++) {
+            values[i + index] = seq.get(i);
+        }
+
+        this.elements = values;
+        size += seqSize;
+    }
+
+    @Override
+    public final void insertAll(int index, @NotNull E[] elements) {
+        Objects.requireNonNull(elements);
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index out of range: " + index);
+        }
+        if (elements.length == 0) {
+            return;
+        }
+
+        Object[] values = this.elements;
+        if (values.length < size + elements.length) {
+            values = growArray(size + elements.length);
+        }
+        System.arraycopy(this.elements, 0, values, 0, index);
+        System.arraycopy(elements, 0, values, index, elements.length);
+        System.arraycopy(this.elements, index, values, index + elements.length, size - index);
+
+        this.elements = values;
+        size += elements.length;
     }
 
     @Override

@@ -98,7 +98,7 @@ public interface SeqView<E> extends Seq<E>, View<E> {
 
     @Override
     @NotNull
-    default <U> SeqView<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+    default <U> SeqView<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         Objects.requireNonNull(mapper);
         return new SeqViews.FlatMapped<>(this, mapper);
     }

@@ -3,10 +3,10 @@ package asia.kala.collection.immutable;
 import asia.kala.Tuple2;
 import asia.kala.collection.*;
 import asia.kala.collection.mutable.ArrayBuffer;
+import asia.kala.collection.mutable.MArray;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -22,9 +22,9 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
     private static final long serialVersionUID = -4395603284341829523L;
     private static final int hashMagic = -104040935;
 
-    static final int BRANCHING_BASE = 5;
-    static final int BRANCHING_FACTOR = 32;
-    static final int BRANCHING_MASK = 31;
+    private static final int VECTOR_SHIFT = 5;
+    private static final int VECTOR_FACTOR = 32;
+    private static final int VECTOR_MASK = 31;
 
     public static final IVector<?> EMPTY = new IVector<>(IArray.empty(), 0, 0, 0);
 
@@ -39,6 +39,12 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
         this.offset = offset;
         this.length = length;
         this.depthShift = depthShift;
+    }
+
+    @Contract("_ -> param1")
+    @SuppressWarnings("unchecked")
+    static <E> IVector<E> narrow(IVector<? extends E> vector) {
+        return (IVector<E>) vector;
     }
 
     @NotNull
@@ -68,9 +74,9 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
 
         int shift = 0;
         Object[] arr = elements;
-        while (arr.length > BRANCHING_FACTOR) {
-            arr = ArrayUtils.spilt(arr, BRANCHING_FACTOR);
-            shift += BRANCHING_BASE;
+        while (arr.length > VECTOR_FACTOR) {
+            arr = ArrayUtils.spilt(arr, VECTOR_FACTOR);
+            shift += VECTOR_SHIFT;
         }
         return new IVector<>(arr, 0, elements.length, shift);
     }
@@ -101,7 +107,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
     }
 
     static int lastDigit(int num) {
-        return num & BRANCHING_MASK;
+        return num & VECTOR_MASK;
     }
 
     private Object modify(Object root, int depthShift, int index, NodeModifier node, NodeModifier leaf) {
@@ -115,7 +121,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
         root = node.apply(root, previousIndex);
 
         Object array = root;
-        for (int shift = depthShift - BRANCHING_BASE; shift >= BRANCHING_BASE; shift -= BRANCHING_BASE) {
+        for (int shift = depthShift - VECTOR_SHIFT; shift >= VECTOR_SHIFT; shift -= VECTOR_SHIFT) {
             final int prev = previousIndex;
             previousIndex = digit(index, shift);
             array = setNewNode(node, prev, array, previousIndex);
@@ -144,7 +150,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
     private Object getLeafGeneral(int index) {
         index += offset;
         Object leaf = Array.get(array, firstDigit(index, depthShift));
-        for (int shift = depthShift - BRANCHING_BASE; shift > 0; shift -= BRANCHING_BASE) {
+        for (int shift = depthShift - VECTOR_SHIFT; shift > 0; shift -= VECTOR_SHIFT) {
             leaf = Array.get(leaf, digit(index, shift));
         }
         return leaf;
@@ -165,7 +171,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
     private NodeModifier prependToLeaf(java.util.Iterator<? extends E> iterator) {
         return (array, index) -> {
             final Object copy =
-                    Arrays.copyOf(((Object[]) array), Math.max(((Object[]) array).length, BRANCHING_FACTOR));
+                    Arrays.copyOf(((Object[]) array), Math.max(((Object[]) array).length, VECTOR_FACTOR));
             while (iterator.hasNext() && index >= 0) {
                 Array.set(copy, index--, iterator.next());
             }
@@ -174,7 +180,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
     }
 
     private boolean isFullRight() {
-        return (offset + length + 1) > treeSize(BRANCHING_FACTOR, depthShift);
+        return (offset + length + 1) > treeSize(VECTOR_FACTOR, depthShift);
     }
 
     private NodeModifier appendToLeaf(Iterator<? extends E> iterator, int leafSize) {
@@ -189,11 +195,11 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
     }
 
     private boolean arePointingToSameLeaf(int i, int j) {
-        return firstDigit(offset + i, BRANCHING_BASE) == firstDigit(offset + j, BRANCHING_BASE);
+        return firstDigit(offset + i, VECTOR_SHIFT) == firstDigit(offset + j, VECTOR_SHIFT);
     }
 
     private static <T> IVector<T> collapsed(Object array, int offset, int length, int shift) {
-        for (; shift > 0; shift -= BRANCHING_BASE) {
+        for (; shift > 0; shift -= VECTOR_SHIFT) {
             final int skippedElements = Array.getLength(array) - 1;
             if (skippedElements != digit(offset, shift)) {
                 break;
@@ -247,11 +253,11 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
             Object array = result.array;
             int shift = result.depthShift, offset = result.offset;
             if (result.isFullLeft()) {
-                Object arr = Array.newInstance(array.getClass(), BRANCHING_FACTOR);
-                Array.set(arr, BRANCHING_FACTOR - 1, array);
+                Object arr = Array.newInstance(array.getClass(), VECTOR_FACTOR);
+                Array.set(arr, VECTOR_FACTOR - 1, array);
                 array = arr;
-                shift += BRANCHING_BASE;
-                offset = treeSize(BRANCHING_FACTOR - 1, shift);
+                shift += VECTOR_SHIFT;
+                offset = treeSize(VECTOR_FACTOR - 1, shift);
             }
 
             final int index = offset - 1;
@@ -262,6 +268,12 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
             result = new IVector<>(array, offset - delta, result.length + delta, shift);
         }
         return result;
+    }
+
+    @NotNull
+    @Override
+    public final IVector<E> prependedAll(@NotNull E[] prefix) {
+        return prependedAll(MArray.wrap(prefix));
     }
 
     @NotNull
@@ -291,18 +303,24 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
             int shift = result.depthShift;
             if (result.isFullRight()) {
                 array = ArrayUtils.wrapInArray(array);
-                shift += BRANCHING_BASE;
+                shift += VECTOR_SHIFT;
             }
 
             final int index = offset + result.length;
             final int leafSpace = lastDigit(index);
-            final int delta = Math.min(size, BRANCHING_FACTOR - leafSpace);
+            final int delta = Math.min(size, VECTOR_FACTOR - leafSpace);
             size -= delta;
 
             array = result.modify(array, shift, index, NodeModifier.COPY_NODE, appendToLeaf(iterator, leafSpace + delta));
             result = new IVector<>(array, offset, result.length + delta, shift);
         }
         return result;
+    }
+
+    @NotNull
+    @Override
+    public final IVector<E> appendedAll(@NotNull E[] postfix) {
+        return appendedAll(MArray.wrap(postfix));
     }
 
     @NotNull
@@ -495,9 +513,9 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
             }
             int shift = 0;
             Object[] arr = values.toArray(Object[]::new);
-            while (arr.length > BRANCHING_FACTOR) {
-                arr = ArrayUtils.spilt(arr, BRANCHING_FACTOR);
-                shift += BRANCHING_BASE;
+            while (arr.length > VECTOR_FACTOR) {
+                arr = ArrayUtils.spilt(arr, VECTOR_FACTOR);
+                shift += VECTOR_SHIFT;
             }
             return new IVector<>(arr, 0, values.size(), shift);
         }

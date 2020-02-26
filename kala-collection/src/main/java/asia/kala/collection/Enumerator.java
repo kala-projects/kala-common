@@ -193,6 +193,12 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E>, Transfor
         return false;
     }
 
+    @NotNull
+    @Override
+    default Iterator<E> asJava() {
+        return this;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -202,9 +208,9 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E>, Transfor
     }
 
     @Override
-    default boolean sameElements(@NotNull TraversableOnce<?> other) {
+    default boolean sameElements(@NotNull Iterable<?> other) {
         Objects.requireNonNull(other);
-        Enumerator<?> it = other.iterator();
+        Iterator<?> it = other.iterator();
         while (this.hasNext() && it.hasNext()) {
             if (!Objects.equals(this.next(), it.next())) {
                 return false;
@@ -239,10 +245,10 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E>, Transfor
      */
     @NotNull
     @Override
-    default <U> Enumerator<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+    default <U> Enumerator<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         Objects.requireNonNull(mapper);
 
-        return new Enumerators.Concat<>(this.map(mapper).map(TraversableOnce::iterator).iterator());
+        return new Enumerators.Concat<>(this.map(mapper).map(Iterable::iterator).iterator());
     }
 
     @NotNull

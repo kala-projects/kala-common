@@ -10,6 +10,8 @@ import asia.kala.collection.mutable.MSeq;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -44,36 +46,48 @@ public interface ICollection<E> extends Traversable<E>, Transformable<E> {
 
     @NotNull
     @Override
+    default Spliterator<E> spliterator() {
+        return Spliterators.spliterator(iterator(), size(), Spliterator.IMMUTABLE);
+    }
+
+    @NotNull
+    @Override
+    @Contract(pure = true)
     default <U> CollectionFactory<U, ?, ? extends ICollection<U>> iterableFactory() {
         return factory();
     }
 
     @NotNull
     @Override
+    @Contract(pure = true)
     default <U> ICollection<U> map(@NotNull Function<? super E, ? extends U> mapper) {
         return AbstractICollection.map(this, mapper, this.<U>iterableFactory());
     }
 
     @NotNull
     @Override
+    @Contract(pure = true)
     default ICollection<E> filter(@NotNull Predicate<? super E> predicate) {
         return AbstractICollection.filter(this, predicate, iterableFactory());
     }
 
     @NotNull
     @Override
+    @Contract(pure = true)
     default ICollection<E> filterNot(@NotNull Predicate<? super E> predicate) {
         return AbstractICollection.filterNot(this, predicate, iterableFactory());
     }
 
     @NotNull
     @Override
-    default <U> ICollection<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+    @Contract(pure = true)
+    default <U> ICollection<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         return AbstractICollection.flatMap(this, mapper, iterableFactory());
     }
 
     @NotNull
     @Override
+    @Contract(pure = true)
     default Tuple2<? extends ICollection<E>, ? extends ICollection<E>> span(@NotNull Predicate<? super E> predicate) {
         return AbstractICollection.span(this, predicate, iterableFactory());
     }

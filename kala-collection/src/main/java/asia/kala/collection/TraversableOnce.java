@@ -3,6 +3,7 @@ package asia.kala.collection;
 import asia.kala.Foldable;
 import asia.kala.Option;
 import asia.kala.collection.immutable.IList;
+import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +28,8 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E> {
     @Override
     Enumerator<E> iterator();
 
-    default Iterable<E> asJava() {
+    @NotNull
+    default Object asJava() {
         return this;
     }
 
@@ -43,7 +45,7 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E> {
         return -1;
     }
 
-    default boolean sameElements(@NotNull TraversableOnce<?> other) {
+    default boolean sameElements(@NotNull @ReadOnly Iterable<?> other) {
         return iterator().sameElements(other);
     }
 

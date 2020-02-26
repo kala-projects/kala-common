@@ -1,15 +1,59 @@
 package asia.kala.collection.mutable;
 
 import asia.kala.collection.IndexedSeq;
-import asia.kala.collection.Seq;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.RandomAccess;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
+import java.util.stream.Stream;
 
 @ApiStatus.Internal
 public final class JDKConverters {
+    public static class MCollectionAsJava<E, C extends MCollection<E>> extends AbstractCollection<E> {
+        protected final C collection;
+
+        public MCollectionAsJava(C collection) {
+            this.collection = collection;
+        }
+
+        @Override
+        public int size() {
+            return collection.size();
+        }
+
+        public <T> T[] toArray(IntFunction<T[]> generator) {
+            return collection.toArray(generator);
+        }
+
+        @NotNull
+        @Override
+        public Iterator<E> iterator() {
+            return collection.iterator();
+        }
+
+        @Override
+        public Spliterator<E> spliterator() {
+            return collection.spliterator();
+        }
+
+        @Override
+        public Stream<E> stream() {
+            return collection.stream();
+        }
+
+        @Override
+        public Stream<E> parallelStream() {
+            return collection.parallelStream();
+        }
+
+        @Override
+        public void forEach(Consumer<? super E> action) {
+            collection.forEach(action);
+        }
+    }
+
     public static class MSeqAsJava<E, C extends MSeq<E>>
             extends asia.kala.collection.JDKConverters.SeqAsJava<E, C> {
         public MSeqAsJava(@NotNull C seq) {
@@ -22,6 +66,12 @@ public final class JDKConverters {
             seq.set(index, element);
             return ans;
         }
+
+        @Override
+        public void sort(Comparator<? super E> c) {
+            seq.sort(c);
+        }
+
     }
 
     public static class MIndexedSeqAsJava<E, C extends MSeq<E> & IndexedSeq<E>>
@@ -69,6 +119,68 @@ public final class JDKConverters {
 
         public IndexedBufferAsJava(@NotNull C seq) {
             super(seq);
+        }
+    }
+
+    public static class ListWrapper<E>
+            extends asia.kala.collection.JDKConverters.ListWrapper<E> implements MSeq<E> {
+
+        public ListWrapper(@NotNull List<E> list) {
+            super(list);
+        }
+
+        @Override
+        public void set(int index, E newValue) {
+            list.set(index, newValue);
+        }
+
+        @Override
+        public void sort(@NotNull Comparator<? super E> comparator) {
+            list.sort(comparator);
+        }
+    }
+
+    public static class RandomAccessListWrapper<E> extends ListWrapper<E> implements IndexedSeq<E> {
+        public RandomAccessListWrapper(@NotNull List<E> list) {
+            super(list);
+        }
+    }
+
+    public static class ResizableListWrapper<E> extends ListWrapper<E> implements Buffer<E> {
+        public ResizableListWrapper(@NotNull List<E> list) {
+            super(list);
+        }
+
+        @Override
+        public void append(E value) {
+            list.add(value);
+        }
+
+        @Override
+        public void prepend(E value) {
+            list.add(0, value);
+        }
+
+        @Override
+        public void insert(int index, E element) {
+            list.add(index, element);
+        }
+
+        @Override
+        public E remove(int index) {
+            return list.remove(index);
+        }
+
+        @Override
+        public void clear() {
+            list.clear();
+        }
+    }
+
+    public static class RandomAccessResizableListWrapper<E>
+            extends ResizableListWrapper<E> implements IndexedSeq<E> {
+        public RandomAccessResizableListWrapper(@NotNull List<E> list) {
+            super(list);
         }
     }
 }

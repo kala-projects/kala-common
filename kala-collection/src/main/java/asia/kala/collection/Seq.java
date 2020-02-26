@@ -226,6 +226,7 @@ public interface Seq<E> extends Traversable<E> {
         return factory();
     }
 
+    @NotNull
     @Override
     default List<E> asJava() {
         if (this instanceof IndexedSeq<?>) {

@@ -4,7 +4,9 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.IntFunction;
+import java.util.stream.Stream;
 
 @ApiStatus.Internal
 public final class JDKConverters {
@@ -37,6 +39,21 @@ public final class JDKConverters {
         @Override
         public final Iterator<E> iterator() {
             return seq.iterator();
+        }
+
+        @Override
+        public final Spliterator<E> spliterator() {
+            return seq.spliterator();
+        }
+
+        @Override
+        public final Stream<E> stream() {
+            return seq.stream();
+        }
+
+        @Override
+        public final Stream<E> parallelStream() {
+            return seq.parallelStream();
         }
 
         @NotNull
@@ -86,6 +103,11 @@ public final class JDKConverters {
         @Override
         public int lastIndexOf(Object o) {
             return seq.lastIndexOf(o);
+        }
+
+        @Override
+        public void forEach(Consumer<? super E> action) {
+            seq.forEach(action);
         }
     }
 
@@ -152,6 +174,30 @@ public final class JDKConverters {
                     return it.previous();
                 }
             };
+        }
+
+        @NotNull
+        @Override
+        public final Spliterator<E> spliterator() {
+            return list.spliterator();
+        }
+
+        @NotNull
+        @Override
+        public final Stream<E> stream() {
+            return list.stream();
+        }
+
+        @NotNull
+        @Override
+        public final Stream<E> parallelStream() {
+            return list.parallelStream();
+        }
+
+        @NotNull
+        @Override
+        public List<E> asJava() {
+            return list;
         }
     }
 

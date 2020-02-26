@@ -192,6 +192,28 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
         return factory.build(builder);
     }
 
+    static <E, T, Builder> T prependedAll(
+            @NotNull ISeq<? extends E> seq,
+            @NotNull E[] prefix,
+            @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
+    ) {
+        assert seq != null;
+        assert factory != null;
+        Objects.requireNonNull(prefix);
+
+        Builder builder = factory.newBuilder();
+
+        factory.sizeHint(builder, prefix.length);
+        for (E e : prefix) {
+            factory.addToBuilder(builder, e);
+        }
+
+        factory.sizeHint(builder, seq);
+        factory.addAllToBuilder(builder, seq);
+
+        return factory.build(builder);
+    }
+
     static <E, T, Builder> T appended(
             @NotNull ISeq<? extends E> seq,
             E element,
@@ -227,6 +249,28 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
 
         factory.sizeHint(builder, postfix);
         factory.addAllToBuilder(builder, postfix);
+
+        return factory.build(builder);
+    }
+
+    static <E, T, Builder> T appendedAll(
+            @NotNull ISeq<? extends E> seq,
+            @NotNull E[] postfix,
+            @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
+    ) {
+        assert seq != null;
+        assert factory != null;
+        Objects.requireNonNull(postfix);
+
+        Builder builder = factory.newBuilder();
+
+        factory.sizeHint(builder, seq);
+        factory.addAllToBuilder(builder, seq);
+
+        factory.sizeHint(builder, postfix.length);
+        for (E e : postfix) {
+            factory.addToBuilder(builder, e);
+        }
 
         return factory.build(builder);
     }
@@ -308,12 +352,22 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     }
 
     @NotNull
+    protected final <To extends ISeq<E>> To prependedAllImpl(@NotNull E[] prefix) {
+        return (To) AbstractISeq.prependedAll(this, prefix, iterableFactory());
+    }
+
+    @NotNull
     protected final <To extends ISeq<E>> To appendedImpl(E element) {
         return (To) AbstractISeq.prepended(this, element, iterableFactory());
     }
 
     @NotNull
     protected final <To extends ISeq<E>> To appendedAllImpl(@NotNull Iterable<? extends E> postfix) {
+        return (To) AbstractISeq.appendedAll(this, postfix, iterableFactory());
+    }
+
+    @NotNull
+    protected final <To extends ISeq<E>> To appendedAllImpl(@NotNull E[] postfix) {
         return (To) AbstractISeq.appendedAll(this, postfix, iterableFactory());
     }
 

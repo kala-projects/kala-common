@@ -74,7 +74,7 @@ public abstract class AbstractICollection<E> extends AbstractTraversable<E> impl
 
     static <E, U, T, Builder> T flatMap(
             @NotNull ICollection<? extends E> collection,
-            @NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper,
+            @NotNull Function<? super E, ? extends Iterable<? extends U>> mapper,
             @NotNull CollectionFactory<? super U, Builder, ? extends T> factory
     ) {
         assert collection != null;
@@ -85,7 +85,7 @@ public abstract class AbstractICollection<E> extends AbstractTraversable<E> impl
         Builder builder = factory.newBuilder();
 
         for (E e : collection) {
-            TraversableOnce<? extends U> us = mapper.apply(e);
+            Iterable<? extends U> us = mapper.apply(e);
             factory.sizeHint(builder, us);
 
             for (U u : us) {
@@ -136,7 +136,7 @@ public abstract class AbstractICollection<E> extends AbstractTraversable<E> impl
 
     @NotNull
     protected final <U, To extends ICollection<U>> To flatMapImpl(
-            @NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+            @NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         return (To) AbstractICollection.flatMap(this, mapper, iterableFactory());
     }
 

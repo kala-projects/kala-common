@@ -2,10 +2,7 @@ package asia.kala.collection.immutable;
 
 import asia.kala.Option;
 import asia.kala.Tuple2;
-import asia.kala.collection.Enumerator;
-import asia.kala.collection.CollectionFactory;
-import asia.kala.collection.Seq;
-import asia.kala.collection.TraversableOnce;
+import asia.kala.collection.*;
 import asia.kala.collection.mutable.LinkedBuffer;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.Contract;
@@ -39,6 +36,11 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
     @SuppressWarnings("unchecked")
     public static <E> IList<E> nil() {
         return (IList<E>) Nil.INSTANCE;
+    }
+
+    @NotNull
+    public static <E> IList<E> empty() {
+        return nil();
     }
 
     @NotNull
@@ -98,6 +100,67 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
+    public final IList<E> prepended(E element) {
+        return cons(element);
+    }
+
+    @NotNull
+    @Override
+    public final IList<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
+        IndexedSeq<E> s = KalaCollectionUtils.tryToIndexedSeq(prefix);
+        if (s == null) {
+            return prependedAllImpl(prefix);
+        }
+
+        IList<E> result = this;
+        for (E e : s.reverseIterator()) {
+            result = result.prepended(e);
+        }
+        return result;
+    }
+
+    @NotNull
+    @Override
+    public final IList<E> prependedAll(@NotNull E[] prefix) {
+        Objects.requireNonNull(prefix);
+
+        IList<E> result = this;
+        for (int i = prefix.length - 1; i >= 0; i--) {
+            result = result.cons(prefix[i]);
+        }
+        return result;
+    }
+
+    @NotNull
+    @Override
+    public final IList<E> appended(E element) {
+        return appendedImpl(element);
+    }
+
+    @NotNull
+    @Override
+    public final IList<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
+        if (KalaCollectionUtils.knowSize(postfix) == 0) {
+            return this;
+        }
+        return appendedAllImpl(postfix);
+    }
+
+    @NotNull
+    @Override
+    public final IList<E> appendedAll(@NotNull E[] postfix) {
+        Objects.requireNonNull(postfix);
+        if (postfix.length == 0) {
+            return this;
+        }
+        if (isEmpty()) {
+            return from(postfix);
+        }
+        return appendedAllImpl(postfix);
+    }
+
+    @NotNull
+    @Override
     public final IList<E> drop(int n) {
         IList<E> list = this;
         while (list != Nil.INSTANCE && n-- > 0) {
@@ -137,7 +200,7 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
-    public final <U> IList<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+    public final <U> IList<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         return flatMapImpl(mapper);
     }
 
@@ -149,7 +212,7 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
-    public final ISeq<E> sorted(@NotNull Comparator<? super E> comparator) {
+    public final IList<E> sorted(@NotNull Comparator<? super E> comparator) {
         return sortedImpl();
     }
 
@@ -421,22 +484,22 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
 
         @Override
-        public IList<E> empty() {
-            return nil();
+        public final IList<E> empty() {
+            return IList.empty();
         }
 
         @Override
-        public LinkedBuffer<E> newBuilder() {
+        public final LinkedBuffer<E> newBuilder() {
             return new LinkedBuffer<>();
         }
 
         @Override
-        public void addToBuilder(@NotNull LinkedBuffer<E> builder, E value) {
+        public final void addToBuilder(@NotNull LinkedBuffer<E> builder, E value) {
             builder.append(value);
         }
 
         @Override
-        public LinkedBuffer<E> mergeBuilder(@NotNull LinkedBuffer<E> builder1, @NotNull LinkedBuffer<E> builder2) {
+        public final LinkedBuffer<E> mergeBuilder(@NotNull LinkedBuffer<E> builder1, @NotNull LinkedBuffer<E> builder2) {
             if (((Internal.LinkedBufferImpl<E>) builder2).first != null) {
                 for (E e : ((Internal.LinkedBufferImpl<E>) builder2).first) {
                     builder1.append(e);
@@ -446,7 +509,7 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
 
         @Override
-        public IList<E> build(@NotNull LinkedBuffer<E> builder) {
+        public final IList<E> build(@NotNull LinkedBuffer<E> builder) {
             return builder.toIList();
         }
     }

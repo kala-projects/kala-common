@@ -44,7 +44,7 @@ public interface View<E> extends Traversable<E>, Transformable<E> {
 
     @Override
     @NotNull
-    default <U> View<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+    default <U> View<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         Objects.requireNonNull(mapper);
         return new Views.FlatMapped<>(this, mapper);
     }

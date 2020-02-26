@@ -29,7 +29,7 @@ final class Views {
         }
 
         @Override
-        public final boolean sameElements(@NotNull TraversableOnce<?> other) {
+        public final boolean sameElements(@NotNull Iterable<?> other) {
             return collection.sameElements(other);
         }
 
@@ -171,6 +171,7 @@ final class Views {
             collection.forEach(action);
         }
 
+        @NotNull
         @Override
         public final Spliterator<E> spliterator() {
             return collection.spliterator();
@@ -262,11 +263,11 @@ final class Views {
         @NotNull
         private final View<? extends T> source;
         @NotNull
-        private final Function<? super T, ? extends TraversableOnce<? extends E>> mapper;
+        private final Function<? super T, ? extends Iterable<? extends E>> mapper;
 
         public FlatMapped(
                 @NotNull View<? extends T> source,
-                @NotNull Function<? super T, ? extends TraversableOnce<? extends E>> mapper) {
+                @NotNull Function<? super T, ? extends Iterable<? extends E>> mapper) {
             assert source != null;
             assert mapper != null;
 

@@ -2,6 +2,8 @@ package asia.kala.collection.mutable;
 
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Traversable;
+import asia.kala.collection.TraversableOnce;
+import kotlin.annotations.jvm.Mutable;
 import org.jetbrains.annotations.NotNull;
 
 public interface MCollection<E> extends Traversable<E> {
@@ -36,5 +38,12 @@ public interface MCollection<E> extends Traversable<E> {
     @NotNull
     default MCollectionEditor<E, ? extends MCollection<E>> edit() {
         return new MCollectionEditor<>(this);
+    }
+
+    @NotNull
+    @Mutable
+    @Override
+    default Iterable<E> asJava() {
+        return this;
     }
 }

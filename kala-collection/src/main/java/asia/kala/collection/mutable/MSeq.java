@@ -3,31 +3,45 @@ package asia.kala.collection.mutable;
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.IndexedSeq;
 import asia.kala.collection.Seq;
+import kotlin.annotations.jvm.Mutable;
+import org.intellij.lang.annotations.MagicConstant;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 
 public interface MSeq<E> extends MCollection<E>, Seq<E> {
 
+    @NotNull
     static <E> CollectionFactory<E, ?, ? extends MSeq<E>> factory() {
         return MArray.factory();
     }
 
+    @NotNull
     @SafeVarargs
     static <E> MSeq<E> of(E... elements) {
         return MSeq.<E>factory().from(elements);
     }
 
+    @NotNull
     static <E> MSeq<E> from(@NotNull E[] elements) {
         return MSeq.<E>factory().from(elements);
     }
 
+    @NotNull
     static <E> MSeq<E> from(@NotNull Iterable<? extends E> iterable) {
         return MSeq.<E>factory().from(iterable);
+    }
+
+    @NotNull
+    @Contract("_ -> new")
+    static <E> MSeq<E> wrapJava(@NotNull @Mutable List<E> list) {
+        Objects.requireNonNull(list);
+        if (list instanceof RandomAccess) {
+            return new JDKConverters.RandomAccessListWrapper<>(list);
+        }
+        return new JDKConverters.ListWrapper<>(list);
     }
 
     void set(int index, E newValue);
@@ -78,6 +92,8 @@ public interface MSeq<E> extends MCollection<E>, Seq<E> {
         return new MSeqEditor<>(this);
     }
 
+    @NotNull
+    @Mutable
     @Override
     default List<E> asJava() {
         if (this instanceof IndexedSeq<?>) {

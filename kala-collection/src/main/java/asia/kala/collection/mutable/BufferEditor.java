@@ -13,7 +13,7 @@ public class BufferEditor<E, C extends Buffer<E>> extends MSeqEditor<E, C> {
     }
 
     @NotNull
-    @Contract("_ -> this")
+    @Contract(value = "_ -> this")
     public BufferEditor<E, C> append(E value) {
         source.append(value);
         return this;
@@ -21,7 +21,14 @@ public class BufferEditor<E, C extends Buffer<E>> extends MSeqEditor<E, C> {
 
     @NotNull
     @Contract("_ -> this")
-    public BufferEditor<E, C> appendAll(@NotNull TraversableOnce<? extends E> collection) {
+    public BufferEditor<E, C> appendAll(@NotNull Iterable<? extends E> collection) {
+        source.appendAll(collection);
+        return this;
+    }
+
+    @NotNull
+    @Contract("_ -> this")
+    public BufferEditor<E, C> appendAll(@NotNull E[] collection) {
         source.appendAll(collection);
         return this;
     }
@@ -35,7 +42,14 @@ public class BufferEditor<E, C extends Buffer<E>> extends MSeqEditor<E, C> {
 
     @NotNull
     @Contract("_ -> this")
-    public BufferEditor<E, C> prependAll(@NotNull TraversableOnce<? extends E> collection) {
+    public BufferEditor<E, C> prependAll(@NotNull Iterable<? extends E> collection) {
+        source.prependAll(collection);
+        return this;
+    }
+
+    @NotNull
+    @Contract("_ -> this")
+    public BufferEditor<E, C> prependAll(@NotNull E[] collection) {
         source.prependAll(collection);
         return this;
     }
@@ -50,6 +64,13 @@ public class BufferEditor<E, C extends Buffer<E>> extends MSeqEditor<E, C> {
     @NotNull
     @Contract("_, _ -> this")
     public BufferEditor<E, C> insertAll(int index, @NotNull Iterable<? extends E> elements) {
+        source.insertAll(index, elements);
+        return this;
+    }
+
+    @NotNull
+    @Contract("_, _ -> this")
+    public BufferEditor<E, C> insertAll(int index, @NotNull E[] elements) {
         source.insertAll(index, elements);
         return this;
     }

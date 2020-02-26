@@ -49,13 +49,23 @@ public final class KalaCollectionUtils {
             return (MArray<E>) MArray.wrap(((Collection<?>) collection).toArray());
         }
         if (collection instanceof Iterable<?>) {
-            return IArray.from(((Iterable<E>) collection));
+            return ArrayBuffer.from(((Iterable<E>) collection));
         }
         if (collection instanceof Iterator<?>) {
-            return IArray.from(Enumerator.fromJava(((Iterator<E>) collection)));
+            return ArrayBuffer.from(Enumerator.fromJava(((Iterator<E>) collection)));
         }
 
         throw new IllegalArgumentException();
+    }
+
+    public static <E> IndexedSeq<E> tryToIndexedSeq(Object collection) {
+        if (collection instanceof IndexedSeq<?>) {
+            return ((IndexedSeq<E>) collection);
+        }
+        if (collection instanceof List<?> && collection instanceof RandomAccess) {
+            return new JDKConverters.RandomAccessListWrapper<>(((List<E>) collection));
+        }
+        return null;
     }
 
     public static <E> Seq<E> asSeq(Object collection) {

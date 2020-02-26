@@ -49,67 +49,92 @@ public interface ISeq<E> extends ICollection<E>, Seq<E> {
     }
 
     @NotNull
+    @Contract(pure = true)
     default ISeq<E> updated(int index, E newValue) {
         return AbstractISeq.updated(this, index, newValue, iterableFactory());
     }
 
     @NotNull
+    @Contract(pure = true)
     default ISeq<E> drop(int n) {
         return AbstractISeq.drop(this, n, iterableFactory());
     }
 
     @NotNull
+    @Contract(pure = true)
     default ISeq<E> dropWhile(@NotNull Predicate<? super E> predicate) {
         return AbstractISeq.dropWhile(this, predicate, iterableFactory());
     }
 
     @NotNull
+    @Contract(pure = true)
     default ISeq<E> take(int n) {
         return AbstractISeq.take(this, n, iterableFactory());
     }
 
     @NotNull
+    @Contract(pure = true)
     default ISeq<E> takeWhile(@NotNull Predicate<? super E> predicate) {
         return AbstractISeq.takeWhile(this, predicate, iterableFactory());
     }
 
     @NotNull
+    @Contract(pure = true)
     default ISeq<E> concat(@NotNull Seq<? extends E> other) {
         return AbstractISeq.concat(this, other, iterableFactory());
     }
 
     @NotNull
+    @Contract(pure = true)
     default ISeq<E> prepended(E element) {
         return AbstractISeq.prepended(this, element, iterableFactory());
     }
 
     @NotNull
+    @Contract(pure = true)
     default ISeq<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
         return AbstractISeq.prependedAll(this, prefix, iterableFactory());
     }
 
     @NotNull
+    @Contract(pure = true)
+    default ISeq<E> prependedAll(@NotNull E[] prefix) {
+        return AbstractISeq.prependedAll(this, prefix, iterableFactory());
+    }
+
+    @NotNull
+    @Contract(pure = true)
     default ISeq<E> appended(E element) {
         return AbstractISeq.appended(this, element, iterableFactory());
     }
 
     @NotNull
+    @Contract(pure = true)
     default ISeq<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
         return AbstractISeq.prependedAll(this, postfix, iterableFactory());
     }
 
     @NotNull
+    @Contract(pure = true)
+    default ISeq<E> appendedAll(@NotNull E[] postfix) {
+        return AbstractISeq.prependedAll(this, postfix, iterableFactory());
+    }
+
+    @NotNull
+    @Contract(pure = true)
     @SuppressWarnings("unchecked")
     default ISeq<E> sorted() {
         return sorted((Comparator<? super E>) Comparator.naturalOrder());
     }
 
     @NotNull
+    @Contract(pure = true)
     default ISeq<E> sorted(@NotNull Comparator<? super E> comparator) {
         return AbstractISeq.sorted(this, comparator, iterableFactory());
     }
 
     @NotNull
+    @Contract(pure = true)
     default <U> ISeq<U> mapIndexed(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
         return AbstractISeq.mapIndexed(this, mapper, this.<U>iterableFactory());
     }
@@ -149,7 +174,7 @@ public interface ISeq<E> extends ICollection<E>, Seq<E> {
 
     @NotNull
     @Override
-    default <U> ISeq<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper) {
+    default <U> ISeq<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         return AbstractICollection.flatMap(this, mapper, iterableFactory());
     }
 

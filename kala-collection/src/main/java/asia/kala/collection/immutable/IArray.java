@@ -11,14 +11,12 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
 public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, Serializable {
@@ -196,6 +194,18 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
 
     @NotNull
     @Override
+    public final IArray<E> prependedAll(@NotNull E[] prefix) {
+        Objects.requireNonNull(prefix);
+
+        Object[] newValues = new Object[prefix.length + values.length];
+        System.arraycopy(prefix, 0, newValues, 0, prefix.length);
+        System.arraycopy(values, 0, newValues, prefix.length, values.length);
+
+        return new IArray<>(newValues);
+    }
+
+    @NotNull
+    @Override
     public final IArray<E> appended(E element) {
         Object[] newValues = Arrays.copyOf(values, values.length + 1);
         newValues[values.length] = element;
@@ -213,6 +223,19 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
 
         System.arraycopy(values, 0, newValues, 0, values.length);
         System.arraycopy(data, 0, newValues, values.length, data.length);
+
+        return new IArray<>(newValues);
+    }
+
+    @NotNull
+    @Override
+    public final IArray<E> appendedAll(@NotNull E[] postfix) {
+        Objects.requireNonNull(postfix);
+
+        Object[] newValues = new Object[postfix.length + values.length];
+
+        System.arraycopy(values, 0, newValues, 0, values.length);
+        System.arraycopy(postfix, 0, newValues, values.length, postfix.length);
 
         return new IArray<>(newValues);
     }
@@ -258,6 +281,30 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
     @Override
     public final String className() {
         return "IArray";
+    }
+
+    @NotNull
+    @Override
+    public final Enumerator<E> iterator() {
+        return (Enumerator<E>) Enumerator.ofArray(values);
+    }
+
+    @NotNull
+    @Override
+    public final Stream<E> stream() {
+        return Arrays.stream((E[]) values);
+    }
+
+    @NotNull
+    @Override
+    public final Stream<E> parallelStream() {
+        return stream().parallel();
+    }
+
+    @NotNull
+    @Override
+    public final Spliterator<E> spliterator() {
+        return Spliterators.spliterator(values, Spliterator.IMMUTABLE);
     }
 
     @NotNull
@@ -311,12 +358,6 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
     @Override
     public <U> IArray.Factory<U> iterableFactory() {
         return factory();
-    }
-
-    @NotNull
-    @Override
-    public final Enumerator<E> iterator() {
-        return (Enumerator<E>) Enumerator.ofArray(values);
     }
 
     @NotNull

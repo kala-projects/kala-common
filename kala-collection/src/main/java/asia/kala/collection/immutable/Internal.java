@@ -196,6 +196,7 @@ public final class Internal {
             aliased = false;
         }
 
+        @NotNull
         @Override
         public final IList<E> toIList() {
             aliased = true;

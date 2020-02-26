@@ -395,11 +395,11 @@ final class SeqViews {
         @NotNull
         private final SeqView<? extends T> source;
         @NotNull
-        private final Function<? super T, ? extends TraversableOnce<? extends E>> mapper;
+        private final Function<? super T, ? extends Iterable<? extends E>> mapper;
 
         public FlatMapped(
                 @NotNull SeqView<? extends T> source,
-                @NotNull Function<? super T, ? extends TraversableOnce<? extends E>> mapper) {
+                @NotNull Function<? super T, ? extends Iterable<? extends E>> mapper) {
             assert source != null;
             assert mapper != null;
 

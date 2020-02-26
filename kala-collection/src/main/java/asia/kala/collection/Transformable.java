@@ -25,7 +25,7 @@ public interface Transformable<E> extends Functor<E> {
     @NotNull
     Transformable<E> filterNot(@NotNull Predicate<? super E> predicate);
 
-    @NotNull <U> Transformable<U> flatMap(@NotNull Function<? super E, ? extends TraversableOnce<? extends U>> mapper);
+    @NotNull <U> Transformable<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper);
 
     @NotNull
     Tuple2<? extends Transformable<E>, ? extends Transformable<E>> span(@NotNull Predicate<? super E> predicate);
