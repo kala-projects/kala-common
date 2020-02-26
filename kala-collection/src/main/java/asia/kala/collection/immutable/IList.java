@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Function;
@@ -142,6 +143,18 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
+    public final IList<E> sorted() {
+        return sortedImpl();
+    }
+
+    @NotNull
+    @Override
+    public final ISeq<E> sorted(@NotNull Comparator<? super E> comparator) {
+        return sortedImpl();
+    }
+
+    @NotNull
+    @Override
     public final <U> IList<U> mapIndexed(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
         return mapIndexedImpl(mapper);
     }
@@ -185,6 +198,7 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
     }
 
 
+    @NotNull
     @Override
     public final IList<E> toIList() {
         return this;

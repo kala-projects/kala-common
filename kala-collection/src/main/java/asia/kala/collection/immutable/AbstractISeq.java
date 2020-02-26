@@ -6,6 +6,8 @@ import asia.kala.collection.TraversableOnce;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -229,6 +231,22 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
         return factory.build(builder);
     }
 
+    static <E, T, Builder> T sorted(
+            @NotNull ISeq<? extends E> seq,
+            @NotNull Comparator<? super E> comparator,
+            @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
+    ) {
+        assert seq != null;
+        assert factory != null;
+
+        Objects.requireNonNull(comparator);
+
+        Object[] arr = seq.toObjectArray();
+        Arrays.sort(arr, ((Comparator<? super Object>) comparator));
+
+        return factory.from((E[]) arr);
+    }
+
     static <E, U, T, Builder> T mapIndexed(
             @NotNull ISeq<? extends E> Seq,
             @NotNull IndexedFunction<? super E, ? extends U> mapper,
@@ -297,6 +315,16 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     @NotNull
     protected final <To extends ISeq<E>> To appendedAllImpl(@NotNull Iterable<? extends E> postfix) {
         return (To) AbstractISeq.appendedAll(this, postfix, iterableFactory());
+    }
+
+    @NotNull
+    protected final <To extends ISeq<E>> To sortedImpl() {
+        return (To) this.sorted((Comparator<? super E>) Comparator.naturalOrder());
+    }
+
+    @NotNull
+    protected final <To extends ISeq<E>> To sortedImpl(@NotNull Comparator<? super E> comparator) {
+        return (To) AbstractISeq.sorted(this, comparator, iterableFactory());
     }
 
     @NotNull

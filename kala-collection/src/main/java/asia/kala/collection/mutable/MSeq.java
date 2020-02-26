@@ -5,6 +5,8 @@ import asia.kala.collection.IndexedSeq;
 import asia.kala.collection.Seq;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -36,6 +38,22 @@ public interface MSeq<E> extends MCollection<E>, Seq<E> {
         int size = size();
         for (int i = 0; i < size; i++) {
             this.set(i, mapper.apply(this.get(i)));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    default void sort() {
+        sort((Comparator<? super E>) Comparator.naturalOrder());
+    }
+
+    @SuppressWarnings("unchecked")
+    default void sort(@NotNull Comparator<? super E> comparator) {
+        Objects.requireNonNull(comparator);
+        Object[] values = toObjectArray();
+        Arrays.sort(values, (Comparator<? super Object>) comparator);
+
+        for (int i = 0; i < values.length; i++) {
+            this.set(i, (E) values[i]);
         }
     }
 

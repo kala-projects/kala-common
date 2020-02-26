@@ -117,6 +117,7 @@ public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
         return new IndexedSeqViews.Of<>(this);
     }
 
+    @NotNull
     @Override
     @SuppressWarnings("unchecked")
     default <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {

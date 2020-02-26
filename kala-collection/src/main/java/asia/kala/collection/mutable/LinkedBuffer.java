@@ -68,6 +68,7 @@ public final class LinkedBuffer<E> extends asia.kala.collection.immutable.Intern
         return new BufferEditor<>(this);
     }
 
+    @NotNull
     @Override
     @SuppressWarnings("unchecked")
     public final <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {

@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -101,12 +102,18 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
     }
 
     @Override
-    public void forEachIndexed(@NotNull IndexedConsumer<? super E> action) {
+    public final void forEachIndexed(@NotNull IndexedConsumer<? super E> action) {
         Objects.requireNonNull(action);
 
         for (int i = 0; i < values.length; i++) {
             action.accept(i, (E) values[i]);
         }
+    }
+
+    @Override
+    public final void sort(@NotNull Comparator<? super E> comparator) {
+        Objects.requireNonNull(comparator);
+        Arrays.sort(values, (Comparator<? super Object>) comparator);
     }
 
     //
@@ -130,6 +137,7 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
         return (Enumerator<E>) Enumerator.ofArray(values);
     }
 
+    @NotNull
     @Override
     @SuppressWarnings("SuspiciousSystemArraycopy")
     public <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {

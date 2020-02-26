@@ -168,6 +168,7 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E>, Transfor
         return new Enumerators.Appended<>(this, value);
     }
 
+    @NotNull
     @Override
     default <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
         Objects.requireNonNull(generator);

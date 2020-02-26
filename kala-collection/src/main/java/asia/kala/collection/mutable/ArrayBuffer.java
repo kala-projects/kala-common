@@ -8,10 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.RandomAccess;
+import java.util.*;
 import java.util.function.IntFunction;
 
 @SuppressWarnings("unchecked")
@@ -254,6 +251,10 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         elements[index] = newValue;
     }
 
+    @Override
+    public final void sort(@NotNull Comparator<? super E> comparator) {
+        Arrays.sort(elements, 0, size, (Comparator<? super Object>) comparator);
+    }
 
     //
     // -- MCollection
@@ -287,6 +288,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         return (Enumerator<E>) Enumerator.ofArray(elements, 0, size);
     }
 
+    @NotNull
     @Override
     @SuppressWarnings("SuspiciousSystemArraycopy")
     public final <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {

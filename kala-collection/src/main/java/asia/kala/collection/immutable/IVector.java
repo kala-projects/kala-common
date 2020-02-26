@@ -3,6 +3,7 @@ package asia.kala.collection.immutable;
 import asia.kala.Tuple2;
 import asia.kala.collection.*;
 import asia.kala.collection.mutable.ArrayBuffer;
+import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.Range;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
@@ -131,21 +133,6 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
         return newNode;
     }
 
-    //
-    // -- ISeq
-    //
-
-    @Override
-    public final int size() {
-        return length;
-    }
-
-    public final E get(int index) {
-        final Object leaf = getLeaf(index);
-        final int leafIndex = lastDigit(offset + index);
-        return (E) Array.get(leaf, leafIndex);
-    }
-
     private Object getLeaf(int index) {
         if (depthShift == 0) {
             return array;
@@ -163,19 +150,80 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
         return leaf;
     }
 
-    @NotNull
-    @Override
-    public final IVector<E> updated(int index, E newValue) {
-        final Object root = modify(array, depthShift, offset + index, NodeModifier.COPY_NODE, updateLeafWith(newValue));
-        return new IVector<>(root, offset, length, depthShift);
-    }
-
     private NodeModifier updateLeafWith(E element) {
         return (a, i) -> {
             Object arr = Arrays.copyOf((Object[]) a, Math.max(i + 1, Array.getLength(a)));
             Array.set(arr, i, element);
             return arr;
         };
+    }
+
+    private boolean isFullLeft() {
+        return offset == 0;
+    }
+
+    private NodeModifier prependToLeaf(java.util.Iterator<? extends E> iterator) {
+        return (array, index) -> {
+            final Object copy =
+                    Arrays.copyOf(((Object[]) array), Math.max(((Object[]) array).length, BRANCHING_FACTOR));
+            while (iterator.hasNext() && index >= 0) {
+                Array.set(copy, index--, iterator.next());
+            }
+            return copy;
+        };
+    }
+
+    private boolean isFullRight() {
+        return (offset + length + 1) > treeSize(BRANCHING_FACTOR, depthShift);
+    }
+
+    private NodeModifier appendToLeaf(Iterator<? extends E> iterator, int leafSize) {
+        return (array, index) -> {
+            final Object copy =
+                    Arrays.copyOf((Object[]) array, Math.max(((Object[]) array).length, leafSize));
+            while (iterator.hasNext() && index < leafSize) {
+                Array.set(copy, index++, iterator.next());
+            }
+            return copy;
+        };
+    }
+
+    private boolean arePointingToSameLeaf(int i, int j) {
+        return firstDigit(offset + i, BRANCHING_BASE) == firstDigit(offset + j, BRANCHING_BASE);
+    }
+
+    private static <T> IVector<T> collapsed(Object array, int offset, int length, int shift) {
+        for (; shift > 0; shift -= BRANCHING_BASE) {
+            final int skippedElements = Array.getLength(array) - 1;
+            if (skippedElements != digit(offset, shift)) {
+                break;
+            }
+            array = Array.get(array, skippedElements);
+            offset -= treeSize(skippedElements, shift);
+        }
+        return new IVector<>(array, offset, length, shift);
+    }
+
+    //
+    // -- ISeq
+    //
+
+    @Override
+    public final int size() {
+        return length;
+    }
+
+    public final E get(int index) {
+        final Object leaf = getLeaf(index);
+        final int leafIndex = lastDigit(offset + index);
+        return (E) Array.get(leaf, leafIndex);
+    }
+
+    @NotNull
+    @Override
+    public final IVector<E> updated(int index, E newValue) {
+        final Object root = modify(array, depthShift, offset + index, NodeModifier.COPY_NODE, updateLeafWith(newValue));
+        return new IVector<>(root, offset, length, depthShift);
     }
 
     @NotNull
@@ -214,21 +262,6 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
             result = new IVector<>(array, offset - delta, result.length + delta, shift);
         }
         return result;
-    }
-
-    private boolean isFullLeft() {
-        return offset == 0;
-    }
-
-    private NodeModifier prependToLeaf(java.util.Iterator<? extends E> iterator) {
-        return (array, index) -> {
-            final Object copy =
-                    Arrays.copyOf(((Object[]) array), Math.max(((Object[]) array).length, BRANCHING_FACTOR));
-            while (iterator.hasNext() && index >= 0) {
-                Array.set(copy, index--, iterator.next());
-            }
-            return copy;
-        };
     }
 
     @NotNull
@@ -270,21 +303,6 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
             result = new IVector<>(array, offset, result.length + delta, shift);
         }
         return result;
-    }
-
-    private boolean isFullRight() {
-        return (offset + length + 1) > treeSize(BRANCHING_FACTOR, depthShift);
-    }
-
-    private NodeModifier appendToLeaf(Iterator<? extends E> iterator, int leafSize) {
-        return (array, index) -> {
-            final Object copy =
-                    Arrays.copyOf((Object[]) array, Math.max(((Object[]) array).length, leafSize));
-            while (iterator.hasNext() && index < leafSize) {
-                Array.set(copy, index++, iterator.next());
-            }
-            return copy;
-        };
     }
 
     @NotNull
@@ -371,20 +389,22 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
         return drop(count);
     }
 
-    private boolean arePointingToSameLeaf(int i, int j) {
-        return firstDigit(offset + i, BRANCHING_BASE) == firstDigit(offset + j, BRANCHING_BASE);
+    @NotNull
+    @Override
+    public final IVector<E> sorted() {
+        return sortedImpl();
     }
 
-    private static <T> IVector<T> collapsed(Object array, int offset, int length, int shift) {
-        for (; shift > 0; shift -= BRANCHING_BASE) {
-            final int skippedElements = Array.getLength(array) - 1;
-            if (skippedElements != digit(offset, shift)) {
-                break;
-            }
-            array = Array.get(array, skippedElements);
-            offset -= treeSize(skippedElements, shift);
-        }
-        return new IVector<>(array, offset, length, shift);
+    @NotNull
+    @Override
+    public final IVector<E> sorted(@NotNull Comparator<? super E> comparator) {
+        return sortedImpl(comparator);
+    }
+
+    @NotNull
+    @Override
+    public final <U> IVector<U> mapIndexed(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
+        return mapIndexedImpl(mapper);
     }
 
     //
@@ -425,6 +445,10 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
     public final Tuple2<IVector<E>, IVector<E>> span(@NotNull Predicate<? super E> predicate) {
         return spanImpl(predicate);
     }
+
+    //
+    // -- Object
+    //
 
     @Override
     public final boolean equals(Object o) {

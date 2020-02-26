@@ -107,6 +107,7 @@ final class Views {
             return collection.joinToString(separator, prefix, postfix);
         }
 
+        @NotNull
         @Override
         public final <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
             return collection.toArray(generator);

@@ -7,6 +7,9 @@ import asia.kala.collection.mutable.LinkedBuffer;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 @ApiStatus.Internal
 public final class Internal {
     /**
@@ -69,7 +72,6 @@ public final class Internal {
             last = i;
             ++len;
         }
-
 
         @Override
         public final void prepend(E value) {
@@ -218,6 +220,25 @@ public final class Internal {
                 l = l.tail();
             }
             ((IList.MCons<E>) l).head = newValue;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public final void sort(@NotNull Comparator<? super E> comparator) {
+            if (len == 0) {
+                return;
+            }
+            Object[] values = toObjectArray();
+            Arrays.sort(values, (Comparator<? super Object>) comparator);
+
+            IList.MCons<E> c = first;
+            for (Object value : values) {
+                //noinspection ConstantConditions
+                c.head = (E) value;
+                c = c.tail instanceof IList.MCons<?>
+                        ? (IList.MCons<E>) c.tail
+                        : null;
+            }
         }
 
         @Override

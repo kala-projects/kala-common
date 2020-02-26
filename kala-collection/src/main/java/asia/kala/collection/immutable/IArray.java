@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -227,6 +228,20 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
         return new IArray<>(newValues);
     }
 
+    @NotNull
+    @Override
+    public final IArray<E> sorted() {
+        return sortedImpl();
+    }
+
+    @NotNull
+    @Override
+    public final IArray<E> sorted(@NotNull Comparator<? super E> comparator) {
+        Object[] newValues = values.clone();
+        Arrays.sort(newValues, (Comparator<? super Object>) comparator);
+        return new IArray<>(newValues);
+    }
+
     @Override
     public void forEachIndexed(@NotNull IndexedConsumer<? super E> action) {
         Objects.requireNonNull(action);
@@ -304,6 +319,7 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
         return (Enumerator<E>) Enumerator.ofArray(values);
     }
 
+    @NotNull
     @Override
     @SuppressWarnings("SuspiciousSystemArraycopy")
     public <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -95,6 +96,17 @@ public interface ISeq<E> extends ICollection<E>, Seq<E> {
     @NotNull
     default ISeq<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
         return AbstractISeq.prependedAll(this, postfix, iterableFactory());
+    }
+
+    @NotNull
+    @SuppressWarnings("unchecked")
+    default ISeq<E> sorted() {
+        return sorted((Comparator<? super E>) Comparator.naturalOrder());
+    }
+
+    @NotNull
+    default ISeq<E> sorted(@NotNull Comparator<? super E> comparator) {
+        return AbstractISeq.sorted(this, comparator, iterableFactory());
     }
 
     @NotNull

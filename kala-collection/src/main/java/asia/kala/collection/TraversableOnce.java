@@ -138,11 +138,17 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E> {
         return joinTo(new StringBuilder(), prefix, separator, postfix).toString();
     }
 
+    @NotNull
+    default Object[] toObjectArray() {
+        return toArray(Object[]::new);
+    }
+
+    @NotNull
     default E[] toArray(@NotNull Class<E> type) {
         return toArray(size -> (E[]) Array.newInstance(type, size));
     }
 
-
+    @NotNull
     default <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
         return iterator().toArray(generator);
     }
@@ -152,6 +158,7 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E> {
         iterator().forEach(action);
     }
 
+    @NotNull
     default IList<E> toIList() {
         return IList.from(this);
     }
