@@ -3,7 +3,6 @@ package asia.kala.collection.immutable;
 import asia.kala.Tuple2;
 import asia.kala.collection.AbstractTraversable;
 import asia.kala.collection.CollectionFactory;
-import asia.kala.collection.TraversableOnce;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;

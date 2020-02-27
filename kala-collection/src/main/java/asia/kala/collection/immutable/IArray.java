@@ -39,14 +39,17 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
         return (IArray<E>) array;
     }
 
+    @NotNull
     public static <E> IArray.Factory<E> factory() {
         return (Factory<E>) FACTORY;
     }
 
+    @NotNull
     public static <E> IArray<E> empty() {
         return (IArray<E>) EMPTY;
     }
 
+    @NotNull
     public static <E> IArray<E> of() {
         return (IArray<E>) EMPTY;
     }
@@ -68,8 +71,19 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
         return new IArray<>(elements.clone());
     }
 
+    @NotNull
     public static <E> IArray<E> from(@NotNull Iterable<? extends E> iterable) {
         return IArray.<E>factory().from(iterable);
+    }
+
+    @StaticClass
+    public static class Unsafe {
+        @NotNull
+        @Contract("_ -> new")
+        public static <E> IArray<E> wrap(@NotNull E[] array) {
+            Objects.requireNonNull(array);
+            return new IArray<>(array);
+        }
     }
 
     //
@@ -404,37 +418,43 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
         }
 
         @Override
-        public IArray<E> empty() {
+        public final IArray<E> empty() {
             return IArray.empty();
         }
 
         @Override
-        public ArrayBuffer<E> newBuilder() {
+        public final IArray<E> from(@NotNull E[] elements) {
+            return IArray.from(elements);
+        }
+
+        @Override
+        public final ArrayBuffer<E> newBuilder() {
             return new ArrayBuffer<>();
         }
 
         @Override
-        public void addToBuilder(@NotNull ArrayBuffer<E> buffer, E value) {
+        public final void addToBuilder(@NotNull ArrayBuffer<E> buffer, E value) {
             buffer.append(value);
         }
 
         @Override
-        public void sizeHint(@NotNull ArrayBuffer<E> buffer, int size) {
+        public final void sizeHint(@NotNull ArrayBuffer<E> buffer, int size) {
             buffer.sizeHint(size);
         }
 
         @Override
-        public ArrayBuffer<E> mergeBuilder(@NotNull ArrayBuffer<E> buffer1, @NotNull ArrayBuffer<E> buffer2) {
+        public final ArrayBuffer<E> mergeBuilder(@NotNull ArrayBuffer<E> buffer1, @NotNull ArrayBuffer<E> buffer2) {
             buffer1.appendAll(buffer2);
             return buffer1;
         }
 
         @Override
-        public IArray<E> build(@NotNull ArrayBuffer<E> buffer) {
+        public final IArray<E> build(@NotNull ArrayBuffer<E> buffer) {
             if (buffer.isEmpty()) {
                 return empty();
             }
             return new IArray<>(buffer.toArray(Object[]::new));
         }
+
     }
 }

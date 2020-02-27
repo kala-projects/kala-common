@@ -2,12 +2,16 @@ package asia.kala.collection.mutable;
 
 import asia.kala.collection.*;
 import kotlin.annotations.jvm.Mutable;
+import kotlin.annotations.jvm.ReadOnly;
+import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.RandomAccess;
+import java.util.function.Predicate;
 
 public interface Buffer<E> extends MSeq<E> {
 
@@ -46,7 +50,7 @@ public interface Buffer<E> extends MSeq<E> {
     void append(E value);
 
     @Contract(mutates = "this")
-    default void appendAll(@NotNull Iterable<? extends E> collection) {
+    default void appendAll(@NotNull @ReadOnly Iterable<? extends E> collection) {
         Objects.requireNonNull(collection);
         for (E e : collection) {
             this.append(e);
@@ -63,7 +67,7 @@ public interface Buffer<E> extends MSeq<E> {
 
     @Contract(mutates = "this")
     @SuppressWarnings("unchecked")
-    default void prependAll(@NotNull Iterable<? extends E> collection) {
+    default void prependAll(@NotNull @ReadOnly Iterable<? extends E> collection) {
         Objects.requireNonNull(collection);
         if (collection instanceof Seq<?>) {
             Enumerator<?> iterator = ((Seq<?>) collection).reverseIterator();
@@ -98,7 +102,7 @@ public interface Buffer<E> extends MSeq<E> {
     void insert(int index, E element);
 
     @Contract(mutates = "this")
-    default void insertAll(int index, @NotNull Iterable<? extends E> elements) {
+    default void insertAll(int index, @NotNull @ReadOnly Iterable<? extends E> elements) {
         Objects.requireNonNull(elements);
 
         for (E e : elements) {
@@ -112,7 +116,8 @@ public interface Buffer<E> extends MSeq<E> {
     }
 
     @Contract(mutates = "this")
-    E remove(int index);
+    @Flow(sourceIsContainer = true)
+    E remove(@Range(from = 0, to = Integer.MAX_VALUE) int index);
 
     @Contract(mutates = "this")
     default void remove(int index, int count) {
@@ -123,6 +128,45 @@ public interface Buffer<E> extends MSeq<E> {
 
     @Contract(mutates = "this")
     void clear();
+
+    @Contract(mutates = "this")
+    default void dropInPlace(int n) {
+        if (n <= 0) {
+            return;
+        }
+        remove(0, Integer.min(n, size()));
+    }
+
+    @Contract(mutates = "this")
+    default void dropWhileInPlace(@NotNull Predicate<? super E> predicate) {
+        Objects.requireNonNull(predicate);
+
+        int idx = indexWhere(predicate.negate());
+        if (idx < 0) {
+            clear();
+        } else {
+            dropInPlace(idx);
+        }
+    }
+
+    @Contract(mutates = "this")
+    default void takeInPlace(int n) {
+        int size = this.size();
+        if (n >= size) {
+            return;
+        }
+        remove(n, size - n);
+    }
+
+    @Contract(mutates = "this")
+    default void takeWhileInPlace(@NotNull Predicate<? super E> predicate) {
+        Objects.requireNonNull(predicate);
+
+        int idx = indexWhere(predicate.negate());
+        if (idx >= 0) {
+            takeInPlace(idx);
+        }
+    }
 
     //
     // -- MCollection

@@ -1,9 +1,13 @@
 package asia.kala.collection;
 
+import asia.kala.LazyValue;
 import asia.kala.Option;
+import asia.kala.collection.mutable.MArray;
 import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.function.*;
 
 final class SeqViews {
@@ -243,24 +247,29 @@ final class SeqViews {
 
     static class Concat<E> extends AbstractSeqView<E> {
         @NotNull
-        private final SeqView<E> view1;
+        private final Seq<E> seq1;
 
         @NotNull
-        private final SeqView<E> view2;
+        private final Seq<E> seq2;
 
-        Concat(@NotNull SeqView<E> view1, @NotNull SeqView<E> view2) {
-            assert view1 != null;
-            assert view2 != null;
+        Concat(@NotNull Seq<E> seq1, @NotNull Seq<E> seq2) {
+            assert seq1 != null;
+            assert seq2 != null;
 
 
-            this.view1 = view1;
-            this.view2 = view2;
+            this.seq1 = seq1;
+            this.seq2 = seq2;
+        }
+
+        @Override
+        public final int size() {
+            return seq1.size() + seq2.size();
         }
 
         @NotNull
         @Override
         public final Enumerator<E> iterator() {
-            return Enumerator.concat(view1.iterator(), view2.iterator());
+            return Enumerator.concat(seq1.iterator(), seq1.iterator());
         }
     }
 
@@ -414,4 +423,46 @@ final class SeqViews {
         }
     }
 
+    static final class Sorted<E> extends AbstractSeqView<E> {
+        private final SeqView<E> source;
+        private final LazyValue<Seq<E>> sortedSeq;
+
+        @SuppressWarnings("unchecked")
+        Sorted(@NotNull SeqView<E> source, @NotNull Comparator<? super E> comparator) {
+            assert source != null;
+            assert comparator != null;
+
+            this.source = source;
+            this.sortedSeq = LazyValue.of(() -> {
+                Object[] arr = source.toObjectArray();
+                Arrays.sort(arr, (Comparator<? super Object>) comparator);
+                return MArray.wrap((E[]) arr);
+            });
+        }
+
+        @Override
+        public final E get(int index) {
+            return sortedSeq.get().get(index);
+        }
+
+        @NotNull
+        @Override
+        public final Option<E> getOption(int index) {
+            return sortedSeq.get().getOption(index);
+        }
+
+        @Override
+        public final int size() {
+            if (sortedSeq.isReady()) {
+                return sortedSeq.get().size();
+            }
+            return source.size();
+        }
+
+        @NotNull
+        @Override
+        public final Enumerator<E> iterator() {
+            return sortedSeq.get().iterator();
+        }
+    }
 }

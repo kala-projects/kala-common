@@ -1,9 +1,12 @@
 package asia.kala.collection;
 
 import asia.kala.Tuple2;
+import asia.kala.collection.mutable.MArray;
+import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -55,8 +58,39 @@ public interface SeqView<E> extends Seq<E>, View<E> {
         return new SeqViews.Prepended<>(this, value);
     }
 
+    default SeqView<E> prependedAll(@NotNull @ReadOnly Iterable<? extends E> prefix) {
+        Objects.requireNonNull(prefix);
+        return new SeqViews.Concat<>(KalaCollectionUtils.asSeq(prefix), this);
+    }
+
+    default SeqView<E> prependedAll(@NotNull E[] prefix) {
+        Objects.requireNonNull(prefix);
+        return new SeqViews.Concat<>(MArray.wrap(prefix), this);
+    }
+
     default SeqView<E> appended(E value) {
         return new SeqViews.Appended<>(this, value);
+    }
+
+    default SeqView<E> appendedAll(@NotNull @ReadOnly Iterable<? extends E> postfix) {
+        Objects.requireNonNull(postfix);
+        return new SeqViews.Concat<>(this, KalaCollectionUtils.asSeq(postfix));
+    }
+
+    default SeqView<E> appendedAll(@NotNull E[] postfix) {
+        Objects.requireNonNull(postfix);
+        return new SeqViews.Concat<>(this, MArray.wrap(postfix));
+    }
+
+    @SuppressWarnings("unchecked")
+    default SeqView<E> sorted() {
+        return sorted((Comparator<? super E>) Comparator.naturalOrder());
+    }
+
+    default SeqView<E> sorted(@NotNull Comparator<? super E> comparator) {
+        Objects.requireNonNull(comparator);
+
+        return new SeqViews.Sorted<>(this, comparator);
     }
 
     //

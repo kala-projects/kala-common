@@ -3,6 +3,9 @@ package asia.kala.collection.immutable;
 import asia.kala.collection.Enumerator;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+import java.util.function.Function;
+
 final class ISeq0<E> extends ISeqN<E> {
     private static final long serialVersionUID = 0L;
 
@@ -28,8 +31,27 @@ final class ISeq0<E> extends ISeqN<E> {
 
     @NotNull
     @Override
+    public final ISeq<E> appended(E element) {
+        return new ISeq1<>(element);
+    }
+
+    @NotNull
+    @Override
+    public final ISeq<E> prepended(E element) {
+        return new ISeq1<>(element);
+    }
+
+    @NotNull
+    @Override
     public final Enumerator<E> iterator() {
         return Enumerator.empty();
+    }
+
+    @NotNull
+    @Override
+    public final <U> ISeq<U> map(@NotNull Function<? super E, ? extends U> mapper) {
+        Objects.requireNonNull(mapper);
+        return instance();
     }
 
     //

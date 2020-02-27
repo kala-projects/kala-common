@@ -5,8 +5,10 @@ import asia.kala.collection.immutable.IArray;
 import asia.kala.collection.immutable.IList;
 import asia.kala.collection.immutable.ISeq;
 import asia.kala.function.IndexedConsumer;
+import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.util.List;
 import java.util.Objects;
@@ -14,19 +16,23 @@ import java.util.function.Predicate;
 
 public interface Seq<E> extends Traversable<E> {
 
+    @NotNull
     static <E> CollectionFactory<E, ?, ? extends Seq<E>> factory() {
         return ISeq.factory();
     }
 
+    @NotNull
     @SafeVarargs
     static <E> Seq<E> of(E... elements) {
         return Seq.<E>factory().from(elements);
     }
 
+    @NotNull
     static <E> Seq<E> from(@NotNull E[] elements) {
         return Seq.<E>factory().from(elements);
     }
 
+    @NotNull
     static <E> Seq<E> from(@NotNull Iterable<? extends E> iterable) {
         return Seq.<E>factory().from(iterable);
     }
@@ -37,11 +43,13 @@ public interface Seq<E> extends Traversable<E> {
         return (Seq<E>) seq;
     }
 
-    default E get(int index) {
+    @Flow(sourceIsContainer = true)
+    default E get(@Range(from = 0, to = Integer.MAX_VALUE) int index) {
         return getOption(index).getOrThrow(IndexOutOfBoundsException::new);
     }
 
     @NotNull
+    @Flow(sourceIsContainer = true, targetIsContainer = true)
     default Option<E> getOption(int index) {
         if (index < 0) {
             return Option.none();
@@ -166,10 +174,12 @@ public interface Seq<E> extends Traversable<E> {
         return -1;
     }
 
+    @Flow(sourceIsContainer = true, target = "array", targetIsContainer = true)
     default int copyToArray(@NotNull Object[] array) {
         return copyToArray(array, 0);
     }
 
+    @Flow(sourceIsContainer = true, target = "array", targetIsContainer = true)
     default int copyToArray(@NotNull Object[] array, int start) {
         int arrayLength = array.length;
         Enumerator<E> it = iterator();
@@ -181,6 +191,7 @@ public interface Seq<E> extends Traversable<E> {
         return i - start;
     }
 
+    @Flow(sourceIsContainer = true, target = "array", targetIsContainer = true)
     default int copyToArray(@NotNull Object[] array, int start, int length) {
         Enumerator<E> it = iterator();
         int i = start;

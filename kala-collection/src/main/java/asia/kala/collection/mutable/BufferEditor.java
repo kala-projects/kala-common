@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class BufferEditor<E, C extends Buffer<E>> extends MSeqEditor<E, C> {
     public BufferEditor(@NotNull C source) {
@@ -93,6 +94,30 @@ public class BufferEditor<E, C extends Buffer<E>> extends MSeqEditor<E, C> {
     @Contract("-> this")
     public BufferEditor<E, C> clear() {
         source.clear();
+        return this;
+    }
+
+    @Contract("_ -> this")
+    public BufferEditor<E, C> dropInPlace(int n) {
+        source.dropInPlace(n);
+        return this;
+    }
+
+    @Contract("_ -> this")
+    public BufferEditor<E, C> dropWhileInPlace(@NotNull Predicate<? super E> predicate) {
+        source.dropWhileInPlace(predicate);
+        return this;
+    }
+
+    @Contract("_ -> this")
+    public BufferEditor<E, C> takeInPlace(int n) {
+        source.takeInPlace(n);
+        return this;
+    }
+
+    @Contract("_ -> this")
+    public BufferEditor<E, C> takeWhileInPlace(@NotNull Predicate<? super E> predicate) {
+        source.takeWhileInPlace(predicate);
         return this;
     }
 

@@ -1,3 +1,11 @@
+/*
+ * Part of the implementation of IVector modified from vavr BitMappedTrie:
+ * https://github.com/vavr-io/vavr/blob/master/src/main/java/io/vavr/collection/BitMappedTrie.java
+ *
+ * License:
+ * https://github.com/vavr-io/vavr/blob/master/LICENSE
+ */
+
 package asia.kala.collection.immutable;
 
 import asia.kala.Tuple2;
@@ -31,7 +39,8 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
     public static final IVector.Factory<?> FACTORY = new Factory<>();
 
     private final Object array;
-    private final int offset, length;
+    private final int offset;
+    private final int length;
     private final int depthShift;
 
     IVector(@NotNull Object array, int offset, int length, int depthShift) {
@@ -68,9 +77,12 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
     }
 
     @NotNull
-    @Contract("_ -> new")
     public static <E> IVector<E> from(@NotNull E[] elements) {
         Objects.requireNonNull(elements);
+
+        if (elements.length == 0) {
+            return empty();
+        }
 
         int shift = 0;
         Object[] arr = elements;
@@ -81,6 +93,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
         return new IVector<>(arr, 0, elements.length, shift);
     }
 
+    @NotNull
     public static <E> IVector<E> from(@NotNull Iterable<? extends E> elements) {
         if (elements instanceof IVector<?>) {
             return (IVector<E>) elements;

@@ -2,7 +2,6 @@ package asia.kala.collection.immutable;
 
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Seq;
-import asia.kala.collection.TraversableOnce;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.NotNull;
 

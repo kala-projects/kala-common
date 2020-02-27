@@ -38,13 +38,13 @@ Maven:
 <dependency>
   <groupId>asia.kala</groupId>
   <artifactId>kala-common</artifactId>
-  <version>0.2.0</version>
+  <version>0.3.0</version>
   <type>pom</type>
 </dependency>
 ```
 
 Gradle:
 ```groovy
-implementation group: 'asia.kala', name: 'kala-common', version: '0.2.0'
+implementation group: 'asia.kala', name: 'kala-common', version: '0.3.0'
 ```
 

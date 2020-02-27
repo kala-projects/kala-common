@@ -4,9 +4,6 @@ import asia.kala.Tuple2;
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Transformable;
 import asia.kala.collection.Traversable;
-import asia.kala.collection.TraversableOnce;
-import asia.kala.collection.mutable.MCollection;
-import asia.kala.collection.mutable.MSeq;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

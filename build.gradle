@@ -13,7 +13,7 @@ buildscript {
 
 allprojects {
     group 'asia.kala'
-    version '0.3.0-SHAPSHOT'
+    version '0.3.0'
 }
 
 subprojects {

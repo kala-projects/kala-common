@@ -3,15 +3,14 @@ package asia.kala.collection.immutable;
 import asia.kala.Tuple2;
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Seq;
-import asia.kala.collection.TraversableOnce;
 import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.function.IndexedFunction;
+import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -29,15 +28,18 @@ public interface ISeq<E> extends ICollection<E>, Seq<E> {
         return ISeq.<E>factory().empty();
     }
 
+    @NotNull
     @SafeVarargs
     static <E> ISeq<E> of(E... elements) {
         return ISeq.<E>factory().from(elements);
     }
 
+    @NotNull
     static <E> ISeq<E> from(@NotNull E[] elements) {
         return ISeq.<E>factory().from(elements);
     }
 
+    @NotNull
     static <E> ISeq<E> from(@NotNull Iterable<? extends E> iterable) {
         return ISeq.<E>factory().from(iterable);
     }
@@ -92,7 +94,7 @@ public interface ISeq<E> extends ICollection<E>, Seq<E> {
 
     @NotNull
     @Contract(pure = true)
-    default ISeq<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
+    default ISeq<E> prependedAll(@NotNull @ReadOnly Iterable<? extends E> prefix) {
         return AbstractISeq.prependedAll(this, prefix, iterableFactory());
     }
 
@@ -110,7 +112,7 @@ public interface ISeq<E> extends ICollection<E>, Seq<E> {
 
     @NotNull
     @Contract(pure = true)
-    default ISeq<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
+    default ISeq<E> appendedAll(@NotNull @ReadOnly Iterable<? extends E> postfix) {
         return AbstractISeq.prependedAll(this, postfix, iterableFactory());
     }
 

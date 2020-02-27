@@ -103,7 +103,6 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
     @Override
     public final void forEachIndexed(@NotNull IndexedConsumer<? super E> action) {
         Objects.requireNonNull(action);
-
         for (int i = 0; i < values.length; i++) {
             action.accept(i, (E) values[i]);
         }
@@ -116,7 +115,7 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
     }
 
     //
-    // -- Traversable
+    // -- MCollection
     //
 
     @Override
@@ -157,14 +156,14 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
     @NotNull
     @Override
     @SuppressWarnings("SuspiciousSystemArraycopy")
-    public <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
+    public final <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
         U[] newValues = generator.apply(values.length);
         System.arraycopy(values, 0, newValues, 0, values.length);
         return newValues;
     }
 
     @Override
-    public void forEach(@NotNull Consumer<? super E> action) {
+    public final void forEach(@NotNull Consumer<? super E> action) {
         Objects.requireNonNull(action);
 
         for (Object value : values) {

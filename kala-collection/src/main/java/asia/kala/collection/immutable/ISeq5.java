@@ -1,5 +1,9 @@
 package asia.kala.collection.immutable;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Function;
+
 final class ISeq5<E> extends ISeqN<E> {
     private static final long serialVersionUID = 0L;
 
@@ -37,5 +41,11 @@ final class ISeq5<E> extends ISeqN<E> {
                 return $4;
         }
         throw new IndexOutOfBoundsException("Index out of range: " + index);
+    }
+
+    @NotNull
+    @Override
+    public final <U> ISeq<U> map(@NotNull Function<? super E, ? extends U> mapper) {
+        return new ISeq5<>(mapper.apply($0), mapper.apply($1), mapper.apply($2), mapper.apply($3), mapper.apply($4));
     }
 }
