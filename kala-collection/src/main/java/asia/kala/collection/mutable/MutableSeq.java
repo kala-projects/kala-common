@@ -4,39 +4,38 @@ import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.IndexedSeq;
 import asia.kala.collection.Seq;
 import kotlin.annotations.jvm.Mutable;
-import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
 
-public interface MSeq<E> extends MCollection<E>, Seq<E> {
+public interface MutableSeq<E> extends MutableCollection<E>, Seq<E> {
 
     @NotNull
-    static <E> CollectionFactory<E, ?, ? extends MSeq<E>> factory() {
-        return MArray.factory();
+    static <E> CollectionFactory<E, ?, ? extends MutableSeq<E>> factory() {
+        return MutableArray.factory();
     }
 
     @NotNull
     @SafeVarargs
-    static <E> MSeq<E> of(E... elements) {
-        return MSeq.<E>factory().from(elements);
+    static <E> MutableSeq<E> of(E... elements) {
+        return MutableSeq.<E>factory().from(elements);
     }
 
     @NotNull
-    static <E> MSeq<E> from(@NotNull E[] elements) {
-        return MSeq.<E>factory().from(elements);
+    static <E> MutableSeq<E> from(@NotNull E[] elements) {
+        return MutableSeq.<E>factory().from(elements);
     }
 
     @NotNull
-    static <E> MSeq<E> from(@NotNull Iterable<? extends E> iterable) {
-        return MSeq.<E>factory().from(iterable);
+    static <E> MutableSeq<E> from(@NotNull Iterable<? extends E> iterable) {
+        return MutableSeq.<E>factory().from(iterable);
     }
 
     @NotNull
     @Contract("_ -> new")
-    static <E> MSeq<E> wrapJava(@NotNull @Mutable List<E> list) {
+    static <E> MutableSeq<E> wrapJava(@NotNull @Mutable List<E> list) {
         Objects.requireNonNull(list);
         if (list instanceof RandomAccess) {
             return new JDKConverters.RandomAccessListWrapper<>(list);
@@ -72,24 +71,24 @@ public interface MSeq<E> extends MCollection<E>, Seq<E> {
     }
 
     //
-    // -- MCollection
+    // -- MutableCollection
     //
 
     @Override
     default String className() {
-        return "MSeq";
+        return "MutableSeq";
     }
 
     @NotNull
     @Override
-    default <U> CollectionFactory<U, ?, ? extends MSeq<U>> iterableFactory() {
+    default <U> CollectionFactory<U, ?, ? extends MutableSeq<U>> iterableFactory() {
         return factory();
     }
 
     @NotNull
     @Override
-    default MSeqEditor<E, ? extends MSeq<E>> edit() {
-        return new MSeqEditor<>(this);
+    default MutableSeqEditor<E, ? extends MutableSeq<E>> edit() {
+        return new MutableSeqEditor<>(this);
     }
 
     @NotNull
@@ -97,8 +96,8 @@ public interface MSeq<E> extends MCollection<E>, Seq<E> {
     @Override
     default List<E> asJava() {
         if (this instanceof IndexedSeq<?>) {
-            return new JDKConverters.MIndexedSeqAsJava<>((MSeq<E> & IndexedSeq<E>) this);
+            return new JDKConverters.MIndexedSeqAsJava<>((MutableSeq<E> & IndexedSeq<E>) this);
         }
-        return new JDKConverters.MSeqAsJava<>(this);
+        return new JDKConverters.MutableSeqAsJava<>(this);
     }
 }

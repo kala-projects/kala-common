@@ -1,7 +1,6 @@
 package asia.kala.collection;
 
-import asia.kala.collection.immutable.IArray;
-import asia.kala.collection.immutable.ICollection;
+import asia.kala.collection.immutable.ImmutableCollection;
 import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +15,7 @@ public interface Traversable<E> extends TraversableOnce<E> {
     @NotNull
     @Contract(pure = true)
     static <E> CollectionFactory<E, ?, ? extends Traversable<E>> factory() {
-        return ICollection.factory();
+        return ImmutableCollection.factory();
     }
 
     @Contract("_ -> param1")

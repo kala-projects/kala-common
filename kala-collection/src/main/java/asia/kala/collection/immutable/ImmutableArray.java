@@ -6,7 +6,6 @@ import asia.kala.collection.*;
 import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.function.IndexedConsumer;
 import asia.kala.function.IndexedFunction;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,75 +18,74 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
-public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, Serializable {
+public final class ImmutableArray<E> extends AbstractImmutableSeq<E> implements IndexedSeq<E>, Serializable {
     private static final long serialVersionUID = 1845940935381169058L;
-    private static final int hashMagic = -1300712527;
 
     public static final Object[] EMPTY_ARRAY = new Object[0];
-    public static final IArray<?> EMPTY = new IArray<>(EMPTY_ARRAY);
+    public static final ImmutableArray<?> EMPTY = new ImmutableArray<>(EMPTY_ARRAY);
 
-    public static final IArray.Factory<?> FACTORY = new Factory<>();
+    public static final ImmutableArray.Factory<?> FACTORY = new Factory<>();
 
     private final Object[] values;
 
-    IArray(Object[] values) {
+    ImmutableArray(Object[] values) {
         this.values = values;
     }
 
     @Contract("_ -> param1")
-    public static <E> IArray<E> narrow(IArray<? extends E> array) {
-        return (IArray<E>) array;
+    public static <E> ImmutableArray<E> narrow(ImmutableArray<? extends E> array) {
+        return (ImmutableArray<E>) array;
     }
 
     @NotNull
-    public static <E> IArray.Factory<E> factory() {
+    public static <E> ImmutableArray.Factory<E> factory() {
         return (Factory<E>) FACTORY;
     }
 
     @NotNull
-    public static <E> IArray<E> empty() {
-        return (IArray<E>) EMPTY;
+    public static <E> ImmutableArray<E> empty() {
+        return (ImmutableArray<E>) EMPTY;
     }
 
     @NotNull
-    public static <E> IArray<E> of() {
-        return (IArray<E>) EMPTY;
+    public static <E> ImmutableArray<E> of() {
+        return (ImmutableArray<E>) EMPTY;
     }
 
     @NotNull
     @SafeVarargs
     @Contract("_ -> new")
-    public static <E> IArray<E> of(E... elements) {
+    public static <E> ImmutableArray<E> of(E... elements) {
         return from(elements);
     }
 
     @NotNull
     @Contract("_ -> new")
-    public static <E> IArray<E> from(@NotNull E[] elements) {
+    public static <E> ImmutableArray<E> from(@NotNull E[] elements) {
         Objects.requireNonNull(elements);
         if (elements.length == 0) {
             return empty();
         }
-        return new IArray<>(elements.clone());
+        return new ImmutableArray<>(elements.clone());
     }
 
     @NotNull
-    public static <E> IArray<E> from(@NotNull Iterable<? extends E> iterable) {
-        return IArray.<E>factory().from(iterable);
+    public static <E> ImmutableArray<E> from(@NotNull Iterable<? extends E> iterable) {
+        return ImmutableArray.<E>factory().from(iterable);
     }
 
     @StaticClass
     public static class Unsafe {
         @NotNull
         @Contract("_ -> new")
-        public static <E> IArray<E> wrap(@NotNull E[] array) {
+        public static <E> ImmutableArray<E> wrap(@NotNull E[] array) {
             Objects.requireNonNull(array);
-            return new IArray<>(array);
+            return new ImmutableArray<>(array);
         }
     }
 
     //
-    // -- ISeq
+    // -- ImmutableSeq
     //
 
     @Override
@@ -102,18 +100,18 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
 
     @NotNull
     @Override
-    public final IArray<E> updated(int index, E newValue) {
+    public final ImmutableArray<E> updated(int index, E newValue) {
         if (index < 0 || index >= values.length) {
             throw new IndexOutOfBoundsException();
         }
         Object[] newValues = values.clone();
         newValues[index] = newValue;
-        return new IArray<>(newValues);
+        return new ImmutableArray<>(newValues);
     }
 
     @NotNull
     @Override
-    public final IArray<E> drop(int n) {
+    public final ImmutableArray<E> drop(int n) {
         if (n <= 0) {
             return this;
         }
@@ -122,12 +120,12 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
             return empty();
         }
 
-        return new IArray<>(Arrays.copyOfRange(values, n, values.length));
+        return new ImmutableArray<>(Arrays.copyOfRange(values, n, values.length));
     }
 
     @NotNull
     @Override
-    public final IArray<E> dropWhile(@NotNull Predicate<? super E> predicate) {
+    public final ImmutableArray<E> dropWhile(@NotNull Predicate<? super E> predicate) {
         int idx = 0;
         while (idx < values.length && predicate.test((E) values[idx])) {
             ++idx;
@@ -136,12 +134,12 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
         if (idx >= values.length) {
             return empty();
         }
-        return new IArray<>(Arrays.copyOfRange(values, idx, values.length));
+        return new ImmutableArray<>(Arrays.copyOfRange(values, idx, values.length));
     }
 
     @NotNull
     @Override
-    public final IArray<E> take(int n) {
+    public final ImmutableArray<E> take(int n) {
         if (n <= 0) {
             return empty();
         }
@@ -153,12 +151,12 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
         Object[] newValues = new Object[n];
         System.arraycopy(values, 0, newValues, 0, n);
 
-        return new IArray<>(newValues);
+        return new ImmutableArray<>(newValues);
     }
 
     @NotNull
     @Override
-    public final IArray<E> takeWhile(@NotNull Predicate<? super E> predicate) {
+    public final ImmutableArray<E> takeWhile(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
         if (values.length == 0) {
             return empty();
@@ -173,77 +171,77 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
             return empty();
         }
 
-        return new IArray<>(Arrays.copyOf(values, count));
+        return new ImmutableArray<>(Arrays.copyOf(values, count));
     }
 
     @NotNull
     @Override
-    public final IArray<E> concat(@NotNull Seq<? extends E> other) {
+    public final ImmutableArray<E> concat(@NotNull Seq<? extends E> other) {
         return appendedAll(other);
     }
 
     @NotNull
     @Override
-    public final IArray<E> prepended(E element) {
+    public final ImmutableArray<E> prepended(E element) {
         Object[] newValues = new Object[values.length + 1];
         newValues[0] = element;
         System.arraycopy(values, 0, newValues, 1, values.length);
 
-        return new IArray<>(newValues);
+        return new ImmutableArray<>(newValues);
     }
 
     @NotNull
     @Override
-    public final IArray<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
+    public final ImmutableArray<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
         Objects.requireNonNull(prefix);
 
-        Object[] data = prefix instanceof IArray<?> ? ((IArray<?>) prefix).values : KalaCollectionUtils.asArray(prefix);
+        Object[] data = prefix instanceof ImmutableArray<?> ? ((ImmutableArray<?>) prefix).values : KalaCollectionUtils.asArray(prefix);
         Object[] newValues = new Object[data.length + values.length];
 
         System.arraycopy(data, 0, newValues, 0, data.length);
         System.arraycopy(values, 0, newValues, data.length, values.length);
 
-        return new IArray<>(newValues);
+        return new ImmutableArray<>(newValues);
     }
 
     @NotNull
     @Override
-    public final IArray<E> prependedAll(@NotNull E[] prefix) {
+    public final ImmutableArray<E> prependedAll(@NotNull E[] prefix) {
         Objects.requireNonNull(prefix);
 
         Object[] newValues = new Object[prefix.length + values.length];
         System.arraycopy(prefix, 0, newValues, 0, prefix.length);
         System.arraycopy(values, 0, newValues, prefix.length, values.length);
 
-        return new IArray<>(newValues);
+        return new ImmutableArray<>(newValues);
     }
 
     @NotNull
     @Override
-    public final IArray<E> appended(E element) {
+    public final ImmutableArray<E> appended(E element) {
         Object[] newValues = Arrays.copyOf(values, values.length + 1);
         newValues[values.length] = element;
 
-        return new IArray<>(newValues);
+        return new ImmutableArray<>(newValues);
     }
 
     @NotNull
     @Override
-    public final IArray<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
+    public final ImmutableArray<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
         Objects.requireNonNull(postfix);
 
-        Object[] data = postfix instanceof IArray<?> ? ((IArray<?>) postfix).values : KalaCollectionUtils.asArray(postfix);
+        Object[] data = postfix instanceof ImmutableArray<?> ? ((ImmutableArray<?>) postfix).values : KalaCollectionUtils.asArray(postfix);
         Object[] newValues = new Object[data.length + values.length];
 
         System.arraycopy(values, 0, newValues, 0, values.length);
         System.arraycopy(data, 0, newValues, values.length, data.length);
 
-        return new IArray<>(newValues);
+        return new ImmutableArray<>(newValues);
     }
 
     @NotNull
     @Override
-    public final IArray<E> appendedAll(@NotNull E[] postfix) {
+    public final ImmutableArray<E> appendedAll(@NotNull E[] postfix) {
         Objects.requireNonNull(postfix);
 
         Object[] newValues = new Object[postfix.length + values.length];
@@ -251,32 +249,32 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
         System.arraycopy(values, 0, newValues, 0, values.length);
         System.arraycopy(postfix, 0, newValues, values.length, postfix.length);
 
-        return new IArray<>(newValues);
+        return new ImmutableArray<>(newValues);
     }
 
     @NotNull
     @Override
-    public final <U> IArray<U> mapIndexed(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
+    public final <U> ImmutableArray<U> mapIndexed(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
         Objects.requireNonNull(mapper);
         Object[] newValues = new Object[values.length];
         for (int i = 0; i < values.length; i++) {
             newValues[i] = mapper.apply(i, (E) values[i]);
         }
-        return new IArray<>(newValues);
+        return new ImmutableArray<>(newValues);
     }
 
     @NotNull
     @Override
-    public final IArray<E> sorted() {
+    public final ImmutableArray<E> sorted() {
         return sortedImpl();
     }
 
     @NotNull
     @Override
-    public final IArray<E> sorted(@NotNull Comparator<? super E> comparator) {
+    public final ImmutableArray<E> sorted(@NotNull Comparator<? super E> comparator) {
         Object[] newValues = values.clone();
         Arrays.sort(newValues, (Comparator<? super Object>) comparator);
-        return new IArray<>(newValues);
+        return new ImmutableArray<>(newValues);
     }
 
     @Override
@@ -289,12 +287,12 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
     }
 
     //
-    // -- ICollection
+    // -- ImmutableCollection
     //
 
     @Override
     public final String className() {
-        return "IArray";
+        return "ImmutableArray";
     }
 
     @NotNull
@@ -323,7 +321,7 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
 
     @NotNull
     @Override
-    public final <U> IArray<U> map(@NotNull Function<? super E, ? extends U> mapper) {
+    public final <U> ImmutableArray<U> map(@NotNull Function<? super E, ? extends U> mapper) {
         Object[] values = this.values;
         int length = values.length;
 
@@ -337,12 +335,12 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
             newValues[i] = mapper.apply((E) values[i]);
         }
 
-        return new IArray<>(newValues);
+        return new ImmutableArray<>(newValues);
     }
 
     @NotNull
     @Override
-    public final Tuple2<IArray<E>, IArray<E>> span(@NotNull Predicate<? super E> predicate) {
+    public final Tuple2<ImmutableArray<E>, ImmutableArray<E>> span(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
 
         if (values.length == 0) {
@@ -362,15 +360,15 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
             }
         }
 
-        IArray<E> ia1 = idx1 == 0 ? empty() : new IArray<>(Arrays.copyOf(newArr1, idx1));
-        IArray<E> ia2 = idx2 == 0 ? empty() : new IArray<>(Arrays.copyOf(newArr2, idx2));
+        ImmutableArray<E> ia1 = idx1 == 0 ? empty() : new ImmutableArray<>(Arrays.copyOf(newArr1, idx1));
+        ImmutableArray<E> ia2 = idx2 == 0 ? empty() : new ImmutableArray<>(Arrays.copyOf(newArr2, idx2));
 
         return new Tuple2<>(ia1, ia2);
     }
 
     @NotNull
     @Override
-    public <U> IArray.Factory<U> iterableFactory() {
+    public <U> ImmutableArray.Factory<U> iterableFactory() {
         return factory();
     }
 
@@ -392,39 +390,18 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
         }
     }
 
-    //
-    // -- Object
-    //
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof IArray<?>)) {
-            return false;
-        }
-
-        return Arrays.equals(values, ((IArray<?>) o).values);
-    }
-
-    @Override
-    public final int hashCode() {
-        return Arrays.hashCode(values) + hashMagic;
-    }
-
-    public static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, IArray<E>> {
+    public static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, ImmutableArray<E>> {
         Factory() {
         }
 
         @Override
-        public final IArray<E> empty() {
-            return IArray.empty();
+        public final ImmutableArray<E> empty() {
+            return ImmutableArray.empty();
         }
 
         @Override
-        public final IArray<E> from(@NotNull E[] elements) {
-            return IArray.from(elements);
+        public final ImmutableArray<E> from(@NotNull E[] elements) {
+            return ImmutableArray.from(elements);
         }
 
         @Override
@@ -449,11 +426,11 @@ public final class IArray<E> extends AbstractISeq<E> implements IndexedSeq<E>, S
         }
 
         @Override
-        public final IArray<E> build(@NotNull ArrayBuffer<E> buffer) {
+        public final ImmutableArray<E> build(@NotNull ArrayBuffer<E> buffer) {
             if (buffer.isEmpty()) {
                 return empty();
             }
-            return new IArray<>(buffer.toArray(Object[]::new));
+            return new ImmutableArray<>(buffer.toArray(Object[]::new));
         }
 
     }

@@ -1,6 +1,5 @@
 package asia.kala.collection.mutable;
 
-import asia.kala.collection.TraversableOnce;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,7 +7,7 @@ import java.util.Comparator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class BufferEditor<E, C extends Buffer<E>> extends MSeqEditor<E, C> {
+public class BufferEditor<E, C extends Buffer<E>> extends MutableSeqEditor<E, C> {
     public BufferEditor(@NotNull C source) {
         super(source);
     }
@@ -122,7 +121,7 @@ public class BufferEditor<E, C extends Buffer<E>> extends MSeqEditor<E, C> {
     }
 
     //
-    // -- MSeqEditor
+    // -- MutableSeqEditor
     //
 
     @NotNull

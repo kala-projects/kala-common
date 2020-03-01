@@ -1,9 +1,8 @@
 package asia.kala.collection;
 
 import asia.kala.Option;
-import asia.kala.collection.immutable.IArray;
-import asia.kala.collection.immutable.IList;
-import asia.kala.collection.immutable.ISeq;
+import asia.kala.collection.immutable.ImmutableList;
+import asia.kala.collection.immutable.ImmutableSeq;
 import asia.kala.function.IndexedConsumer;
 import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
@@ -18,7 +17,7 @@ public interface Seq<E> extends Traversable<E> {
 
     @NotNull
     static <E> CollectionFactory<E, ?, ? extends Seq<E>> factory() {
-        return ISeq.factory();
+        return ImmutableSeq.factory();
     }
 
     @NotNull
@@ -207,7 +206,7 @@ public interface Seq<E> extends Traversable<E> {
     }
 
     default Enumerator<E> reverseIterator() {
-        IList<E> l = IList.nil();
+        ImmutableList<E> l = ImmutableList.nil();
         for (E e : this) {
             l = l.cons(e);
         }

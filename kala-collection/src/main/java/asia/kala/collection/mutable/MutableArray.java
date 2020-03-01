@@ -3,7 +3,7 @@ package asia.kala.collection.mutable;
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Enumerator;
 import asia.kala.collection.IndexedSeq;
-import asia.kala.collection.immutable.IArray;
+import asia.kala.collection.immutable.ImmutableArray;
 import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,42 +15,41 @@ import java.util.function.IntFunction;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
-public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, Serializable {
+public final class MutableArray<E> extends AbstractMutableSeq<E> implements IndexedSeq<E>, Serializable {
     private static final long serialVersionUID = 6278999671163491762L;
-    private static final int hashMagic = -822992626;
 
-    public static final Object[] EMPTY_ARRAY = IArray.EMPTY_ARRAY;
-    public static final MArray<?> EMPTY = new MArray<>(EMPTY_ARRAY);
+    public static final Object[] EMPTY_ARRAY = ImmutableArray.EMPTY_ARRAY;
+    public static final MutableArray<?> EMPTY = new MutableArray<>(EMPTY_ARRAY);
 
-    public static final MArray.Factory<?> FACTORY = new Factory<>();
+    public static final MutableArray.Factory<?> FACTORY = new Factory<>();
 
     @NotNull
     private final Object[] values;
     private final boolean isChecked;
 
-    MArray(@NotNull Object[] values) {
+    MutableArray(@NotNull Object[] values) {
         this(values, false);
     }
 
-    MArray(@NotNull Object[] values, boolean isChecked) {
+    MutableArray(@NotNull Object[] values, boolean isChecked) {
         this.values = values;
         this.isChecked = isChecked;
     }
 
-    public static <E> MArray.Factory<E> factory() {
+    public static <E> MutableArray.Factory<E> factory() {
         return (Factory<E>) FACTORY;
     }
 
-    public static <E> MArray<E> empty() {
-        return (MArray<E>) EMPTY;
+    public static <E> MutableArray<E> empty() {
+        return (MutableArray<E>) EMPTY;
     }
 
-    public static <E> MArray<E> of() {
-        return (MArray<E>) EMPTY;
+    public static <E> MutableArray<E> of() {
+        return (MutableArray<E>) EMPTY;
     }
 
     @NotNull
-    public static <E> MArray<E> of(@NotNull E... values) {
+    public static <E> MutableArray<E> of(@NotNull E... values) {
         Objects.requireNonNull(values);
         if (values.length == 0) {
             return empty();
@@ -58,13 +57,13 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
 
         Object[] newValues = new Object[values.length];
         System.arraycopy(values, 0, newValues, 0, values.length);
-        return new MArray<>(newValues);
+        return new MutableArray<>(newValues);
     }
 
     @NotNull
-    public static <E> MArray<E> wrap(@NotNull E[] array) {
+    public static <E> MutableArray<E> wrap(@NotNull E[] array) {
         Objects.requireNonNull(array);
-        return new MArray<>(array, true);
+        return new MutableArray<>(array, true);
     }
 
     public final Object[] getArray() {
@@ -76,7 +75,7 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
     }
 
     //
-    // -- MSeq
+    // -- MutableSeq
     //
 
     public final E get(int index) {
@@ -115,17 +114,17 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
     }
 
     //
-    // -- MCollection
+    // -- MutableCollection
     //
 
     @Override
     public final String className() {
-        return "MArray";
+        return "MutableArray";
     }
 
     @NotNull
     @Override
-    public final <U> MArray.Factory<U> iterableFactory() {
+    public final <U> MutableArray.Factory<U> iterableFactory() {
         return factory();
     }
 
@@ -171,29 +170,7 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
         }
     }
 
-
-    //
-    // -- Object
-    //
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof MArray<?>)) {
-            return false;
-        }
-
-        return Arrays.equals(values, ((MArray<?>) o).values);
-    }
-
-    @Override
-    public final int hashCode() {
-        return Arrays.hashCode(values) + hashMagic;
-    }
-
-    public static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, MArray<E>> {
+    public static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, MutableArray<E>> {
         Factory() {
         }
 
@@ -219,8 +196,8 @@ public final class MArray<E> extends AbstractMSeq<E> implements IndexedSeq<E>, S
         }
 
         @Override
-        public MArray<E> build(@NotNull ArrayBuffer<E> buffer) {
-            return new MArray<>(buffer.toArray(Object[]::new));
+        public MutableArray<E> build(@NotNull ArrayBuffer<E> buffer) {
+            return new MutableArray<>(buffer.toArray(Object[]::new));
         }
     }
 }

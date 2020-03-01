@@ -2,7 +2,7 @@ package asia.kala.collection;
 
 import asia.kala.LazyValue;
 import asia.kala.Option;
-import asia.kala.collection.mutable.MArray;
+import asia.kala.collection.mutable.MutableArray;
 import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.NotNull;
 
@@ -436,7 +436,7 @@ final class SeqViews {
             this.sortedSeq = LazyValue.of(() -> {
                 Object[] arr = source.toObjectArray();
                 Arrays.sort(arr, (Comparator<? super Object>) comparator);
-                return MArray.wrap((E[]) arr);
+                return MutableArray.wrap((E[]) arr);
             });
         }
 

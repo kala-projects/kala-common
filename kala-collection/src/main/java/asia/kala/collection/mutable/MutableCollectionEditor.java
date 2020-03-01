@@ -2,11 +2,11 @@ package asia.kala.collection.mutable;
 
 import org.jetbrains.annotations.NotNull;
 
-public class MCollectionEditor<E, C extends MCollection<E>> {
+public class MutableCollectionEditor<E, C extends MutableCollection<E>> {
     @NotNull
     protected final C source;
 
-    public MCollectionEditor(@NotNull C source) {
+    public MutableCollectionEditor(@NotNull C source) {
         assert source != null;
 
         this.source = source;

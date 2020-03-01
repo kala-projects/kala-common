@@ -19,8 +19,8 @@ public final class Internal {
      */
     @ApiStatus.Internal
     public static abstract class LinkedBufferImpl<E> extends AbstractBuffer<E> {
-        IList.MCons<E> first = null;
-        IList.MCons<E> last = null;
+        ImmutableList.MCons<E> first = null;
+        ImmutableList.MCons<E> last = null;
 
         int len = 0;
 
@@ -63,7 +63,7 @@ public final class Internal {
 
         @Override
         public final void append(E value) {
-            IList.MCons<E> i = new IList.MCons<>(value, IList.nil());
+            ImmutableList.MCons<E> i = new ImmutableList.MCons<>(value, ImmutableList.nil());
             if (len == 0) {
                 first = i;
             } else {
@@ -80,7 +80,7 @@ public final class Internal {
                 append(value);
                 return;
             }
-            first = new IList.MCons<>(value, first);
+            first = new ImmutableList.MCons<>(value, first);
             ++len;
         }
 
@@ -100,14 +100,14 @@ public final class Internal {
                 return;
             }
             ensureUnaliased();
-            IList<E> i = first;
+            ImmutableList<E> i = first;
             int c = 1;
 
             while (c++ != index) {
                 i = i.tail();
             }
 
-            ((IList.MCons<E>) i).tail = new IList.MCons<>(element, i.tail());
+            ((ImmutableList.MCons<E>) i).tail = new ImmutableList.MCons<>(element, i.tail());
             ++len;
         }
 
@@ -124,21 +124,21 @@ public final class Internal {
                     first = last = null;
                     aliased = false;
                 } else {
-                    first = (IList.MCons<E>) first.tail;
+                    first = (ImmutableList.MCons<E>) first.tail;
                 }
                 --len;
                 return v;
             }
 
             ensureUnaliased();
-            IList<E> i = first;
+            ImmutableList<E> i = first;
             int c = 1;
 
             while (c++ != index) {
                 i = i.tail();
             }
             E v = i.tail().head();
-            ((IList.MCons<E>) i).tail = i.tail().tail();
+            ((ImmutableList.MCons<E>) i).tail = i.tail().tail();
             --len;
             return v;
         }
@@ -167,26 +167,26 @@ public final class Internal {
             if (index == 0) {
                 int c = count;
                 while (c-- > 0) {
-                    first = (IList.MCons<E>) first.tail;
+                    first = (ImmutableList.MCons<E>) first.tail;
                 }
                 len -= count;
                 return;
             }
 
             ensureUnaliased();
-            IList<E> i = first;
+            ImmutableList<E> i = first;
             int c = 1;
             while (c++ != index) {
                 i = i.tail();
             }
 
-            IList<E> t = i.tail();
+            ImmutableList<E> t = i.tail();
             c = count;
             while (c-- > 0) {
                 t = t.tail();
             }
 
-            ((IList.MCons<E>) i).tail = t;
+            ((ImmutableList.MCons<E>) i).tail = t;
             len -= count;
         }
 
@@ -198,7 +198,7 @@ public final class Internal {
 
         @NotNull
         @Override
-        public final IList<E> toIList() {
+        public final ImmutableList<E> toImmutableList() {
             aliased = true;
             return first;
         }
@@ -216,11 +216,11 @@ public final class Internal {
                 return;
             }
 
-            IList<E> l = first;
+            ImmutableList<E> l = first;
             while (--index >= 0) {
                 l = l.tail();
             }
-            ((IList.MCons<E>) l).head = newValue;
+            ((ImmutableList.MCons<E>) l).head = newValue;
         }
 
         @Override
@@ -232,12 +232,12 @@ public final class Internal {
             Object[] values = toObjectArray();
             Arrays.sort(values, (Comparator<? super Object>) comparator);
 
-            IList.MCons<E> c = first;
+            ImmutableList.MCons<E> c = first;
             for (Object value : values) {
                 //noinspection ConstantConditions
                 c.head = (E) value;
-                c = c.tail instanceof IList.MCons<?>
-                        ? (IList.MCons<E>) c.tail
+                c = c.tail instanceof ImmutableList.MCons<?>
+                        ? (ImmutableList.MCons<E>) c.tail
                         : null;
             }
         }

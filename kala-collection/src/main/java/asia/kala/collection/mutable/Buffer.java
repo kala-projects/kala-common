@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.RandomAccess;
 import java.util.function.Predicate;
 
-public interface Buffer<E> extends MSeq<E> {
+public interface Buffer<E> extends MutableSeq<E> {
 
     @NotNull
     static <E> CollectionFactory<E, ?, ? extends Buffer<E>> factory() {
@@ -59,7 +59,7 @@ public interface Buffer<E> extends MSeq<E> {
 
     @Contract(mutates = "this")
     default void appendAll(@NotNull E[] elements) {
-        this.appendAll(MArray.wrap(elements));
+        this.appendAll(MutableArray.wrap(elements));
     }
 
     @Contract(mutates = "this")
@@ -95,7 +95,7 @@ public interface Buffer<E> extends MSeq<E> {
 
     @Contract(mutates = "this")
     default void prependAll(@NotNull E[] elements) {
-        this.prependAll(MArray.wrap(elements));
+        this.prependAll(MutableArray.wrap(elements));
     }
 
     @Contract(mutates = "this")
@@ -112,7 +112,7 @@ public interface Buffer<E> extends MSeq<E> {
 
     @Contract(mutates = "this")
     default void insertAll(int index, @NotNull E[] elements) {
-        insertAll(index, MArray.wrap(elements));
+        insertAll(index, MutableArray.wrap(elements));
     }
 
     @Contract(mutates = "this")
@@ -169,7 +169,7 @@ public interface Buffer<E> extends MSeq<E> {
     }
 
     //
-    // -- MCollection
+    // -- MutableCollection
     //
 
     @Override

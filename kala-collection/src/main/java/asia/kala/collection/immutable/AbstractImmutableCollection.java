@@ -10,9 +10,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
-public abstract class AbstractICollection<E> extends AbstractTraversable<E> implements ICollection<E> {
+public abstract class AbstractImmutableCollection<E> extends AbstractTraversable<E> implements ImmutableCollection<E> {
     static <E, U, T, Builder> T map(
-            @NotNull ICollection<? extends E> collection,
+            @NotNull ImmutableCollection<? extends E> collection,
             @NotNull Function<? super E, ? extends U> mapper,
             @NotNull CollectionFactory<? super U, Builder, ? extends T> factory
     ) {
@@ -32,7 +32,7 @@ public abstract class AbstractICollection<E> extends AbstractTraversable<E> impl
     }
 
     static <E, T, Builder> T filter(
-            @NotNull ICollection<? extends E> collection,
+            @NotNull ImmutableCollection<? extends E> collection,
             @NotNull Predicate<? super E> predicate,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory) {
         assert collection != null;
@@ -52,7 +52,7 @@ public abstract class AbstractICollection<E> extends AbstractTraversable<E> impl
     }
 
     static <E, T, Builder> T filterNot(
-            @NotNull ICollection<? extends E> collection,
+            @NotNull ImmutableCollection<? extends E> collection,
             @NotNull Predicate<? super E> predicate,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory) {
         assert collection != null;
@@ -72,7 +72,7 @@ public abstract class AbstractICollection<E> extends AbstractTraversable<E> impl
     }
 
     static <E, U, T, Builder> T flatMap(
-            @NotNull ICollection<? extends E> collection,
+            @NotNull ImmutableCollection<? extends E> collection,
             @NotNull Function<? super E, ? extends Iterable<? extends U>> mapper,
             @NotNull CollectionFactory<? super U, Builder, ? extends T> factory
     ) {
@@ -96,7 +96,7 @@ public abstract class AbstractICollection<E> extends AbstractTraversable<E> impl
     }
 
     static <E, T, Builder> Tuple2<T, T> span(
-            @NotNull ICollection<? extends E> collection,
+            @NotNull ImmutableCollection<? extends E> collection,
             @NotNull Predicate<? super E> predicate,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory) {
         assert collection != null;
@@ -119,28 +119,28 @@ public abstract class AbstractICollection<E> extends AbstractTraversable<E> impl
 
 
     @NotNull
-    protected final <U, To extends ICollection<U>> To mapImpl(@NotNull Function<? super E, ? extends U> mapper) {
-        return (To) AbstractICollection.map(this, mapper, iterableFactory());
+    protected final <U, To extends ImmutableCollection<U>> To mapImpl(@NotNull Function<? super E, ? extends U> mapper) {
+        return (To) AbstractImmutableCollection.map(this, mapper, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ICollection<E>> To filterImpl(@NotNull Predicate<? super E> predicate) {
-        return (To) AbstractICollection.filter(this, predicate, iterableFactory());
+    protected final <To extends ImmutableCollection<E>> To filterImpl(@NotNull Predicate<? super E> predicate) {
+        return (To) AbstractImmutableCollection.filter(this, predicate, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ICollection<E>> To filterNotImpl(@NotNull Predicate<? super E> predicate) {
-        return (To) AbstractICollection.filterNot(this, predicate, iterableFactory());
+    protected final <To extends ImmutableCollection<E>> To filterNotImpl(@NotNull Predicate<? super E> predicate) {
+        return (To) AbstractImmutableCollection.filterNot(this, predicate, iterableFactory());
     }
 
     @NotNull
-    protected final <U, To extends ICollection<U>> To flatMapImpl(
+    protected final <U, To extends ImmutableCollection<U>> To flatMapImpl(
             @NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
-        return (To) AbstractICollection.flatMap(this, mapper, iterableFactory());
+        return (To) AbstractImmutableCollection.flatMap(this, mapper, iterableFactory());
     }
 
     @SuppressWarnings("rawtypes")
-    protected final <To extends ICollection<E>> Tuple2<To, To> spanImpl(@NotNull Predicate<? super E> predicate) {
-        return (Tuple2) AbstractICollection.span(this, predicate, iterableFactory());
+    protected final <To extends ImmutableCollection<E>> Tuple2<To, To> spanImpl(@NotNull Predicate<? super E> predicate) {
+        return (Tuple2) AbstractImmutableCollection.span(this, predicate, iterableFactory());
     }
 }

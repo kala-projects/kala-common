@@ -1,7 +1,7 @@
 package asia.kala.collection;
 
 import asia.kala.Option;
-import asia.kala.collection.immutable.IArray;
+import asia.kala.collection.immutable.ImmutableArray;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,7 +13,7 @@ import java.util.function.IntFunction;
 public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
 
     static <E> CollectionFactory<E, ?, ? extends IndexedSeq<E>> factory() {
-        return IArray.factory();
+        return ImmutableArray.factory();
     }
 
     @SafeVarargs

@@ -1,5 +1,5 @@
 /*
- * Part of the implementation of IVector modified from vavr BitMappedTrie:
+ * Part of the implementation of ImmutableVector modified from vavr BitMappedTrie:
  * https://github.com/vavr-io/vavr/blob/master/src/main/java/io/vavr/collection/BitMappedTrie.java
  *
  * License:
@@ -11,7 +11,7 @@ package asia.kala.collection.immutable;
 import asia.kala.Tuple2;
 import asia.kala.collection.*;
 import asia.kala.collection.mutable.ArrayBuffer;
-import asia.kala.collection.mutable.MArray;
+import asia.kala.collection.mutable.MutableArray;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -26,24 +26,23 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @SuppressWarnings({"unchecked", "SuspiciousSystemArraycopy"})
-public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, Serializable {
+public final class ImmutableVector<E> extends AbstractImmutableSeq<E> implements IndexedSeq<E>, Serializable {
     private static final long serialVersionUID = -4395603284341829523L;
-    private static final int hashMagic = -104040935;
 
     private static final int VECTOR_SHIFT = 5;
     private static final int VECTOR_FACTOR = 32;
     private static final int VECTOR_MASK = 31;
 
-    public static final IVector<?> EMPTY = new IVector<>(IArray.empty(), 0, 0, 0);
+    public static final ImmutableVector<?> EMPTY = new ImmutableVector<>(ImmutableArray.empty(), 0, 0, 0);
 
-    public static final IVector.Factory<?> FACTORY = new Factory<>();
+    public static final ImmutableVector.Factory<?> FACTORY = new Factory<>();
 
     private final Object array;
     private final int offset;
     private final int length;
     private final int depthShift;
 
-    IVector(@NotNull Object array, int offset, int length, int depthShift) {
+    ImmutableVector(@NotNull Object array, int offset, int length, int depthShift) {
         this.array = array;
         this.offset = offset;
         this.length = length;
@@ -52,32 +51,32 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
 
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")
-    static <E> IVector<E> narrow(IVector<? extends E> vector) {
-        return (IVector<E>) vector;
+    static <E> ImmutableVector<E> narrow(ImmutableVector<? extends E> vector) {
+        return (ImmutableVector<E>) vector;
     }
 
     @NotNull
-    public static <E> IVector.Factory<E> factory() {
-        return (IVector.Factory<E>) FACTORY;
+    public static <E> ImmutableVector.Factory<E> factory() {
+        return (ImmutableVector.Factory<E>) FACTORY;
     }
 
     @NotNull
-    public static <E> IVector<E> empty() {
-        return (IVector<E>) EMPTY;
+    public static <E> ImmutableVector<E> empty() {
+        return (ImmutableVector<E>) EMPTY;
     }
 
     @NotNull
-    public static <E> IVector<E> of() {
+    public static <E> ImmutableVector<E> of() {
         return empty();
     }
 
     @NotNull
-    public static <E> IVector<E> of(E... elements) {
+    public static <E> ImmutableVector<E> of(E... elements) {
         return from(elements);
     }
 
     @NotNull
-    public static <E> IVector<E> from(@NotNull E[] elements) {
+    public static <E> ImmutableVector<E> from(@NotNull E[] elements) {
         Objects.requireNonNull(elements);
 
         if (elements.length == 0) {
@@ -90,20 +89,20 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
             arr = ArrayUtils.spilt(arr, VECTOR_FACTOR);
             shift += VECTOR_SHIFT;
         }
-        return new IVector<>(arr, 0, elements.length, shift);
+        return new ImmutableVector<>(arr, 0, elements.length, shift);
     }
 
     @NotNull
-    public static <E> IVector<E> from(@NotNull Iterable<? extends E> elements) {
-        if (elements instanceof IVector<?>) {
-            return (IVector<E>) elements;
+    public static <E> ImmutableVector<E> from(@NotNull Iterable<? extends E> elements) {
+        if (elements instanceof ImmutableVector<?>) {
+            return (ImmutableVector<E>) elements;
         }
         if (elements instanceof ArrayBuffer<?>) {
             Builder<E> builder = new Builder<>();
             builder.values = (ArrayBuffer<E>) elements;
             return builder.build();
         }
-        return IVector.<E>factory().from(elements);
+        return ImmutableVector.<E>factory().from(elements);
     }
 
     private static int treeSize(int branchCount, int depthShift) {
@@ -211,7 +210,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
         return firstDigit(offset + i, VECTOR_SHIFT) == firstDigit(offset + j, VECTOR_SHIFT);
     }
 
-    private static <T> IVector<T> collapsed(Object array, int offset, int length, int shift) {
+    private static <T> ImmutableVector<T> collapsed(Object array, int offset, int length, int shift) {
         for (; shift > 0; shift -= VECTOR_SHIFT) {
             final int skippedElements = Array.getLength(array) - 1;
             if (skippedElements != digit(offset, shift)) {
@@ -220,11 +219,11 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
             array = Array.get(array, skippedElements);
             offset -= treeSize(skippedElements, shift);
         }
-        return new IVector<>(array, offset, length, shift);
+        return new ImmutableVector<>(array, offset, length, shift);
     }
 
     //
-    // -- ISeq
+    // -- ImmutableSeq
     //
 
     @Override
@@ -240,20 +239,20 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
 
     @NotNull
     @Override
-    public final IVector<E> updated(int index, E newValue) {
+    public final ImmutableVector<E> updated(int index, E newValue) {
         final Object root = modify(array, depthShift, offset + index, NodeModifier.COPY_NODE, updateLeafWith(newValue));
-        return new IVector<>(root, offset, length, depthShift);
+        return new ImmutableVector<>(root, offset, length, depthShift);
     }
 
     @NotNull
     @Override
-    public final IVector<E> prepended(E element) {
-        return prependedAll(new ISeq1<>(element));
+    public final ImmutableVector<E> prepended(E element) {
+        return prependedAll(new ImmutableSeq1<>(element));
     }
 
     @NotNull
     @Override
-    public final IVector<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
+    public final ImmutableVector<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
         Objects.requireNonNull(prefix);
 
         IndexedSeq<E> seq = KalaCollectionUtils.asIndexedSeq(prefix);
@@ -261,7 +260,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
         Iterator<? extends E> iterator = seq.reverseIterator();
         int size = seq.size();
 
-        IVector<E> result = this;
+        ImmutableVector<E> result = this;
         while (size > 0) {
             Object array = result.array;
             int shift = result.depthShift, offset = result.offset;
@@ -278,26 +277,26 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
             size -= delta;
 
             array = result.modify(array, shift, index, NodeModifier.COPY_NODE, prependToLeaf(iterator));
-            result = new IVector<>(array, offset - delta, result.length + delta, shift);
+            result = new ImmutableVector<>(array, offset - delta, result.length + delta, shift);
         }
         return result;
     }
 
     @NotNull
     @Override
-    public final IVector<E> prependedAll(@NotNull E[] prefix) {
-        return prependedAll(MArray.wrap(prefix));
+    public final ImmutableVector<E> prependedAll(@NotNull E[] prefix) {
+        return prependedAll(MutableArray.wrap(prefix));
     }
 
     @NotNull
     @Override
-    public final IVector<E> appended(E element) {
-        return appendedAll(new ISeq1<>(element));
+    public final ImmutableVector<E> appended(E element) {
+        return appendedAll(new ImmutableSeq1<>(element));
     }
 
     @NotNull
     @Override
-    public final IVector<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
+    public final ImmutableVector<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
         Objects.requireNonNull(postfix);
 
         int size = KalaCollectionUtils.knowSize(postfix);
@@ -310,7 +309,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
             iterator = postfix.iterator();
         }
 
-        IVector<E> result = this;
+        ImmutableVector<E> result = this;
         while (size > 0) {
             Object array = result.array;
             int shift = result.depthShift;
@@ -325,20 +324,20 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
             size -= delta;
 
             array = result.modify(array, shift, index, NodeModifier.COPY_NODE, appendToLeaf(iterator, leafSpace + delta));
-            result = new IVector<>(array, offset, result.length + delta, shift);
+            result = new ImmutableVector<>(array, offset, result.length + delta, shift);
         }
         return result;
     }
 
     @NotNull
     @Override
-    public final IVector<E> appendedAll(@NotNull E[] postfix) {
-        return appendedAll(MArray.wrap(postfix));
+    public final ImmutableVector<E> appendedAll(@NotNull E[] postfix) {
+        return appendedAll(MutableArray.wrap(postfix));
     }
 
     @NotNull
     @Override
-    public final IVector<E> take(int n) {
+    public final ImmutableVector<E> take(int n) {
         if (n <= 0) {
             return empty();
         }
@@ -362,7 +361,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
 
     @NotNull
     @Override
-    public final IVector<E> takeWhile(@NotNull Predicate<? super E> predicate) {
+    public final ImmutableVector<E> takeWhile(@NotNull Predicate<? super E> predicate) {
         if (this.isEmpty()) {
             return empty();
         }
@@ -380,7 +379,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
 
     @NotNull
     @Override
-    public final IVector<E> drop(int n) {
+    public final ImmutableVector<E> drop(int n) {
         if (n <= 0) {
             return this;
         }
@@ -404,7 +403,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
 
     @NotNull
     @Override
-    public final IVector<E> dropWhile(@NotNull Predicate<? super E> predicate) {
+    public final ImmutableVector<E> dropWhile(@NotNull Predicate<? super E> predicate) {
         if (this.isEmpty()) {
             return empty();
         }
@@ -422,86 +421,65 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
 
     @NotNull
     @Override
-    public final IVector<E> sorted() {
+    public final ImmutableVector<E> sorted() {
         return sortedImpl();
     }
 
     @NotNull
     @Override
-    public final IVector<E> sorted(@NotNull Comparator<? super E> comparator) {
+    public final ImmutableVector<E> sorted(@NotNull Comparator<? super E> comparator) {
         return sortedImpl(comparator);
     }
 
     @NotNull
     @Override
-    public final <U> IVector<U> mapIndexed(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
+    public final <U> ImmutableVector<U> mapIndexed(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
         return mapIndexedImpl(mapper);
     }
 
     //
-    // -- ICollection
+    // -- ImmutableCollection
     //
 
     @Override
     public final String className() {
-        return "IVector";
+        return "ImmutableVector";
     }
 
     @NotNull
     @Override
-    public final <U> IVector.Factory<U> iterableFactory() {
+    public final <U> ImmutableVector.Factory<U> iterableFactory() {
         return factory();
     }
 
     @NotNull
     @Override
-    public final <U> IVector<U> map(@NotNull Function<? super E, ? extends U> mapper) {
+    public final <U> ImmutableVector<U> map(@NotNull Function<? super E, ? extends U> mapper) {
         return mapImpl(mapper);
     }
 
     @NotNull
     @Override
-    public final IVector<E> filter(@NotNull Predicate<? super E> predicate) {
+    public final ImmutableVector<E> filter(@NotNull Predicate<? super E> predicate) {
         return filterImpl(predicate);
     }
 
     @NotNull
     @Override
-    public final IVector<E> filterNot(@NotNull Predicate<? super E> predicate) {
+    public final ImmutableVector<E> filterNot(@NotNull Predicate<? super E> predicate) {
         return filterNotImpl(predicate);
     }
 
     @NotNull
     @Override
-    public final Tuple2<IVector<E>, IVector<E>> span(@NotNull Predicate<? super E> predicate) {
+    public final Tuple2<ImmutableVector<E>, ImmutableVector<E>> span(@NotNull Predicate<? super E> predicate) {
         return spanImpl(predicate);
     }
 
-    //
-    // -- Object
-    //
-
+    @NotNull
     @Override
-    public final boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (!(o instanceof IVector<?>)) {
-            return false;
-        }
-
-        IVector<?> other = (IVector<?>) o;
-
-        if (other.length != this.length) {
-            return false;
-        }
-
-        return sameElements(other);
-    }
-
-    @Override
-    public final int hashCode() {
-        return KalaCollectionUtils.hash(iterator()) + hashMagic;
+    public final ImmutableVector<E> toImmutableVector() {
+        return this;
     }
 
     public static final class Builder<E> {
@@ -520,7 +498,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
         }
 
         @NotNull
-        public final IVector<E> build() {
+        public final ImmutableVector<E> build() {
             if (values.isEmpty()) {
                 return empty();
             }
@@ -530,23 +508,23 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
                 arr = ArrayUtils.spilt(arr, VECTOR_FACTOR);
                 shift += VECTOR_SHIFT;
             }
-            return new IVector<>(arr, 0, values.size(), shift);
+            return new ImmutableVector<>(arr, 0, values.size(), shift);
         }
     }
 
-    public static final class Factory<E> implements CollectionFactory<E, Builder<E>, IVector<E>> {
+    public static final class Factory<E> implements CollectionFactory<E, Builder<E>, ImmutableVector<E>> {
         Factory() {
         }
 
         @Override
-        public final IVector<E> empty() {
-            return IVector.empty();
+        public final ImmutableVector<E> empty() {
+            return ImmutableVector.empty();
         }
 
         @NotNull
         @Override
-        public final IVector<E> from(@NotNull E[] elements) {
-            return IVector.from(elements);
+        public final ImmutableVector<E> from(@NotNull E[] elements) {
+            return ImmutableVector.from(elements);
         }
 
         @Override
@@ -566,7 +544,7 @@ public final class IVector<E> extends AbstractISeq<E> implements IndexedSeq<E>, 
         }
 
         @Override
-        public final IVector<E> build(@NotNull Builder<E> builder) {
+        public final ImmutableVector<E> build(@NotNull Builder<E> builder) {
             return builder.build();
         }
     }

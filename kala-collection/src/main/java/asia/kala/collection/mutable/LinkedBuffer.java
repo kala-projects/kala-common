@@ -14,7 +14,6 @@ import java.util.function.IntFunction;
 public final class LinkedBuffer<E> extends asia.kala.collection.immutable.Internal.LinkedBufferImpl<E>
         implements Serializable {
     private static final long serialVersionUID = 1621067498993048170L;
-    private static final int hashMagic = -1383198749;
 
     public static final LinkedBuffer.Factory<?> FACTORY = new LinkedBuffer.Factory<>();
 
@@ -48,7 +47,7 @@ public final class LinkedBuffer<E> extends asia.kala.collection.immutable.Intern
     }
 
     //
-    // -- MCollection
+    // -- MutableCollection
     //
 
     @Override
@@ -78,34 +77,6 @@ public final class LinkedBuffer<E> extends asia.kala.collection.immutable.Intern
             arr[i++] = (U) e;
         }
         return arr;
-    }
-
-    //
-    // -- Object
-    //
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
-        if (!(obj instanceof LinkedBuffer<?>)) {
-            return false;
-        }
-
-        LinkedBuffer<?> other = (LinkedBuffer<?>) obj;
-
-        if (size() != other.size()) {
-            return false;
-        }
-
-        return this.sameElements((LinkedBuffer<?>) obj);
-    }
-
-    @Override
-    public final int hashCode() {
-        return KalaCollectionUtils.hash(iterator()) + hashMagic;
     }
 
     //

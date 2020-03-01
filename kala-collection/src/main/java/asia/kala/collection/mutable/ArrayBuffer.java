@@ -14,7 +14,6 @@ import java.util.function.IntFunction;
 @SuppressWarnings("unchecked")
 public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSeq<E>, Serializable {
     private static final long serialVersionUID = 6323541372807433607L;
-    private static final int hashMagic = -1142720889;
 
     private static final int DEFAULT_CAPACITY = 16;
 
@@ -32,7 +31,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     }
 
     public ArrayBuffer() {
-        this(MArray.EMPTY_ARRAY, 0);
+        this(MutableArray.EMPTY_ARRAY, 0);
     }
 
     public ArrayBuffer(int initialCapacity) {
@@ -40,7 +39,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
             throw new IllegalArgumentException("illegal initialCapacity: " + initialCapacity);
         }
 
-        this.elements = initialCapacity == 0 ? MArray.EMPTY_ARRAY : new Object[initialCapacity];
+        this.elements = initialCapacity == 0 ? MutableArray.EMPTY_ARRAY : new Object[initialCapacity];
         this.size = 0;
     }
 
@@ -62,7 +61,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
 
         int length = elements.length;
         if (length == 0) {
-            return new ArrayBuffer<>(MArray.EMPTY_ARRAY, 0);
+            return new ArrayBuffer<>(MutableArray.EMPTY_ARRAY, 0);
         }
         Object[] newValues = new Object[length];
         System.arraycopy(elements, 0, newValues, 0, length);
@@ -284,7 +283,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     }
 
     //
-    // -- MSeq
+    // -- MutableSeq
     //
 
     @Override
@@ -305,7 +304,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     }
 
     //
-    // -- MCollection
+    // -- MutableCollection
     //
 
     @Override
@@ -361,36 +360,10 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         this.size = in.readInt();
         if (size == 0) {
-            elements = MArray.EMPTY_ARRAY;
+            elements = MutableArray.EMPTY_ARRAY;
         } else {
             elements = (Object[]) in.readObject();
         }
-    }
-
-    //
-    // -- Object
-    //
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ArrayBuffer<?>)) {
-            return false;
-        }
-
-        ArrayBuffer<?> other = (ArrayBuffer<?>) o;
-
-        if (size != other.size) {
-            return false;
-        }
-        return Arrays.equals(elements, other.elements);
-    }
-
-    @Override
-    public final int hashCode() {
-        return KalaCollectionUtils.hash(elements, 0, size) + hashMagic;
     }
 
     public static final class Factory<E> extends AbstractBufferFactory<E, ArrayBuffer<E>> {

@@ -6,11 +6,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.NoSuchElementException;
 
-final class IListIterator<E> extends AbstractEnumerator<E> implements Enumerator<E> {
+final class ImmutableListIterator<E> extends AbstractEnumerator<E> implements Enumerator<E> {
     @NotNull
-    private IList<? extends E> list;
+    private ImmutableList<? extends E> list;
 
-    IListIterator(@NotNull IList<? extends E> list) {
+    ImmutableListIterator(@NotNull ImmutableList<? extends E> list) {
         assert list != null;
 
         this.list = list;
@@ -18,13 +18,13 @@ final class IListIterator<E> extends AbstractEnumerator<E> implements Enumerator
 
     @Override
     public final boolean hasNext() {
-        return list != IList.Nil.INSTANCE;
+        return list != ImmutableList.Nil.INSTANCE;
     }
 
     @Override
     public final E next() {
-        if (list == IList.Nil.INSTANCE) {
-            throw new NoSuchElementException("IListIterator.next()");
+        if (list == ImmutableList.Nil.INSTANCE) {
+            throw new NoSuchElementException("ImmutableListIterator.next()");
         }
 
         E v = list.head();

@@ -1,6 +1,7 @@
 package asia.kala.collection;
 
 import asia.kala.Tuple2;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -11,6 +12,7 @@ public interface View<E> extends Traversable<E>, Transformable<E> {
 
     @NotNull
     @Override
+    @Contract(value = "-> this", pure = true)
     default View<E> view() {
         return this;
     }

@@ -11,10 +11,10 @@ import java.util.stream.Stream;
 
 @ApiStatus.Internal
 public final class JDKConverters {
-    public static class MCollectionAsJava<E, C extends MCollection<E>> extends AbstractCollection<E> {
+    public static class MutableCollectionAsJava<E, C extends MutableCollection<E>> extends AbstractCollection<E> {
         protected final C collection;
 
-        public MCollectionAsJava(C collection) {
+        public MutableCollectionAsJava(C collection) {
             this.collection = collection;
         }
 
@@ -54,9 +54,9 @@ public final class JDKConverters {
         }
     }
 
-    public static class MSeqAsJava<E, C extends MSeq<E>>
+    public static class MutableSeqAsJava<E, C extends MutableSeq<E>>
             extends asia.kala.collection.JDKConverters.SeqAsJava<E, C> {
-        public MSeqAsJava(@NotNull C seq) {
+        public MutableSeqAsJava(@NotNull C seq) {
             super(seq);
         }
 
@@ -74,14 +74,14 @@ public final class JDKConverters {
 
     }
 
-    public static class MIndexedSeqAsJava<E, C extends MSeq<E> & IndexedSeq<E>>
-            extends MSeqAsJava<E, C> implements RandomAccess {
+    public static class MIndexedSeqAsJava<E, C extends MutableSeq<E> & IndexedSeq<E>>
+            extends MutableSeqAsJava<E, C> implements RandomAccess {
         public MIndexedSeqAsJava(@NotNull C seq) {
             super(seq);
         }
     }
 
-    public static class BufferAsJava<E, C extends Buffer<E>> extends MSeqAsJava<E, C> {
+    public static class BufferAsJava<E, C extends Buffer<E>> extends MutableSeqAsJava<E, C> {
         public BufferAsJava(@NotNull C seq) {
             super(seq);
         }
@@ -123,7 +123,7 @@ public final class JDKConverters {
     }
 
     public static class ListWrapper<E>
-            extends asia.kala.collection.JDKConverters.ListWrapper<E> implements MSeq<E> {
+            extends asia.kala.collection.JDKConverters.ListWrapper<E> implements MutableSeq<E> {
 
         public ListWrapper(@NotNull List<E> list) {
             super(list);

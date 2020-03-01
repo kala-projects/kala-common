@@ -1,7 +1,7 @@
 package asia.kala.collection;
 
 import asia.kala.Tuple2;
-import asia.kala.collection.mutable.MArray;
+import asia.kala.collection.mutable.MutableArray;
 import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -65,7 +65,7 @@ public interface SeqView<E> extends Seq<E>, View<E> {
 
     default SeqView<E> prependedAll(@NotNull E[] prefix) {
         Objects.requireNonNull(prefix);
-        return new SeqViews.Concat<>(MArray.wrap(prefix), this);
+        return new SeqViews.Concat<>(MutableArray.wrap(prefix), this);
     }
 
     default SeqView<E> appended(E value) {
@@ -79,7 +79,7 @@ public interface SeqView<E> extends Seq<E>, View<E> {
 
     default SeqView<E> appendedAll(@NotNull E[] postfix) {
         Objects.requireNonNull(postfix);
-        return new SeqViews.Concat<>(this, MArray.wrap(postfix));
+        return new SeqViews.Concat<>(this, MutableArray.wrap(postfix));
     }
 
     @SuppressWarnings("unchecked")
@@ -99,6 +99,7 @@ public interface SeqView<E> extends Seq<E>, View<E> {
 
     @NotNull
     @Override
+    @Contract(value = "-> this", pure = true)
     default SeqView<E> view() {
         return this;
     }

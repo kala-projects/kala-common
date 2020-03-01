@@ -2,6 +2,7 @@ package asia.kala.collection.immutable;
 
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Seq;
+import asia.kala.collection.View;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,9 +12,9 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
-public abstract class AbstractISeq<E> extends AbstractICollection<E> implements ISeq<E> {
+public abstract class AbstractImmutableSeq<E> extends AbstractImmutableCollection<E> implements ImmutableSeq<E> {
     static <E, T, Builder> T updated(
-            @NotNull ISeq<? extends E> seq,
+            @NotNull ImmutableSeq<? extends E> seq,
             int index,
             E newValue,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
@@ -42,8 +43,8 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
         return factory.build(builder);
     }
 
-    static <E, T extends ISeq<? extends E>, Builder> T drop(
-            @NotNull ISeq<? extends E> seq,
+    static <E, T extends ImmutableSeq<? extends E>, Builder> T drop(
+            @NotNull ImmutableSeq<? extends E> seq,
             int n,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
@@ -63,8 +64,8 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
         return factory.build(builder);
     }
 
-    static <E, T extends ISeq<? extends E>, Builder> T dropWhile(
-            @NotNull ISeq<? extends E> seq,
+    static <E, T extends ImmutableSeq<? extends E>, Builder> T dropWhile(
+            @NotNull ImmutableSeq<? extends E> seq,
             @NotNull Predicate<? super E> predicate,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
@@ -80,8 +81,8 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
         return factory.build(builder);
     }
 
-    static <E, T extends ISeq<? extends E>, Builder> T take(
-            @NotNull ISeq<? extends E> seq,
+    static <E, T extends ImmutableSeq<? extends E>, Builder> T take(
+            @NotNull ImmutableSeq<? extends E> seq,
             int n,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
@@ -110,8 +111,8 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
         return factory.build(builder);
     }
 
-    static <E, T extends ISeq<? extends E>, Builder> T takeWhile(
-            @NotNull ISeq<? extends E> seq,
+    static <E, T extends ImmutableSeq<? extends E>, Builder> T takeWhile(
+            @NotNull ImmutableSeq<? extends E> seq,
             @NotNull Predicate<? super E> predicate,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
@@ -132,8 +133,8 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
         return factory.build(builder);
     }
 
-    static <E, T extends ISeq<? extends E>, Builder> T concat(
-            @NotNull ISeq<? extends E> seq,
+    static <E, T extends ImmutableSeq<? extends E>, Builder> T concat(
+            @NotNull ImmutableSeq<? extends E> seq,
             @NotNull Seq<? extends E> other,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
@@ -154,7 +155,7 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     }
 
     static <E, T, Builder> T prepended(
-            @NotNull ISeq<? extends E> seq,
+            @NotNull ImmutableSeq<? extends E> seq,
             E element,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
@@ -172,7 +173,7 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     }
 
     static <E, T, Builder> T prependedAll(
-            @NotNull ISeq<? extends E> seq,
+            @NotNull ImmutableSeq<? extends E> seq,
             @NotNull Iterable<? extends E> prefix,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
@@ -192,7 +193,7 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     }
 
     static <E, T, Builder> T prependedAll(
-            @NotNull ISeq<? extends E> seq,
+            @NotNull ImmutableSeq<? extends E> seq,
             @NotNull E[] prefix,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
@@ -214,7 +215,7 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     }
 
     static <E, T, Builder> T appended(
-            @NotNull ISeq<? extends E> seq,
+            @NotNull ImmutableSeq<? extends E> seq,
             E element,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
@@ -233,7 +234,7 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     }
 
     static <E, T, Builder> T appendedAll(
-            @NotNull ISeq<? extends E> seq,
+            @NotNull ImmutableSeq<? extends E> seq,
             @NotNull Iterable<? extends E> postfix,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
@@ -253,7 +254,7 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     }
 
     static <E, T, Builder> T appendedAll(
-            @NotNull ISeq<? extends E> seq,
+            @NotNull ImmutableSeq<? extends E> seq,
             @NotNull E[] postfix,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
@@ -275,7 +276,7 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     }
 
     static <E, T, Builder> T sorted(
-            @NotNull ISeq<? extends E> seq,
+            @NotNull ImmutableSeq<? extends E> seq,
             @NotNull Comparator<? super E> comparator,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
@@ -291,7 +292,7 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     }
 
     static <E, U, T, Builder> T mapIndexed(
-            @NotNull ISeq<? extends E> Seq,
+            @NotNull ImmutableSeq<? extends E> Seq,
             @NotNull IndexedFunction<? super E, ? extends U> mapper,
             @NotNull CollectionFactory<? super U, Builder, ? extends T> factory
     ) {
@@ -311,77 +312,89 @@ public abstract class AbstractISeq<E> extends AbstractICollection<E> implements 
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To updatedImpl(int index, E newValue) {
-        return (To) AbstractISeq.updated(this, index, newValue, iterableFactory());
+    protected final <To extends ImmutableSeq<E>> To updatedImpl(int index, E newValue) {
+        return (To) AbstractImmutableSeq.updated(this, index, newValue, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To dropImpl(int n) {
-        return (To) AbstractISeq.drop(this, n, iterableFactory());
+    protected final <To extends ImmutableSeq<E>> To dropImpl(int n) {
+        return (To) AbstractImmutableSeq.drop(this, n, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To dropWhileImpl(@NotNull Predicate<? super E> predicate) {
-        return (To) AbstractISeq.dropWhile(this, predicate, iterableFactory());
+    protected final <To extends ImmutableSeq<E>> To dropWhileImpl(@NotNull Predicate<? super E> predicate) {
+        return (To) AbstractImmutableSeq.dropWhile(this, predicate, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To takeImpl(int n) {
-        return (To) AbstractISeq.take(this, n, iterableFactory());
+    protected final <To extends ImmutableSeq<E>> To takeImpl(int n) {
+        return (To) AbstractImmutableSeq.take(this, n, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To takeWhileImpl(@NotNull Predicate<? super E> predicate) {
-        return (To) AbstractISeq.takeWhile(this, predicate, iterableFactory());
+    protected final <To extends ImmutableSeq<E>> To takeWhileImpl(@NotNull Predicate<? super E> predicate) {
+        return (To) AbstractImmutableSeq.takeWhile(this, predicate, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To concatImpl(@NotNull Seq<? extends E> other) {
-        return (To) AbstractISeq.concat(this, other, iterableFactory());
+    protected final <To extends ImmutableSeq<E>> To concatImpl(@NotNull Seq<? extends E> other) {
+        return (To) AbstractImmutableSeq.concat(this, other, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To prependedImpl(E element) {
-        return (To) AbstractISeq.prepended(this, element, iterableFactory());
+    protected final <To extends ImmutableSeq<E>> To prependedImpl(E element) {
+        return (To) AbstractImmutableSeq.prepended(this, element, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To prependedAllImpl(@NotNull Iterable<? extends E> prefix) {
-        return (To) AbstractISeq.prependedAll(this, prefix, iterableFactory());
+    protected final <To extends ImmutableSeq<E>> To prependedAllImpl(@NotNull Iterable<? extends E> prefix) {
+        return (To) AbstractImmutableSeq.prependedAll(this, prefix, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To prependedAllImpl(@NotNull E[] prefix) {
-        return (To) AbstractISeq.prependedAll(this, prefix, iterableFactory());
+    protected final <To extends ImmutableSeq<E>> To prependedAllImpl(@NotNull E[] prefix) {
+        return (To) AbstractImmutableSeq.prependedAll(this, prefix, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To appendedImpl(E element) {
-        return (To) AbstractISeq.prepended(this, element, iterableFactory());
+    protected final <To extends ImmutableSeq<E>> To appendedImpl(E element) {
+        return (To) AbstractImmutableSeq.prepended(this, element, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To appendedAllImpl(@NotNull Iterable<? extends E> postfix) {
-        return (To) AbstractISeq.appendedAll(this, postfix, iterableFactory());
+    protected final <To extends ImmutableSeq<E>> To appendedAllImpl(@NotNull Iterable<? extends E> postfix) {
+        return (To) AbstractImmutableSeq.appendedAll(this, postfix, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To appendedAllImpl(@NotNull E[] postfix) {
-        return (To) AbstractISeq.appendedAll(this, postfix, iterableFactory());
+    protected final <To extends ImmutableSeq<E>> To appendedAllImpl(@NotNull E[] postfix) {
+        return (To) AbstractImmutableSeq.appendedAll(this, postfix, iterableFactory());
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To sortedImpl() {
+    protected final <To extends ImmutableSeq<E>> To sortedImpl() {
         return (To) this.sorted((Comparator<? super E>) Comparator.naturalOrder());
     }
 
     @NotNull
-    protected final <To extends ISeq<E>> To sortedImpl(@NotNull Comparator<? super E> comparator) {
-        return (To) AbstractISeq.sorted(this, comparator, iterableFactory());
+    protected final <To extends ImmutableSeq<E>> To sortedImpl(@NotNull Comparator<? super E> comparator) {
+        return (To) AbstractImmutableSeq.sorted(this, comparator, iterableFactory());
     }
 
     @NotNull
-    protected final <U, To extends ISeq<U>> To mapIndexedImpl(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
-        return (To) AbstractISeq.mapIndexed(this, mapper, iterableFactory());
+    protected final <U, To extends ImmutableSeq<U>> To mapIndexedImpl(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
+        return (To) AbstractImmutableSeq.mapIndexed(this, mapper, iterableFactory());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Seq<?>) || obj instanceof View<?>) {
+            return false;
+        }
+
+        return this.sameElements((Seq<?>) obj);
     }
 }

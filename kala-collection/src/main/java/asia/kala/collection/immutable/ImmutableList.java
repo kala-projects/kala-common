@@ -15,49 +15,49 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Serializable {
-    IList() {
+public abstract class ImmutableList<E> extends AbstractImmutableSeq<E> implements ImmutableSeq<E>, Serializable {
+    ImmutableList() {
     }
 
-    public static final IList.Factory<?> FACTORY = new Factory<>();
+    public static final ImmutableList.Factory<?> FACTORY = new Factory<>();
 
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")
-    public static <E> IList<E> narrow(IList<? extends E> list) {
-        return (IList<E>) list;
+    public static <E> ImmutableList<E> narrow(ImmutableList<? extends E> list) {
+        return (ImmutableList<E>) list;
     }
 
     @SuppressWarnings("unchecked")
-    public static <E> IList.Factory<E> factory() {
+    public static <E> ImmutableList.Factory<E> factory() {
         return (Factory<E>) FACTORY;
     }
 
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <E> IList<E> nil() {
-        return (IList<E>) Nil.INSTANCE;
+    public static <E> ImmutableList<E> nil() {
+        return (ImmutableList<E>) Nil.INSTANCE;
     }
 
     @NotNull
-    public static <E> IList<E> empty() {
+    public static <E> ImmutableList<E> empty() {
         return nil();
     }
 
     @NotNull
-    public static <E> IList<E> of() {
+    public static <E> ImmutableList<E> of() {
         return nil();
     }
 
     @NotNull
     @SafeVarargs
-    public static <E> IList<E> of(E... elements) {
+    public static <E> ImmutableList<E> of(E... elements) {
         return from(elements);
     }
 
     @NotNull
-    public static <E> IList<E> from(@NotNull E[] elements) {
+    public static <E> ImmutableList<E> from(@NotNull E[] elements) {
         Objects.requireNonNull(elements);
-        IList<E> list = nil();
+        ImmutableList<E> list = nil();
 
         for (int i = elements.length - 1; i >= 0; i--) {
             list = list.cons(elements[i]);
@@ -66,9 +66,9 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         return list;
     }
 
-    public static <E> IList<E> from(@NotNull Iterable<? extends E> iterable) {
+    public static <E> ImmutableList<E> from(@NotNull Iterable<? extends E> iterable) {
         Objects.requireNonNull(iterable);
-        return IList.<E>factory().from(iterable);
+        return ImmutableList.<E>factory().from(iterable);
     }
 
     public abstract E head();
@@ -76,43 +76,43 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
     public abstract Option<E> headOption();
 
     @NotNull
-    public abstract IList<E> tail();
+    public abstract ImmutableList<E> tail();
 
     @NotNull
-    public abstract Option<IList<E>> tailOption();
+    public abstract Option<ImmutableList<E>> tailOption();
 
     @NotNull
     @Contract("_ -> new")
-    public final IList<E> cons(E element) {
-        return new ICons<>(element, this);
+    public final ImmutableList<E> cons(E element) {
+        return new ImmutableCons<>(element, this);
     }
 
 
     //
-    // -- ISeq
+    // -- ImmutableSeq
     //
 
     @NotNull
     @Override
-    public final IList<E> updated(int index, E newValue) {
+    public final ImmutableList<E> updated(int index, E newValue) {
         return updatedImpl(index, newValue);
     }
 
     @NotNull
     @Override
-    public final IList<E> prepended(E element) {
+    public final ImmutableList<E> prepended(E element) {
         return cons(element);
     }
 
     @NotNull
     @Override
-    public final IList<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
+    public final ImmutableList<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
         IndexedSeq<E> s = KalaCollectionUtils.tryToIndexedSeq(prefix);
         if (s == null) {
             return prependedAllImpl(prefix);
         }
 
-        IList<E> result = this;
+        ImmutableList<E> result = this;
         for (E e : s.reverseIterator()) {
             result = result.prepended(e);
         }
@@ -121,10 +121,10 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
-    public final IList<E> prependedAll(@NotNull E[] prefix) {
+    public final ImmutableList<E> prependedAll(@NotNull E[] prefix) {
         Objects.requireNonNull(prefix);
 
-        IList<E> result = this;
+        ImmutableList<E> result = this;
         for (int i = prefix.length - 1; i >= 0; i--) {
             result = result.cons(prefix[i]);
         }
@@ -133,13 +133,13 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
-    public final IList<E> appended(E element) {
+    public final ImmutableList<E> appended(E element) {
         return appendedImpl(element);
     }
 
     @NotNull
     @Override
-    public final IList<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
+    public final ImmutableList<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
         if (KalaCollectionUtils.knowSize(postfix) == 0) {
             return this;
         }
@@ -148,7 +148,7 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
-    public final IList<E> appendedAll(@NotNull E[] postfix) {
+    public final ImmutableList<E> appendedAll(@NotNull E[] postfix) {
         Objects.requireNonNull(postfix);
         if (postfix.length == 0) {
             return this;
@@ -161,8 +161,8 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
-    public final IList<E> drop(int n) {
-        IList<E> list = this;
+    public final ImmutableList<E> drop(int n) {
+        ImmutableList<E> list = this;
         while (list != Nil.INSTANCE && n-- > 0) {
             list = list.tail();
         }
@@ -172,8 +172,8 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
-    public final IList<E> dropWhile(@NotNull Predicate<? super E> predicate) {
-        IList<E> list = this;
+    public final ImmutableList<E> dropWhile(@NotNull Predicate<? super E> predicate) {
+        ImmutableList<E> list = this;
         while (list != Nil.INSTANCE && predicate.test(list.head())) {
             list = list.tail();
         }
@@ -182,100 +182,99 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
     @NotNull
     @Override
-    public final IList<E> take(int n) {
+    public final ImmutableList<E> take(int n) {
         return takeImpl(n);
     }
 
     @NotNull
     @Override
-    public final ISeq<E> takeWhile(@NotNull Predicate<? super E> predicate) {
+    public final ImmutableSeq<E> takeWhile(@NotNull Predicate<? super E> predicate) {
         return takeWhileImpl(predicate);
     }
 
     @NotNull
     @Override
-    public final IList<E> concat(@NotNull Seq<? extends E> other) {
+    public final ImmutableList<E> concat(@NotNull Seq<? extends E> other) {
         return concatImpl(other);
     }
 
     @NotNull
     @Override
-    public final <U> IList<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
+    public final <U> ImmutableList<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         return flatMapImpl(mapper);
     }
 
     @NotNull
     @Override
-    public final IList<E> sorted() {
+    public final ImmutableList<E> sorted() {
         return sortedImpl();
     }
 
     @NotNull
     @Override
-    public final IList<E> sorted(@NotNull Comparator<? super E> comparator) {
+    public final ImmutableList<E> sorted(@NotNull Comparator<? super E> comparator) {
         return sortedImpl();
     }
 
     @NotNull
     @Override
-    public final <U> IList<U> mapIndexed(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
+    public final <U> ImmutableList<U> mapIndexed(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
         return mapIndexedImpl(mapper);
     }
 
 
     //
-    // -- ICollection
+    // -- ImmutableCollection
     //
 
     @Override
     public final String className() {
-        return "IList";
+        return "ImmutableList";
     }
 
     @NotNull
     @Override
-    public <U> IList.Factory<U> iterableFactory() {
+    public <U> ImmutableList.Factory<U> iterableFactory() {
         return factory();
     }
 
     @NotNull
     @Override
-    public abstract Tuple2<IList<E>, IList<E>> span(@NotNull Predicate<? super E> predicate);
+    public abstract Tuple2<ImmutableList<E>, ImmutableList<E>> span(@NotNull Predicate<? super E> predicate);
 
     @NotNull
     @Override
-    public final <U> IList<U> map(@NotNull Function<? super E, ? extends U> mapper) {
+    public final <U> ImmutableList<U> map(@NotNull Function<? super E, ? extends U> mapper) {
         return mapImpl(mapper);
     }
 
     @NotNull
     @Override
-    public final IList<E> filter(@NotNull Predicate<? super E> predicate) {
+    public final ImmutableList<E> filter(@NotNull Predicate<? super E> predicate) {
         return filterImpl(predicate);
     }
 
     @NotNull
     @Override
-    public final IList<E> filterNot(@NotNull Predicate<? super E> predicate) {
+    public final ImmutableList<E> filterNot(@NotNull Predicate<? super E> predicate) {
         return filterNotImpl(predicate);
     }
 
 
     @NotNull
     @Override
-    public final IList<E> toIList() {
+    public final ImmutableList<E> toImmutableList() {
         return this;
     }
 
-    public static final class Nil extends IList<Object> {
+    public static final class Nil extends ImmutableList<Object> {
         private static final long serialVersionUID = -7963313933036451568L;
-        private static final int hashMagic = 251090697;
 
         static final Nil INSTANCE = new Nil();
 
         @Override
         public final Object head() {
-            throw new NoSuchElementException("IList.Nil.head()");
+            throw new NoSuchElementException("ImmutableList.Nil.head()");
         }
 
         @Override
@@ -285,18 +284,18 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
         @NotNull
         @Override
-        public final IList<Object> tail() {
-            throw new NoSuchElementException("IList.Nil.tail()");
+        public final ImmutableList<Object> tail() {
+            throw new NoSuchElementException("ImmutableList.Nil.tail()");
         }
 
         @NotNull
         @Override
-        public final Option<IList<Object>> tailOption() {
+        public final Option<ImmutableList<Object>> tailOption() {
             return Option.none();
         }
 
         //
-        // -- ISeq
+        // -- ImmutableSeq
         //
 
         @Override
@@ -316,8 +315,8 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
         @NotNull
         @Override
-        public final Tuple2<IList<Object>, IList<Object>> span(@NotNull Predicate<? super Object> predicate) {
-            return new Tuple2<>(IList.nil(), IList.nil());
+        public final Tuple2<ImmutableList<Object>, ImmutableList<Object>> span(@NotNull Predicate<? super Object> predicate) {
+            return new Tuple2<>(ImmutableList.nil(), ImmutableList.nil());
         }
 
         @Override
@@ -337,13 +336,8 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
 
         @Override
-        public final int hashCode() {
-            return hashMagic;
-        }
-
-        @Override
         public final String toString() {
-            return "IList[]";
+            return "ImmutableList[]";
         }
 
 
@@ -356,7 +350,7 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
     }
 
-    public static abstract class Cons<E> extends IList<E> {
+    public static abstract class Cons<E> extends ImmutableList<E> {
         Cons() {
         }
 
@@ -367,17 +361,17 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
         @NotNull
         @Override
-        public final Option<IList<E>> tailOption() {
+        public final Option<ImmutableList<E>> tailOption() {
             return Option.some(tail());
         }
 
         //
-        // -- ICollection
+        // -- ImmutableCollection
         //
 
         @NotNull
         @Override
-        public final Tuple2<IList<E>, IList<E>> span(@NotNull Predicate<? super E> predicate) {
+        public final Tuple2<ImmutableList<E>, ImmutableList<E>> span(@NotNull Predicate<? super E> predicate) {
             return spanImpl(predicate);
         }
 
@@ -390,42 +384,7 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         @NotNull
         @Override
         public final Enumerator<E> iterator() {
-            return new IListIterator<>(this);
-        }
-
-        @Override
-        public final int hashCode() {
-            int hash = 0;
-            IList<E> list = this;
-            while (list != Nil.INSTANCE) {
-                hash = 31 * hash + Objects.hashCode(list.head());
-                list = list.tail();
-            }
-            hash += Nil.INSTANCE.hashCode();
-            return hash;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public final boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (!(obj instanceof Cons<?>)) {
-                return false;
-            }
-
-            IList<E> list1 = this;
-            IList<E> list2 = (IList<E>) obj;
-
-            while (list1 != Nil.INSTANCE && list2 != Nil.INSTANCE) {
-                if (!Objects.equals(list1.head(), list1.head())) {
-                    return false;
-                }
-                list1 = list1.tail();
-                list2 = list2.tail();
-            }
-            return list1 == list2;
+            return new ImmutableListIterator<>(this);
         }
     }
 
@@ -435,9 +394,9 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         E head;
 
         @NotNull
-        IList<? extends E> tail;
+        ImmutableList<? extends E> tail;
 
-        MCons(E head, @NotNull IList<? extends E> tail) {
+        MCons(E head, @NotNull ImmutableList<? extends E> tail) {
             this.head = head;
             this.tail = tail;
         }
@@ -449,20 +408,20 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
         @NotNull
         @Override
-        public final IList<E> tail() {
-            return IList.narrow(tail);
+        public final ImmutableList<E> tail() {
+            return ImmutableList.narrow(tail);
         }
     }
 
-    static final class ICons<E> extends Cons<E> {
+    static final class ImmutableCons<E> extends Cons<E> {
         private static final long serialVersionUID = -1987307027661389715L;
 
         final E head;
 
         @NotNull
-        final IList<? extends E> tail;
+        final ImmutableList<? extends E> tail;
 
-        ICons(E head, @NotNull IList<? extends E> tail) {
+        ImmutableCons(E head, @NotNull ImmutableList<? extends E> tail) {
             this.head = head;
             this.tail = tail;
         }
@@ -474,18 +433,18 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
 
         @NotNull
         @Override
-        public final IList<E> tail() {
-            return IList.narrow(tail);
+        public final ImmutableList<E> tail() {
+            return ImmutableList.narrow(tail);
         }
     }
 
-    public static final class Factory<E> implements CollectionFactory<E, LinkedBuffer<E>, IList<E>> {
+    public static final class Factory<E> implements CollectionFactory<E, LinkedBuffer<E>, ImmutableList<E>> {
         Factory() {
         }
 
         @Override
-        public final IList<E> empty() {
-            return IList.empty();
+        public final ImmutableList<E> empty() {
+            return ImmutableList.empty();
         }
 
         @Override
@@ -509,8 +468,8 @@ public abstract class IList<E> extends AbstractISeq<E> implements ISeq<E>, Seria
         }
 
         @Override
-        public final IList<E> build(@NotNull LinkedBuffer<E> builder) {
-            return builder.toIList();
+        public final ImmutableList<E> build(@NotNull LinkedBuffer<E> builder) {
+            return builder.toImmutableList();
         }
     }
 }

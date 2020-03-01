@@ -2,7 +2,8 @@ package asia.kala.collection;
 
 import asia.kala.Foldable;
 import asia.kala.Option;
-import asia.kala.collection.immutable.IList;
+import asia.kala.collection.immutable.ImmutableList;
+import asia.kala.collection.immutable.ImmutableVector;
 import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -155,14 +156,19 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E> {
         return iterator().toArray(generator);
     }
 
-    @Override
-    default void forEach(@NotNull Consumer<? super E> action) {
-        iterator().forEach(action);
+    @NotNull
+    default ImmutableList<E> toImmutableList() {
+        return ImmutableList.from(this);
     }
 
     @NotNull
-    default IList<E> toIList() {
-        return IList.from(this);
+    default ImmutableVector<E> toImmutableVector() {
+        return ImmutableVector.from(this);
+    }
+
+    @Override
+    default void forEach(@NotNull Consumer<? super E> action) {
+        iterator().forEach(action);
     }
 
     //
@@ -233,6 +239,21 @@ public interface TraversableOnce<E> extends Iterable<E>, Foldable<E> {
     @Override
     default boolean contains(Object v) {
         return iterator().contains(v);
+    }
+
+    default boolean containsAll(@NotNull Iterable<?> values) {
+        Objects.requireNonNull(values);
+        TraversableOnce<?> t = this;
+        if (!isTraversableAgain()) {
+            t = this.toImmutableVector();
+        }
+
+        for (Object value : values) {
+            if (!t.contains(value)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

@@ -1,9 +1,9 @@
 package asia.kala.collection;
 
 import asia.kala.annotations.StaticClass;
-import asia.kala.collection.immutable.IArray;
+import asia.kala.collection.immutable.ImmutableArray;
 import asia.kala.collection.mutable.ArrayBuffer;
-import asia.kala.collection.mutable.MArray;
+import asia.kala.collection.mutable.MutableArray;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,8 +15,8 @@ import java.util.*;
 public final class KalaCollectionUtils {
     public static Object[] asArray(@NotNull Iterable<?> it) {
         assert it != null;
-        if (it instanceof MArray<?>) {
-            return ((MArray<?>) it).getArray();
+        if (it instanceof MutableArray<?>) {
+            return ((MutableArray<?>) it).getArray();
         }
         if (it instanceof TraversableOnce<?>) {
             return ((TraversableOnce<?>) it).toArray(Object[]::new);
@@ -39,14 +39,14 @@ public final class KalaCollectionUtils {
             return new JDKConverters.RandomAccessListWrapper<>(((List<E>) collection));
         }
         if (collection instanceof TraversableOnce<?>) {
-            return (MArray<E>) MArray.wrap(((TraversableOnce<?>) collection).toArray(Object[]::new));
+            return (MutableArray<E>) MutableArray.wrap(((TraversableOnce<?>) collection).toArray(Object[]::new));
         }
         if (collection instanceof Object[]) {
-            return MArray.wrap(((E[]) collection));
+            return MutableArray.wrap(((E[]) collection));
         }
 
         if (collection instanceof Collection<?>) {
-            return (MArray<E>) MArray.wrap(((Collection<?>) collection).toArray());
+            return (MutableArray<E>) MutableArray.wrap(((Collection<?>) collection).toArray());
         }
         if (collection instanceof Iterable<?>) {
             return ArrayBuffer.from(((Iterable<E>) collection));
@@ -81,17 +81,17 @@ public final class KalaCollectionUtils {
         }
 
         if (collection instanceof Object[]) {
-            return MArray.wrap(((E[]) collection));
+            return MutableArray.wrap(((E[]) collection));
         }
 
         if (collection instanceof Collection<?>) {
-            return (MArray<E>) MArray.wrap(((Collection<?>) collection).toArray());
+            return (MutableArray<E>) MutableArray.wrap(((Collection<?>) collection).toArray());
         }
         if (collection instanceof Iterable<?>) {
-            return IArray.from(((Iterable<E>) collection));
+            return ImmutableArray.from(((Iterable<E>) collection));
         }
         if (collection instanceof Iterator<?>) {
-            return IArray.from(Enumerator.fromJava(((Iterator<E>) collection)));
+            return ImmutableArray.from(Enumerator.fromJava(((Iterator<E>) collection)));
         }
 
         throw new IllegalArgumentException();
