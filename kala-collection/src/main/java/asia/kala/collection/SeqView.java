@@ -1,6 +1,7 @@
 package asia.kala.collection;
 
 import asia.kala.Tuple2;
+import asia.kala.annotations.Covariant;
 import asia.kala.collection.mutable.MutableArray;
 import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
@@ -11,7 +12,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface SeqView<E> extends Seq<E>, View<E> {
+public interface SeqView<@Covariant E> extends Seq<E>, View<E> {
 
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")

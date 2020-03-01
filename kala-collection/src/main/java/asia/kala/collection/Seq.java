@@ -1,9 +1,11 @@
 package asia.kala.collection;
 
 import asia.kala.Option;
+import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.ImmutableList;
 import asia.kala.collection.immutable.ImmutableSeq;
 import asia.kala.function.IndexedConsumer;
+import kotlin.annotations.jvm.ReadOnly;
 import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-public interface Seq<E> extends Traversable<E> {
+public interface Seq<@Covariant E> extends Traversable<E> {
 
     @NotNull
     static <E> CollectionFactory<E, ?, ? extends Seq<E>> factory() {
@@ -218,7 +220,6 @@ public interface Seq<E> extends Traversable<E> {
     // -- Traversable
     //
 
-
     @Override
     default String className() {
         return "Seq";
@@ -237,6 +238,7 @@ public interface Seq<E> extends Traversable<E> {
     }
 
     @NotNull
+    @ReadOnly
     @Override
     default List<E> asJava() {
         if (this instanceof IndexedSeq<?>) {

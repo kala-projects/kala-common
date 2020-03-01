@@ -1,5 +1,6 @@
 package asia.kala.collection;
 
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -15,7 +16,7 @@ final class Enumerators {
     static final Object TAG = new Object();
 
 
-    static final class IteratorWrapper<E> extends AbstractEnumerator<E> {
+    static final class IteratorWrapper<@Covariant E> extends AbstractEnumerator<E> {
         @NotNull
         private final Iterator<? extends E> iterator;
 
@@ -53,7 +54,7 @@ final class Enumerators {
         }
     }
 
-    static final class Id<T> extends AbstractEnumerator<T> {
+    static final class Id<@Covariant T> extends AbstractEnumerator<T> {
 
         private Object value;
 
@@ -78,7 +79,7 @@ final class Enumerators {
         }
     }
 
-    static final class Mapped<E, S> extends AbstractEnumerator<E> {
+    static final class Mapped<@Covariant E, S> extends AbstractEnumerator<E> {
         @NotNull
         private final Enumerator<? extends S> source;
 
@@ -104,7 +105,7 @@ final class Enumerators {
         }
     }
 
-    static final class Filter<E> extends AbstractEnumerator<E> {
+    static final class Filter<@Covariant E> extends AbstractEnumerator<E> {
         @NotNull
         private final Iterator<? extends E> source;
         @NotNull
@@ -157,7 +158,7 @@ final class Enumerators {
         }
     }
 
-    static final class DropWhile<E> extends AbstractEnumerator<E> {
+    static final class DropWhile<@Covariant E> extends AbstractEnumerator<E> {
         @NotNull
         private final Iterator<? extends E> source;
 
@@ -207,7 +208,7 @@ final class Enumerators {
         }
     }
 
-    static final class Take<E> extends AbstractEnumerator<E> {
+    static final class Take<@Covariant E> extends AbstractEnumerator<E> {
         private final Enumerator<? extends E> source;
         private int n;
 
@@ -233,7 +234,7 @@ final class Enumerators {
         }
     }
 
-    static final class TakeWhile<E> extends AbstractEnumerator<E> {
+    static final class TakeWhile<@Covariant E> extends AbstractEnumerator<E> {
         @NotNull
         private Iterator<? extends E> source;
 
@@ -277,7 +278,7 @@ final class Enumerators {
         }
     }
 
-    static final class Concat<E> extends AbstractEnumerator<E> {
+    static final class Concat<@Covariant E> extends AbstractEnumerator<E> {
         @NotNull
         private final Iterator<? extends Iterator<? extends E>> iterators;
 
@@ -304,7 +305,7 @@ final class Enumerators {
         }
     }
 
-    static final class Updated<E> extends AbstractEnumerator<E> {
+    static final class Updated<@Covariant E> extends AbstractEnumerator<E> {
         @NotNull
         private final Iterator<? extends E> source;
 
@@ -334,7 +335,7 @@ final class Enumerators {
         }
     }
 
-    static final class Prepended<E> extends AbstractEnumerator<E> {
+    static final class Prepended<@Covariant E> extends AbstractEnumerator<E> {
         @NotNull
         private final Iterator<? extends E> source;
 
@@ -363,7 +364,7 @@ final class Enumerators {
         }
     }
 
-    static final class Appended<E> extends AbstractEnumerator<E> {
+    static final class Appended<@Covariant E> extends AbstractEnumerator<E> {
         @NotNull
         private final Iterator<? extends E> source;
 
@@ -394,7 +395,7 @@ final class Enumerators {
         }
     }
 
-    static final class OfArray<E> extends AbstractEnumerator<E> {
+    static final class OfArray<@Covariant E> extends AbstractEnumerator<E> {
         @NotNull
         private final E[] array;
         private final int end;

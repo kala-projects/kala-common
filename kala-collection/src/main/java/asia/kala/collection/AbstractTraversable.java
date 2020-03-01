@@ -1,10 +1,12 @@
 package asia.kala.collection;
 
-public abstract class AbstractTraversable<E> implements Traversable<E> {
+import asia.kala.annotations.Covariant;
+
+public abstract class AbstractTraversable<@Covariant E> implements Traversable<E> {
 
     @Override
     public int hashCode() {
-        return KalaCollectionUtils.hash(iterator());
+        return Enumerator.hash(iterator());
     }
 
     @Override

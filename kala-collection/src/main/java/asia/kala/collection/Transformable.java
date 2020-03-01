@@ -2,13 +2,14 @@ package asia.kala.collection;
 
 import asia.kala.Functor;
 import asia.kala.Tuple2;
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface Transformable<E> extends Functor<E> {
+public interface Transformable<@Covariant E> extends Functor<E> {
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")
     static <E> Transformable<E> narrow(Transformable<? extends E> transformable) {

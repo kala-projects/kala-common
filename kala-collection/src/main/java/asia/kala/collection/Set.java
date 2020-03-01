@@ -1,8 +1,9 @@
 package asia.kala.collection;
 
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.NotNull;
 
-public interface Set<E> extends Traversable<E> {
+public interface Set<@Covariant E> extends Traversable<E> {
 
     //
     // -- Traversable

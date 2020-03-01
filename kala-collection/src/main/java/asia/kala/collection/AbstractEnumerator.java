@@ -1,6 +1,8 @@
 package asia.kala.collection;
 
-public abstract class AbstractEnumerator<E> implements Enumerator<E> {
+import asia.kala.annotations.Covariant;
+
+public abstract class AbstractEnumerator<@Covariant E> implements Enumerator<E> {
 
     @Override
     public String toString() {

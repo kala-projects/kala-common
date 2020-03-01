@@ -1,6 +1,7 @@
 package asia.kala.collection;
 
 import asia.kala.Tuple2;
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,7 +9,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface View<E> extends Traversable<E>, Transformable<E> {
+public interface View<@Covariant E> extends Traversable<E>, Transformable<E> {
 
     @NotNull
     @Override

@@ -1,4 +1,6 @@
 package asia.kala.collection;
 
-public abstract class AbstractIndexedSeqView<E> extends AbstractSeqView<E> implements IndexedSeqView<E> {
+import asia.kala.annotations.Covariant;
+
+public abstract class AbstractIndexedSeqView<@Covariant E> extends AbstractSeqView<E> implements IndexedSeqView<E> {
 }

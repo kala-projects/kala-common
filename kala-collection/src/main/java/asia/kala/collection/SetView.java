@@ -1,9 +1,10 @@
 package asia.kala.collection;
 
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-public interface SetView<E> extends View<E>, Set<E> {
+public interface SetView<@Covariant E> extends View<E>, Set<E> {
 
     //
     // -- View

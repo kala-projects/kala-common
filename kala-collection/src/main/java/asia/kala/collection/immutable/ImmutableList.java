@@ -2,6 +2,7 @@ package asia.kala.collection.immutable;
 
 import asia.kala.Option;
 import asia.kala.Tuple2;
+import asia.kala.annotations.Covariant;
 import asia.kala.collection.*;
 import asia.kala.collection.mutable.LinkedBuffer;
 import asia.kala.function.IndexedFunction;
@@ -15,7 +16,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public abstract class ImmutableList<E> extends AbstractImmutableSeq<E> implements ImmutableSeq<E>, Serializable {
+public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E> implements ImmutableSeq<E>, Serializable {
     ImmutableList() {
     }
 

@@ -97,16 +97,6 @@ public final class KalaCollectionUtils {
         throw new IllegalArgumentException();
     }
 
-    public static int hash(@NotNull Iterator<?> it) {
-        assert it != null;
-
-        int ans = 0;
-        while (it.hasNext()) {
-            ans = ans * 31 + Objects.hashCode(it.next());
-        }
-        return ans;
-    }
-
     public static int hash(@NotNull Object[] arr, int start, int count) {
         int ans = 0;
         for (int i = start; i < start + count; i++) {

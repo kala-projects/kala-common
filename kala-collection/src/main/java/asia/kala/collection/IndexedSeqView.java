@@ -1,11 +1,12 @@
 package asia.kala.collection;
 
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.function.Function;
 
-public interface IndexedSeqView<E> extends SeqView<E>, IndexedSeq<E> {
+public interface IndexedSeqView<@Covariant E> extends SeqView<E>, IndexedSeq<E> {
 
     //
     // -- SeqView

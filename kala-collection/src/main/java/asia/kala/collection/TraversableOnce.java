@@ -2,6 +2,7 @@ package asia.kala.collection;
 
 import asia.kala.Foldable;
 import asia.kala.Option;
+import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.ImmutableList;
 import asia.kala.collection.immutable.ImmutableVector;
 import kotlin.annotations.jvm.ReadOnly;
@@ -18,7 +19,7 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
-public interface TraversableOnce<E> extends Iterable<E>, Foldable<E> {
+public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> {
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")
     static <E> TraversableOnce<E> narrow(TraversableOnce<? extends E> traversable) {

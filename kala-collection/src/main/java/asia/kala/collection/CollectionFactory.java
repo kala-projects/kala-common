@@ -1,5 +1,6 @@
 package asia.kala.collection;
 
+import asia.kala.annotations.Covariant;
 import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,7 +14,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
-public interface CollectionFactory<E, Builder, R> extends Collector<E, Builder, R> {
+public interface CollectionFactory<E, Builder, @Covariant R> extends Collector<E, Builder, R> {
 
     Builder newBuilder();
 

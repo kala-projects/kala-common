@@ -1,6 +1,7 @@
 package asia.kala.collection.immutable;
 
 import asia.kala.Tuple2;
+import asia.kala.annotations.Covariant;
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Seq;
 import asia.kala.collection.mutable.ArrayBuffer;
@@ -14,7 +15,7 @@ import java.util.Comparator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface ImmutableSeq<E> extends ImmutableCollection<E>, Seq<E> {
+public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<E> {
     @ApiStatus.Internal
     ImmutableSeq.Factory<?> FACTORY = new Factory<>();
 

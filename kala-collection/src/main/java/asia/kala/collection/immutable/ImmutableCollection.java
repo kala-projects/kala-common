@@ -1,6 +1,7 @@
 package asia.kala.collection.immutable;
 
 import asia.kala.Tuple2;
+import asia.kala.annotations.Covariant;
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Transformable;
 import asia.kala.collection.Traversable;
@@ -12,20 +13,24 @@ import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface ImmutableCollection<E> extends Traversable<E>, Transformable<E> {
+public interface ImmutableCollection<@Covariant E> extends Traversable<E>, Transformable<E> {
+    @NotNull
     static <E> CollectionFactory<E, ?, ? extends ImmutableCollection<E>> factory() {
         return ImmutableSeq.factory();
     }
 
+    @NotNull
     @SafeVarargs
     static <E> ImmutableCollection<E> of(E... elements) {
         return ImmutableCollection.<E>factory().from(elements);
     }
 
+    @NotNull
     static <E> ImmutableCollection<E> from(@NotNull E[] elements) {
         return ImmutableCollection.<E>factory().from(elements);
     }
 
+    @NotNull
     static <E> ImmutableCollection<E> from(@NotNull Iterable<? extends E> iterable) {
         return ImmutableCollection.<E>factory().from(iterable);
     }

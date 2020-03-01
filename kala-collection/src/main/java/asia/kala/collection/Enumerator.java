@@ -2,6 +2,7 @@ package asia.kala.collection;
 
 import asia.kala.Option;
 import asia.kala.Tuple2;
+import asia.kala.annotations.Covariant;
 import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.Contract;
@@ -13,7 +14,7 @@ import java.util.*;
 import java.util.function.*;
 
 @SuppressWarnings("unchecked")
-public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E>, Transformable<E> {
+public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E>, Transformable<E> {
 
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")
@@ -89,6 +90,16 @@ public interface Enumerator<E> extends Iterator<E>, TraversableOnce<E>, Transfor
         }
 
         return new Enumerators.Concat<>(ofArray(enumerators));
+    }
+
+    static int hash(@NotNull Iterator<?> it) {
+        assert it != null;
+
+        int ans = 0;
+        while (it.hasNext()) {
+            ans = ans * 31 + Objects.hashCode(it.next());
+        }
+        return ans;
     }
 
     /**

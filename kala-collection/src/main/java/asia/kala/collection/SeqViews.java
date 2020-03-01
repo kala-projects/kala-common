@@ -2,6 +2,7 @@ package asia.kala.collection;
 
 import asia.kala.LazyValue;
 import asia.kala.Option;
+import asia.kala.annotations.Covariant;
 import asia.kala.collection.mutable.MutableArray;
 import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +12,7 @@ import java.util.Comparator;
 import java.util.function.*;
 
 final class SeqViews {
-    static class Of<E, C extends Seq<E>> extends Views.Of<E, C> implements SeqView<E> {
+    static class Of<@Covariant E, C extends Seq<E>> extends Views.Of<E, C> implements SeqView<E> {
         Of(@NotNull C collection) {
             super(collection);
         }
@@ -71,7 +72,7 @@ final class SeqViews {
         }
     }
 
-    static class Updated<E> extends AbstractSeqView<E> {
+    static class Updated<@Covariant E> extends AbstractSeqView<E> {
         @NotNull
         private final SeqView<E> source;
 
@@ -140,7 +141,7 @@ final class SeqViews {
         }
     }
 
-    static class Drop<E> extends AbstractSeqView<E> {
+    static class Drop<@Covariant E> extends AbstractSeqView<E> {
         @NotNull
         protected final SeqView<E> source;
 
@@ -172,7 +173,7 @@ final class SeqViews {
         }
     }
 
-    static class DropWhile<E> extends AbstractSeqView<E> {
+    static class DropWhile<@Covariant E> extends AbstractSeqView<E> {
         @NotNull
         private final SeqView<E> source;
 
@@ -194,7 +195,7 @@ final class SeqViews {
         }
     }
 
-    static class Take<E> extends AbstractSeqView<E> {
+    static class Take<@Covariant E> extends AbstractSeqView<E> {
         @NotNull
         protected final SeqView<E> source;
 
@@ -223,7 +224,7 @@ final class SeqViews {
         }
     }
 
-    static class TakeWhile<E> extends AbstractSeqView<E> {
+    static class TakeWhile<@Covariant E> extends AbstractSeqView<E> {
         @NotNull
         private final SeqView<E> source;
 
@@ -245,7 +246,7 @@ final class SeqViews {
         }
     }
 
-    static class Concat<E> extends AbstractSeqView<E> {
+    static class Concat<@Covariant E> extends AbstractSeqView<E> {
         @NotNull
         private final Seq<E> seq1;
 
@@ -273,7 +274,7 @@ final class SeqViews {
         }
     }
 
-    static class Prepended<E> extends AbstractSeqView<E> {
+    static class Prepended<@Covariant E> extends AbstractSeqView<E> {
         @NotNull
         private final SeqView<E> source;
 
@@ -315,7 +316,7 @@ final class SeqViews {
         }
     }
 
-    static class Appended<E> extends AbstractSeqView<E> {
+    static class Appended<@Covariant E> extends AbstractSeqView<E> {
         @NotNull
         protected final SeqView<E> source;
 
@@ -340,7 +341,7 @@ final class SeqViews {
         }
     }
 
-    static class Mapped<E, T> extends AbstractSeqView<E> {
+    static class Mapped<@Covariant E, T> extends AbstractSeqView<E> {
         @NotNull
         private final SeqView<T> source;
 
@@ -378,7 +379,7 @@ final class SeqViews {
         }
     }
 
-    static final class Filter<E> extends AbstractSeqView<E> {
+    static final class Filter<@Covariant E> extends AbstractSeqView<E> {
         @NotNull
         private final SeqView<E> source;
 
@@ -400,7 +401,7 @@ final class SeqViews {
         }
     }
 
-    static final class FlatMapped<E, T> extends AbstractSeqView<E> {
+    static final class FlatMapped<@Covariant E, T> extends AbstractSeqView<E> {
         @NotNull
         private final SeqView<? extends T> source;
         @NotNull
@@ -423,7 +424,7 @@ final class SeqViews {
         }
     }
 
-    static final class Sorted<E> extends AbstractSeqView<E> {
+    static final class Sorted<@Covariant E> extends AbstractSeqView<E> {
         private final SeqView<E> source;
         private final LazyValue<Seq<E>> sortedSeq;
 

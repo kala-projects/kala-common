@@ -9,6 +9,7 @@
 package asia.kala.collection.immutable;
 
 import asia.kala.Tuple2;
+import asia.kala.annotations.Covariant;
 import asia.kala.collection.*;
 import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.collection.mutable.MutableArray;
@@ -26,7 +27,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @SuppressWarnings({"unchecked", "SuspiciousSystemArraycopy"})
-public final class ImmutableVector<E> extends AbstractImmutableSeq<E> implements IndexedSeq<E>, Serializable {
+public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E> implements IndexedSeq<E>, Serializable {
     private static final long serialVersionUID = -4395603284341829523L;
 
     private static final int VECTOR_SHIFT = 5;

@@ -1,8 +1,7 @@
 package asia.kala.collection.immutable;
 
-import asia.kala.collection.CollectionFactory;
-import asia.kala.collection.Seq;
-import asia.kala.collection.View;
+import asia.kala.annotations.Covariant;
+import asia.kala.collection.*;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +11,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
-public abstract class AbstractImmutableSeq<E> extends AbstractImmutableCollection<E> implements ImmutableSeq<E> {
+public abstract class AbstractImmutableSeq<@Covariant E> extends AbstractImmutableCollection<E> implements ImmutableSeq<E> {
     static <E, T, Builder> T updated(
             @NotNull ImmutableSeq<? extends E> seq,
             int index,
@@ -384,6 +383,11 @@ public abstract class AbstractImmutableSeq<E> extends AbstractImmutableCollectio
     @NotNull
     protected final <U, To extends ImmutableSeq<U>> To mapIndexedImpl(@NotNull IndexedFunction<? super E, ? extends U> mapper) {
         return (To) AbstractImmutableSeq.mapIndexed(this, mapper, iterableFactory());
+    }
+
+    @Override
+    public int hashCode() {
+        return Enumerator.hash(iterator()) + Traversable.SEQ_HASH_MAGIC;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package asia.kala.collection;
 
+import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.ImmutableCollection;
 import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
@@ -10,7 +11,11 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public interface Traversable<E> extends TraversableOnce<E> {
+public interface Traversable<@Covariant E> extends TraversableOnce<E> {
+
+    int SEQ_HASH_MAGIC = -1140647423;
+
+    int SET_HASH_MAGIC = 1045751549;
 
     @NotNull
     @Contract(pure = true)

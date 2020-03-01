@@ -1,6 +1,7 @@
 package asia.kala.collection.immutable;
 
 import asia.kala.Tuple2;
+import asia.kala.annotations.Covariant;
 import asia.kala.collection.AbstractTraversable;
 import asia.kala.collection.CollectionFactory;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +11,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
-public abstract class AbstractImmutableCollection<E> extends AbstractTraversable<E> implements ImmutableCollection<E> {
+public abstract class AbstractImmutableCollection<@Covariant E> extends AbstractTraversable<E> implements ImmutableCollection<E> {
     static <E, U, T, Builder> T map(
             @NotNull ImmutableCollection<? extends E> collection,
             @NotNull Function<? super E, ? extends U> mapper,

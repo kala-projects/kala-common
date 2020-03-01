@@ -1,6 +1,7 @@
 package asia.kala.collection.immutable;
 
 import asia.kala.Tuple2;
+import asia.kala.annotations.Covariant;
 import asia.kala.annotations.StaticClass;
 import asia.kala.collection.*;
 import asia.kala.collection.mutable.ArrayBuffer;
@@ -18,7 +19,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
-public final class ImmutableArray<E> extends AbstractImmutableSeq<E> implements IndexedSeq<E>, Serializable {
+public final class ImmutableArray<@Covariant E> extends AbstractImmutableSeq<E> implements IndexedSeq<E>, Serializable {
     private static final long serialVersionUID = 1845940935381169058L;
 
     public static final Object[] EMPTY_ARRAY = new Object[0];

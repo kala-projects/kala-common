@@ -1,6 +1,7 @@
 package asia.kala.collection;
 
 import asia.kala.Option;
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -9,7 +10,7 @@ import java.util.Spliterator;
 import java.util.function.*;
 
 final class Views {
-    static class Of<E, C extends Traversable<E>> implements View<E> {
+    static class Of<@Covariant E, C extends Traversable<E>> implements View<E> {
         @NotNull
         protected final C collection;
 
@@ -215,7 +216,7 @@ final class Views {
         }
     }
 
-    static final class Mapped<E, T> extends AbstractView<E> {
+    static final class Mapped<@Covariant E, T> extends AbstractView<E> {
         @NotNull
         private final View<T> source;
 
@@ -237,7 +238,7 @@ final class Views {
         }
     }
 
-    static final class Filter<E> extends AbstractView<E> {
+    static final class Filter<@Covariant E> extends AbstractView<E> {
         @NotNull
         private final View<E> source;
 
@@ -259,7 +260,7 @@ final class Views {
         }
     }
 
-    static final class FlatMapped<E, T> extends AbstractView<E> {
+    static final class FlatMapped<@Covariant E, T> extends AbstractView<E> {
         @NotNull
         private final View<? extends T> source;
         @NotNull

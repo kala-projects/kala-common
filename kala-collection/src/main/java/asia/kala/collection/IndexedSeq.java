@@ -1,6 +1,7 @@
 package asia.kala.collection;
 
 import asia.kala.Option;
+import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.ImmutableArray;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +11,7 @@ import java.util.Objects;
 import java.util.RandomAccess;
 import java.util.function.IntFunction;
 
-public interface IndexedSeq<E> extends Seq<E>, RandomAccess {
+public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
 
     static <E> CollectionFactory<E, ?, ? extends IndexedSeq<E>> factory() {
         return ImmutableArray.factory();
