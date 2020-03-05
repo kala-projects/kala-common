@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 @ApiStatus.Internal
-public final class Internal {
+public final class ImmutableInternal {
     /**
      * Internal implementation of {@link LinkedBuffer}.
      *
@@ -19,8 +19,8 @@ public final class Internal {
      */
     @ApiStatus.Internal
     public static abstract class LinkedBufferImpl<E> extends AbstractBuffer<E> {
-        ImmutableList.MCons<E> first = null;
-        ImmutableList.MCons<E> last = null;
+        ImmutableList.MutableCons<E> first = null;
+        ImmutableList.MutableCons<E> last = null;
 
         int len = 0;
 
@@ -63,7 +63,7 @@ public final class Internal {
 
         @Override
         public final void append(E value) {
-            ImmutableList.MCons<E> i = new ImmutableList.MCons<>(value, ImmutableList.nil());
+            ImmutableList.MutableCons<E> i = new ImmutableList.MutableCons<>(value, ImmutableList.nil());
             if (len == 0) {
                 first = i;
             } else {
@@ -80,7 +80,7 @@ public final class Internal {
                 append(value);
                 return;
             }
-            first = new ImmutableList.MCons<>(value, first);
+            first = new ImmutableList.MutableCons<>(value, first);
             ++len;
         }
 
@@ -107,7 +107,7 @@ public final class Internal {
                 i = i.tail();
             }
 
-            ((ImmutableList.MCons<E>) i).tail = new ImmutableList.MCons<>(element, i.tail());
+            ((ImmutableList.MutableCons<E>) i).tail = new ImmutableList.MutableCons<>(element, i.tail());
             ++len;
         }
 
@@ -124,7 +124,7 @@ public final class Internal {
                     first = last = null;
                     aliased = false;
                 } else {
-                    first = (ImmutableList.MCons<E>) first.tail;
+                    first = (ImmutableList.MutableCons<E>) first.tail;
                 }
                 --len;
                 return v;
@@ -138,7 +138,7 @@ public final class Internal {
                 i = i.tail();
             }
             E v = i.tail().head();
-            ((ImmutableList.MCons<E>) i).tail = i.tail().tail();
+            ((ImmutableList.MutableCons<E>) i).tail = i.tail().tail();
             --len;
             return v;
         }
@@ -167,7 +167,7 @@ public final class Internal {
             if (index == 0) {
                 int c = count;
                 while (c-- > 0) {
-                    first = (ImmutableList.MCons<E>) first.tail;
+                    first = (ImmutableList.MutableCons<E>) first.tail;
                 }
                 len -= count;
                 return;
@@ -186,7 +186,7 @@ public final class Internal {
                 t = t.tail();
             }
 
-            ((ImmutableList.MCons<E>) i).tail = t;
+            ((ImmutableList.MutableCons<E>) i).tail = t;
             len -= count;
         }
 
@@ -220,7 +220,7 @@ public final class Internal {
             while (--index >= 0) {
                 l = l.tail();
             }
-            ((ImmutableList.MCons<E>) l).head = newValue;
+            ((ImmutableList.MutableCons<E>) l).head = newValue;
         }
 
         @Override
@@ -232,12 +232,12 @@ public final class Internal {
             Object[] values = toObjectArray();
             Arrays.sort(values, (Comparator<? super Object>) comparator);
 
-            ImmutableList.MCons<E> c = first;
+            ImmutableList.MutableCons<E> c = first;
             for (Object value : values) {
                 //noinspection ConstantConditions
                 c.head = (E) value;
-                c = c.tail instanceof ImmutableList.MCons<?>
-                        ? (ImmutableList.MCons<E>) c.tail
+                c = c.tail instanceof ImmutableList.MutableCons<?>
+                        ? (ImmutableList.MutableCons<E>) c.tail
                         : null;
             }
         }

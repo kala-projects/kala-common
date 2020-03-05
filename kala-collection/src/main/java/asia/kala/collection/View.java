@@ -31,22 +31,22 @@ public interface View<@Covariant E> extends Traversable<E>, Transformable<E> {
         return new Views.Mapped<>(this, mapper);
     }
 
-    @Override
     @NotNull
+    @Override
     default View<E> filter(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
         return new Views.Filter<>(this, predicate);
     }
 
-    @Override
     @NotNull
+    @Override
     default View<E> filterNot(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
         return new Views.Filter<>(this, predicate.negate());
     }
 
-    @Override
     @NotNull
+    @Override
     default <U> View<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         Objects.requireNonNull(mapper);
         return new Views.FlatMapped<>(this, mapper);

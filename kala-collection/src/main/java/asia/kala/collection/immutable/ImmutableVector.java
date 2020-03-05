@@ -34,9 +34,9 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
     private static final int VECTOR_FACTOR = 32;
     private static final int VECTOR_MASK = 31;
 
-    public static final ImmutableVector<?> EMPTY = new ImmutableVector<>(ImmutableArray.empty(), 0, 0, 0);
+    private static final ImmutableVector.Factory<?> FACTORY = new Factory<>();
 
-    public static final ImmutableVector.Factory<?> FACTORY = new Factory<>();
+    public static final ImmutableVector<?> EMPTY = new ImmutableVector<>(ImmutableArray.empty(), 0, 0, 0);
 
     private final Object array;
     private final int offset;
@@ -57,7 +57,7 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
     }
 
     @NotNull
-    public static <E> ImmutableVector.Factory<E> factory() {
+    public static <E> CollectionFactory<E, ?, ImmutableVector<E>> factory() {
         return (ImmutableVector.Factory<E>) FACTORY;
     }
 
@@ -77,7 +77,7 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
     }
 
     @NotNull
-    public static <E> ImmutableVector<E> from(@NotNull E[] elements) {
+    public static <E> ImmutableVector<E> from(E @NotNull [] elements) {
         Objects.requireNonNull(elements);
 
         if (elements.length == 0) {
@@ -87,7 +87,7 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
         int shift = 0;
         Object[] arr = elements;
         while (arr.length > VECTOR_FACTOR) {
-            arr = ArrayUtils.spilt(arr, VECTOR_FACTOR);
+            arr = JavaArray.spilt(arr, VECTOR_FACTOR);
             shift += VECTOR_SHIFT;
         }
         return new ImmutableVector<>(arr, 0, elements.length, shift);
@@ -285,8 +285,8 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
 
     @NotNull
     @Override
-    public final ImmutableVector<E> prependedAll(@NotNull E[] prefix) {
-        return prependedAll(MutableArray.wrap(prefix));
+    public final ImmutableVector<E> prependedAll(E @NotNull [] prefix) {
+        return prependedAll(ArraySeq.wrap(prefix));
     }
 
     @NotNull
@@ -315,7 +315,7 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
             Object array = result.array;
             int shift = result.depthShift;
             if (result.isFullRight()) {
-                array = ArrayUtils.wrapInArray(array);
+                array = JavaArray.wrapInArray(array);
                 shift += VECTOR_SHIFT;
             }
 
@@ -332,8 +332,8 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
 
     @NotNull
     @Override
-    public final ImmutableVector<E> appendedAll(@NotNull E[] postfix) {
-        return appendedAll(MutableArray.wrap(postfix));
+    public final ImmutableVector<E> appendedAll(E @NotNull [] postfix) {
+        return appendedAll(ArraySeq.wrap(postfix));
     }
 
     @NotNull
@@ -449,7 +449,7 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
 
     @NotNull
     @Override
-    public final <U> ImmutableVector.Factory<U> iterableFactory() {
+    public final <U> CollectionFactory<U, ?, ImmutableVector<U>> iterableFactory() {
         return factory();
     }
 
@@ -469,6 +469,12 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
     @Override
     public final ImmutableVector<E> filterNot(@NotNull Predicate<? super E> predicate) {
         return filterNotImpl(predicate);
+    }
+
+    @NotNull
+    @Override
+    public final ImmutableVector<@NotNull E> filterNotNull() {
+        return this.filter(Objects::nonNull);
     }
 
     @NotNull
@@ -506,14 +512,14 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
             int shift = 0;
             Object[] arr = values.toArray(Object[]::new);
             while (arr.length > VECTOR_FACTOR) {
-                arr = ArrayUtils.spilt(arr, VECTOR_FACTOR);
+                arr = JavaArray.spilt(arr, VECTOR_FACTOR);
                 shift += VECTOR_SHIFT;
             }
             return new ImmutableVector<>(arr, 0, values.size(), shift);
         }
     }
 
-    public static final class Factory<E> implements CollectionFactory<E, Builder<E>, ImmutableVector<E>> {
+    private static final class Factory<E> implements CollectionFactory<E, Builder<E>, ImmutableVector<E>> {
         Factory() {
         }
 
@@ -524,7 +530,7 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
 
         @NotNull
         @Override
-        public final ImmutableVector<E> from(@NotNull E[] elements) {
+        public final ImmutableVector<E> from(E @NotNull [] elements) {
             return ImmutableVector.from(elements);
         }
 

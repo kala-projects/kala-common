@@ -28,7 +28,7 @@ public class BufferEditor<E, C extends Buffer<E>> extends MutableSeqEditor<E, C>
 
     @NotNull
     @Contract("_ -> this")
-    public BufferEditor<E, C> appendAll(@NotNull E[] collection) {
+    public BufferEditor<E, C> appendAll(E @NotNull [] collection) {
         source.appendAll(collection);
         return this;
     }
@@ -49,7 +49,7 @@ public class BufferEditor<E, C extends Buffer<E>> extends MutableSeqEditor<E, C>
 
     @NotNull
     @Contract("_ -> this")
-    public BufferEditor<E, C> prependAll(@NotNull E[] collection) {
+    public BufferEditor<E, C> prependAll(E @NotNull [] collection) {
         source.prependAll(collection);
         return this;
     }
@@ -70,7 +70,7 @@ public class BufferEditor<E, C extends Buffer<E>> extends MutableSeqEditor<E, C>
 
     @NotNull
     @Contract("_, _ -> this")
-    public BufferEditor<E, C> insertAll(int index, @NotNull E[] elements) {
+    public BufferEditor<E, C> insertAll(int index, E @NotNull [] elements) {
         source.insertAll(index, elements);
         return this;
     }

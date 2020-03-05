@@ -1,6 +1,7 @@
 package asia.kala.collection.mutable;
 
-import asia.kala.collection.KalaCollectionUtils;
+import asia.kala.collection.CollectionFactory;
+import asia.kala.collection.immutable.ImmutableInternal;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,15 +12,15 @@ import java.io.Serializable;
 import java.util.function.IntFunction;
 
 
-public final class LinkedBuffer<E> extends asia.kala.collection.immutable.Internal.LinkedBufferImpl<E>
+public final class LinkedBuffer<E> extends ImmutableInternal.LinkedBufferImpl<E>
         implements Serializable {
     private static final long serialVersionUID = 1621067498993048170L;
 
-    public static final LinkedBuffer.Factory<?> FACTORY = new LinkedBuffer.Factory<>();
+    private static final LinkedBuffer.Factory<?> FACTORY = new LinkedBuffer.Factory<>();
 
     @SuppressWarnings("unchecked")
-    public static <E> LinkedBuffer.Factory<E> factory() {
-        return (LinkedBuffer.Factory<E>) FACTORY;
+    public static <E> CollectionFactory<E, ?, LinkedBuffer<E>> factory() {
+        return (Factory<E>) FACTORY;
     }
 
     @NotNull
@@ -37,7 +38,7 @@ public final class LinkedBuffer<E> extends asia.kala.collection.immutable.Intern
 
     @NotNull
     @Contract("_ -> new")
-    public static <E> LinkedBuffer<E> from(@NotNull E[] elements) {
+    public static <E> LinkedBuffer<E> from(E @NotNull [] elements) {
         return LinkedBuffer.<E>factory().from(elements);
     }
 
@@ -57,7 +58,7 @@ public final class LinkedBuffer<E> extends asia.kala.collection.immutable.Intern
 
     @NotNull
     @Override
-    public final <U> LinkedBuffer.Factory<U> iterableFactory() {
+    public final <U> CollectionFactory<U, ?, LinkedBuffer<U>> iterableFactory() {
         return factory();
     }
 
@@ -95,10 +96,7 @@ public final class LinkedBuffer<E> extends asia.kala.collection.immutable.Intern
         }
     }
 
-    public static final class Factory<E> extends AbstractBufferFactory<E, LinkedBuffer<E>> {
-        Factory() {
-        }
-
+    private static final class Factory<E> extends AbstractBufferFactory<E, LinkedBuffer<E>> {
         @Override
         public final LinkedBuffer<E> newBuilder() {
             return new LinkedBuffer<>();

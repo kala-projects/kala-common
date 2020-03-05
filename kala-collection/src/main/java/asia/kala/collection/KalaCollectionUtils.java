@@ -2,7 +2,9 @@ package asia.kala.collection;
 
 import asia.kala.annotations.StaticClass;
 import asia.kala.collection.immutable.ImmutableArray;
+import asia.kala.collection.immutable.ImmutableSeq;
 import asia.kala.collection.mutable.ArrayBuffer;
+import asia.kala.collection.mutable.LinkedBuffer;
 import asia.kala.collection.mutable.MutableArray;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -39,14 +41,14 @@ public final class KalaCollectionUtils {
             return new JDKConverters.RandomAccessListWrapper<>(((List<E>) collection));
         }
         if (collection instanceof TraversableOnce<?>) {
-            return (MutableArray<E>) MutableArray.wrap(((TraversableOnce<?>) collection).toArray(Object[]::new));
+            return (ArraySeq<E>) ArraySeq.wrap(((TraversableOnce<?>) collection).toArray(Object[]::new));
         }
         if (collection instanceof Object[]) {
-            return MutableArray.wrap(((E[]) collection));
+            return ArraySeq.wrap(((E[]) collection));
         }
 
         if (collection instanceof Collection<?>) {
-            return (MutableArray<E>) MutableArray.wrap(((Collection<?>) collection).toArray());
+            return (ArraySeq<E>) ArraySeq.wrap(((Collection<?>) collection).toArray());
         }
         if (collection instanceof Iterable<?>) {
             return ArrayBuffer.from(((Iterable<E>) collection));
@@ -68,6 +70,35 @@ public final class KalaCollectionUtils {
         return null;
     }
 
+    public static <E> Traversable<E> asTraversable(Object collection) {
+        if (collection instanceof Traversable<?>) {
+            return ((Traversable<E>) collection);
+        }
+
+        if (collection instanceof Collection<?>) {
+            return new JDKConverters.CollectionWrapper<>(((Collection<E>) collection));
+        }
+
+        if (collection instanceof Iterator<?>) {
+            Iterator<?> iterator = (Iterator<?>) collection;
+            if (!iterator.hasNext()) {
+                return ImmutableSeq.empty();
+            }
+            LinkedBuffer<E> buffer = new LinkedBuffer<>();
+            while (iterator.hasNext()) {
+                buffer.append(((E) iterator.next()));
+            }
+            return buffer;
+        }
+
+        if (collection instanceof Iterable<?>) {
+            LinkedBuffer<E> buffer = new LinkedBuffer<>();
+            buffer.appendAll(((Iterable<E>) collection));
+            return buffer;
+        }
+        return null;
+    }
+
     public static <E> Seq<E> asSeq(Object collection) {
         if (collection instanceof Seq<?>) {
             return ((Seq<E>) collection);
@@ -81,11 +112,11 @@ public final class KalaCollectionUtils {
         }
 
         if (collection instanceof Object[]) {
-            return MutableArray.wrap(((E[]) collection));
+            return ArraySeq.wrap(((E[]) collection));
         }
 
         if (collection instanceof Collection<?>) {
-            return (MutableArray<E>) MutableArray.wrap(((Collection<?>) collection).toArray());
+            return (ArraySeq<E>) ArraySeq.wrap(((Collection<?>) collection).toArray());
         }
         if (collection instanceof Iterable<?>) {
             return ImmutableArray.from(((Iterable<E>) collection));

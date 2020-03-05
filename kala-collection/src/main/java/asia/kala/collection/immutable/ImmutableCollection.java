@@ -5,9 +5,11 @@ import asia.kala.annotations.Covariant;
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Transformable;
 import asia.kala.collection.Traversable;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
@@ -26,7 +28,7 @@ public interface ImmutableCollection<@Covariant E> extends Traversable<E>, Trans
     }
 
     @NotNull
-    static <E> ImmutableCollection<E> from(@NotNull E[] elements) {
+    static <E> ImmutableCollection<E> from(E @NotNull [] elements) {
         return ImmutableCollection.<E>factory().from(elements);
     }
 
@@ -78,6 +80,13 @@ public interface ImmutableCollection<@Covariant E> extends Traversable<E>, Trans
     @Contract(pure = true)
     default ImmutableCollection<E> filterNot(@NotNull Predicate<? super E> predicate) {
         return AbstractImmutableCollection.filterNot(this, predicate, iterableFactory());
+    }
+
+    @NotNull
+    @Override
+    @Contract(pure = true)
+    default ImmutableCollection<@NotNull E> filterNotNull() {
+        return this.filter(Objects::nonNull);
     }
 
     @NotNull

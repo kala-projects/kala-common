@@ -6,12 +6,12 @@ import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Seq;
 import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.function.IndexedFunction;
-import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -25,6 +25,7 @@ public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<
         return (CollectionFactory<E, ?, ? extends ImmutableSeq<E>>) FACTORY;
     }
 
+    @NotNull
     static <E> ImmutableSeq<E> empty() {
         return ImmutableSeq.<E>factory().empty();
     }
@@ -36,7 +37,7 @@ public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<
     }
 
     @NotNull
-    static <E> ImmutableSeq<E> from(@NotNull E[] elements) {
+    static <E> ImmutableSeq<E> from(E @NotNull [] elements) {
         return ImmutableSeq.<E>factory().from(elements);
     }
 
@@ -95,13 +96,13 @@ public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<
 
     @NotNull
     @Contract(pure = true)
-    default ImmutableSeq<E> prependedAll(@NotNull @ReadOnly Iterable<? extends E> prefix) {
+    default ImmutableSeq<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
         return AbstractImmutableSeq.prependedAll(this, prefix, iterableFactory());
     }
 
     @NotNull
     @Contract(pure = true)
-    default ImmutableSeq<E> prependedAll(@NotNull E[] prefix) {
+    default ImmutableSeq<E> prependedAll(E @NotNull [] prefix) {
         return AbstractImmutableSeq.prependedAll(this, prefix, iterableFactory());
     }
 
@@ -113,13 +114,13 @@ public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<
 
     @NotNull
     @Contract(pure = true)
-    default ImmutableSeq<E> appendedAll(@NotNull @ReadOnly Iterable<? extends E> postfix) {
+    default ImmutableSeq<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
         return AbstractImmutableSeq.prependedAll(this, postfix, iterableFactory());
     }
 
     @NotNull
     @Contract(pure = true)
-    default ImmutableSeq<E> appendedAll(@NotNull E[] postfix) {
+    default ImmutableSeq<E> appendedAll(E @NotNull [] postfix) {
         return AbstractImmutableSeq.prependedAll(this, postfix, iterableFactory());
     }
 
@@ -177,6 +178,12 @@ public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<
 
     @NotNull
     @Override
+    default ImmutableSeq<@NotNull E> filterNotNull() {
+        return this.filter(Objects::nonNull);
+    }
+
+    @NotNull
+    @Override
     default <U> ImmutableSeq<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         return AbstractImmutableCollection.flatMap(this, mapper, iterableFactory());
     }
@@ -187,6 +194,7 @@ public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<
         return AbstractImmutableCollection.span(this, predicate, iterableFactory());
     }
 
+    @ApiStatus.Internal
     class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, ImmutableSeq<E>> {
         Factory() {
         }

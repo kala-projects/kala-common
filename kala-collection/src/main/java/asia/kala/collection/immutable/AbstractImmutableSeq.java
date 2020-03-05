@@ -193,7 +193,7 @@ public abstract class AbstractImmutableSeq<@Covariant E> extends AbstractImmutab
 
     static <E, T, Builder> T prependedAll(
             @NotNull ImmutableSeq<? extends E> seq,
-            @NotNull E[] prefix,
+            E @NotNull [] prefix,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
@@ -254,7 +254,7 @@ public abstract class AbstractImmutableSeq<@Covariant E> extends AbstractImmutab
 
     static <E, T, Builder> T appendedAll(
             @NotNull ImmutableSeq<? extends E> seq,
-            @NotNull E[] postfix,
+            E @NotNull [] postfix,
             @NotNull CollectionFactory<? super E, Builder, ? extends T> factory
     ) {
         assert seq != null;
@@ -351,7 +351,7 @@ public abstract class AbstractImmutableSeq<@Covariant E> extends AbstractImmutab
     }
 
     @NotNull
-    protected final <To extends ImmutableSeq<E>> To prependedAllImpl(@NotNull E[] prefix) {
+    protected final <To extends ImmutableSeq<E>> To prependedAllImpl(E @NotNull [] prefix) {
         return (To) AbstractImmutableSeq.prependedAll(this, prefix, iterableFactory());
     }
 
@@ -366,7 +366,7 @@ public abstract class AbstractImmutableSeq<@Covariant E> extends AbstractImmutab
     }
 
     @NotNull
-    protected final <To extends ImmutableSeq<E>> To appendedAllImpl(@NotNull E[] postfix) {
+    protected final <To extends ImmutableSeq<E>> To appendedAllImpl(E @NotNull [] postfix) {
         return (To) AbstractImmutableSeq.appendedAll(this, postfix, iterableFactory());
     }
 

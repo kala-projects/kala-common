@@ -29,7 +29,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
     }
 
     @NotNull
-    static <E> Seq<E> from(@NotNull E[] elements) {
+    static <E> Seq<E> from(E @NotNull [] elements) {
         return Seq.<E>factory().from(elements);
     }
 
@@ -75,10 +75,10 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return index >= 0 && index < size();
     }
 
-    default int indexOf(Object element) {
+    default int indexOf(Object value) {
         int idx = 0;
         for (E e : this) {
-            if (Objects.equals(e, element)) {
+            if (Objects.equals(e, value)) {
                 return idx;
             }
             ++idx;
@@ -86,10 +86,10 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return -1;
     }
 
-    default int indexOf(Object element, int from) {
+    default int indexOf(Object value, int from) {
         int idx = 0;
         for (E e : this) {
-            if (idx >= from && Objects.equals(e, element)) {
+            if (idx >= from && Objects.equals(e, value)) {
                 return idx;
             }
             ++idx;
@@ -123,11 +123,11 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return -1;
     }
 
-    default int lastIndexOf(Object element) {
+    default int lastIndexOf(Object value) {
         int idx = size() - 1;
         Enumerator<E> it = reverseIterator();
         while (it.hasNext()) {
-            if (Objects.equals(element, it.next())) {
+            if (Objects.equals(value, it.next())) {
                 return idx;
             }
             --idx;
@@ -135,11 +135,11 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return -1;
     }
 
-    default int lastIndexOf(Object element, int end) {
+    default int lastIndexOf(Object value, int end) {
         int idx = size() - 1;
         Enumerator<E> it = reverseIterator();
         while (it.hasNext()) {
-            if (idx <= end && Objects.equals(element, it.next())) {
+            if (idx <= end && Objects.equals(value, it.next())) {
                 return idx;
             }
             --idx;
@@ -207,6 +207,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         iterator().forEachIndexed(action);
     }
 
+    @NotNull
     default Enumerator<E> reverseIterator() {
         ImmutableList<E> l = ImmutableList.nil();
         for (E e : this) {

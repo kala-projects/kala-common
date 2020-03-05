@@ -1,9 +1,12 @@
 package asia.kala.collection.mutable;
 
 import asia.kala.collection.CollectionFactory;
+import asia.kala.collection.JDKConverters;
 import asia.kala.collection.Traversable;
 import kotlin.annotations.jvm.Mutable;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 public interface MutableCollection<E> extends Traversable<E> {
     static <E> CollectionFactory<E, ?, ? extends MutableCollection<E>> factory() {
@@ -15,7 +18,7 @@ public interface MutableCollection<E> extends Traversable<E> {
         return MutableCollection.<E>factory().from(elements);
     }
 
-    static <E> MutableCollection<E> from(@NotNull E[] elements) {
+    static <E> MutableCollection<E> from(E @NotNull [] elements) {
         return MutableCollection.<E>factory().from(elements);
     }
 
@@ -42,7 +45,7 @@ public interface MutableCollection<E> extends Traversable<E> {
     @NotNull
     @Mutable
     @Override
-    default Iterable<E> asJava() {
-        return this;
+    default Collection<E> asJava() {
+        return new JDKConverters.MutableCollectionAsJava<>(this);
     }
 }

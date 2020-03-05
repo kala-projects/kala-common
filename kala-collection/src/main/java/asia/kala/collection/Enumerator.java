@@ -4,7 +4,9 @@ import asia.kala.Option;
 import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.mutable.ArrayBuffer;
+import asia.kala.collection.mutable.LinkedBuffer;
 import asia.kala.function.IndexedConsumer;
+import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,7 +25,7 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
     }
 
     @NotNull
-    static <E> Enumerator<E> fromJava(@NotNull Iterator<E> iterator) {
+    static <E> Enumerator<E> fromJava(@NotNull @ReadOnly Iterator<? extends E> iterator) {
         Objects.requireNonNull(iterator);
         if (iterator instanceof Enumerator<?>) {
             return (Enumerator<E>) iterator;
@@ -47,25 +49,16 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
 
     @NotNull
     static <E> Enumerator<E> of(E... elements) {
-        Objects.requireNonNull(elements);
-        int l = elements.length;
-        if (l == 0) {
-            return empty();
-        }
-        if (l == 1) {
-            return new Enumerators.Id<>(elements[0]);
-        }
-        return new Enumerators.OfArray<>(elements, 0, elements.length);
+        return JavaArray.iterator(elements);
     }
 
     @NotNull
-    static <E> Enumerator<E> ofArray(@NotNull E[] elements) {
-        Objects.requireNonNull(elements);
-        return new Enumerators.OfArray<>(elements, 0, elements.length);
+    static <E> Enumerator<E> ofArray(E @NotNull [] elements) {
+        return JavaArray.iterator(elements);
     }
 
     @NotNull
-    static <E> Enumerator<E> ofArray(@NotNull E[] elements, int start, int length) {
+    static <E> Enumerator<E> ofArray(E @NotNull [] elements, int start, int length) {
         Objects.requireNonNull(elements);
         if (start < 0 || start >= elements.length) {
             throw new IndexOutOfBoundsException("Index: " + start);
@@ -73,7 +66,7 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
         if (length < 0 || length + start > elements.length) {
             throw new IndexOutOfBoundsException("Index: " + length + start);
         }
-        return new Enumerators.OfArray<>(elements, start, start + length);
+        return new JavaArray.Iterator<>(elements, start, start + length);
     }
 
     @NotNull
@@ -205,6 +198,7 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
     }
 
     @NotNull
+    @ReadOnly
     @Override
     default Iterator<E> asJava() {
         return this;
@@ -264,22 +258,22 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
 
     @NotNull
     @Override
-    default Tuple2<? extends Enumerator<E>, ? extends Enumerator<E>> span(@NotNull Predicate<? super E> predicate) {
-        // TODO
+    default Tuple2<Enumerator<E>, Enumerator<E>> span(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
-        LinkedList<E> list1 = new LinkedList<>();
-        LinkedList<E> list2 = new LinkedList<>();
+
+        LinkedBuffer<E> buffer1 = new LinkedBuffer<>();
+        LinkedBuffer<E> buffer2 = new LinkedBuffer<>();
 
         while (hasNext()) {
             E e = next();
             if (predicate.test(e)) {
-                list1.add(e);
+                buffer1.append(e);
             } else {
-                list2.add(e);
+                buffer2.append(e);
             }
         }
 
-        return new Tuple2<>(Enumerator.fromJava(list1.iterator()), Enumerator.fromJava(list2.iterator()));
+        return new Tuple2<>(buffer1.iterator(), buffer2.iterator());
     }
 
     /**
@@ -346,10 +340,11 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
                 buffer.append(separator).append(Objects.toString(next()));
             }
             buffer.append(postfix);
-            return buffer;
+
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+        return buffer;
     }
 
     /**
@@ -382,9 +377,9 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
      */
     @Override
     default <U> U foldRight(U zero, @NotNull BiFunction<? super E, ? super U, ? extends U> op) {
-        LinkedList<E> list = new LinkedList<>(); // TODO
+        LinkedBuffer<E> list = new LinkedBuffer<>();
         while (hasNext()) {
-            list.addFirst(next());
+            list.prepend(next());
         }
 
         for (E u : list) {
@@ -415,9 +410,9 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
     @Override
     default Option<E> reduceRightOption(@NotNull BiFunction<? super E, ? super E, ? extends E> op) {
         if (hasNext()) {
-            LinkedList<E> list = new LinkedList<>(); // TODO
+            LinkedBuffer<E> list = new LinkedBuffer<>();
             while (hasNext()) {
-                list.addFirst(next());
+                list.prepend(next());
             }
             Iterator<E> it = list.iterator();
             E e = it.next();

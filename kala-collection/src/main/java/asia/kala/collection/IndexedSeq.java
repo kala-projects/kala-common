@@ -22,7 +22,7 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
         return IndexedSeq.<E>factory().from(elements);
     }
 
-    static <E> IndexedSeq<E> from(@NotNull E[] elements) {
+    static <E> IndexedSeq<E> from(E @NotNull [] elements) {
         return IndexedSeq.<E>factory().from(elements);
     }
 
@@ -88,6 +88,7 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
         };
     }
 
+    @NotNull
     @Override
     default Enumerator<E> reverseIterator() {
         return new AbstractEnumerator<E>() {

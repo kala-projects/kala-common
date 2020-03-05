@@ -4,7 +4,4 @@ module kala.collection {
     requires transitive asia.kala.collection;
 
     exports kala.collection;
-    exports kala.collection.mutable;
-    exports kala.collection.immutable;
-
 }

@@ -1,6 +1,7 @@
 package asia.kala.collection.mutable;
 
 import asia.kala.collection.*;
+import asia.kala.collection.JDKConverters;
 import kotlin.annotations.jvm.Mutable;
 import kotlin.annotations.jvm.ReadOnly;
 import org.intellij.lang.annotations.Flow;
@@ -27,7 +28,7 @@ public interface Buffer<E> extends MutableSeq<E> {
     }
 
     @NotNull
-    static <E> Buffer<E> from(@NotNull E[] elements) {
+    static <E> Buffer<E> from(E @NotNull [] elements) {
         return Buffer.<E>factory().from(elements);
     }
 
@@ -43,7 +44,7 @@ public interface Buffer<E> extends MutableSeq<E> {
         if (list instanceof RandomAccess) {
             return new JDKConverters.RandomAccessResizableListWrapper<>(list);
         }
-        return new JDKConverters.ResizableListWrapper<>(list);
+        return new asia.kala.collection.JDKConverters.ResizableListWrapper<>(list);
     }
 
     @Contract(mutates = "this")
@@ -58,8 +59,8 @@ public interface Buffer<E> extends MutableSeq<E> {
     }
 
     @Contract(mutates = "this")
-    default void appendAll(@NotNull E[] elements) {
-        this.appendAll(MutableArray.wrap(elements));
+    default void appendAll(E @NotNull [] elements) {
+        this.appendAll(ArraySeq.wrap(elements));
     }
 
     @Contract(mutates = "this")
@@ -94,8 +95,8 @@ public interface Buffer<E> extends MutableSeq<E> {
     }
 
     @Contract(mutates = "this")
-    default void prependAll(@NotNull E[] elements) {
-        this.prependAll(MutableArray.wrap(elements));
+    default void prependAll(E @NotNull [] elements) {
+        this.prependAll(ArraySeq.wrap(elements));
     }
 
     @Contract(mutates = "this")
@@ -111,7 +112,7 @@ public interface Buffer<E> extends MutableSeq<E> {
     }
 
     @Contract(mutates = "this")
-    default void insertAll(int index, @NotNull E[] elements) {
+    default void insertAll(int index, E @NotNull [] elements) {
         insertAll(index, MutableArray.wrap(elements));
     }
 
@@ -194,8 +195,8 @@ public interface Buffer<E> extends MutableSeq<E> {
     @Override
     default List<E> asJava() {
         if (this instanceof IndexedSeq<?>) {
-            return new JDKConverters.IndexedBufferAsJava<>((Buffer<E> & IndexedSeq<E>) this);
+            return new asia.kala.collection.JDKConverters.IndexedBufferAsJava<>((Buffer<E> & IndexedSeq<E>) this);
         }
-        return new JDKConverters.BufferAsJava<>(this);
+        return new asia.kala.collection.JDKConverters.BufferAsJava<>(this);
     }
 }

@@ -6,6 +6,7 @@ import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
@@ -61,8 +62,8 @@ public interface Traversable<@Covariant E> extends TraversableOnce<E> {
     @NotNull
     @ReadOnly
     @Override
-    default Iterable<E> asJava() {
-        return this;
+    default Collection<E> asJava() {
+        return new JDKConverters.TraversableAsJava<>(this);
     }
 
     @NotNull

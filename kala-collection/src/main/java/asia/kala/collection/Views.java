@@ -231,6 +231,11 @@ final class Views {
             this.mapper = mapper;
         }
 
+        @Override
+        public final int size() {
+            return source.size();
+        }
+
         @NotNull
         @Override
         public final Enumerator<E> iterator() {

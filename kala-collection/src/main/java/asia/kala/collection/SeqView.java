@@ -64,9 +64,9 @@ public interface SeqView<@Covariant E> extends Seq<E>, View<E> {
         return new SeqViews.Concat<>(KalaCollectionUtils.asSeq(prefix), this);
     }
 
-    default SeqView<E> prependedAll(@NotNull E[] prefix) {
+    default SeqView<E> prependedAll(E @NotNull [] prefix) {
         Objects.requireNonNull(prefix);
-        return new SeqViews.Concat<>(MutableArray.wrap(prefix), this);
+        return new SeqViews.Concat<>(ArraySeq.wrap(prefix), this);
     }
 
     default SeqView<E> appended(E value) {
@@ -78,9 +78,9 @@ public interface SeqView<@Covariant E> extends Seq<E>, View<E> {
         return new SeqViews.Concat<>(this, KalaCollectionUtils.asSeq(postfix));
     }
 
-    default SeqView<E> appendedAll(@NotNull E[] postfix) {
+    default SeqView<E> appendedAll(E @NotNull [] postfix) {
         Objects.requireNonNull(postfix);
-        return new SeqViews.Concat<>(this, MutableArray.wrap(postfix));
+        return new SeqViews.Concat<>(this, ArraySeq.wrap(postfix));
     }
 
     @SuppressWarnings("unchecked")

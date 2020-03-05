@@ -9,14 +9,11 @@ import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
+import java.util.function.*;
+import java.util.stream.Collector;
 
 @SuppressWarnings("unchecked")
 public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> {
@@ -47,7 +44,7 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
         return -1;
     }
 
-    default boolean sameElements(@NotNull @ReadOnly Iterable<?> other) {
+    default boolean sameElements(@NotNull Iterable<?> other) {
         return iterator().sameElements(other);
     }
 
@@ -55,7 +52,14 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
      * {@inheritDoc}
      */
     default E max() {
-        return maxOption().getOrThrow(NoSuchElementException::new);
+        return maxBy((Comparator<E>) Comparator.naturalOrder());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    default E maxBy(@NotNull Comparator<? super E> comparator) {
+        return maxByOption(comparator).getOrThrow(NoSuchElementException::new);
     }
 
     /**
@@ -64,13 +68,6 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
     @NotNull
     default Option<E> maxOption() {
         return maxByOption((Comparator<E>) Comparator.naturalOrder());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    default E maxBy(@NotNull Comparator<? super E> comparator) {
-        return maxByOption(comparator).getOrThrow(NoSuchElementException::new);
     }
 
     /**
@@ -85,7 +82,14 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
      * {@inheritDoc}
      */
     default E min() {
-        return minOption().getOrThrow(NoSuchElementException::new);
+        return minBy((Comparator<E>) Comparator.naturalOrder());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    default E minBy(@NotNull Comparator<? super E> comparator) {
+        return minByOption(comparator).getOrThrow(NoSuchElementException::new);
     }
 
     /**
@@ -94,13 +98,6 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
     @NotNull
     default Option<E> minOption() {
         return minByOption((Comparator<E>) Comparator.naturalOrder());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    default E minBy(@NotNull Comparator<? super E> comparator) {
-        return minByOption(comparator).getOrThrow(NoSuchElementException::new);
     }
 
     /**
@@ -119,11 +116,12 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
         return joinTo(buffer, separator, "", "");
     }
 
+    @NotNull
+    @Contract(value = "_, _, _, _ -> param1", mutates = "param1")
     default <A extends Appendable> A joinTo(
             @NotNull A buffer,
-            @NotNull CharSequence separator,
-            @NotNull CharSequence prefix,
-            @NotNull CharSequence postfix) {
+            CharSequence separator, CharSequence prefix, CharSequence postfix
+    ) {
         return iterator().joinTo(buffer, prefix, separator, postfix);
     }
 
@@ -135,11 +133,16 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
         return joinTo(new StringBuilder(), separator).toString();
     }
 
-    default String joinToString(
-            @NotNull CharSequence separator,
-            @NotNull CharSequence prefix,
-            @NotNull CharSequence postfix) {
+    default String joinToString(CharSequence separator, CharSequence prefix, CharSequence postfix) {
         return joinTo(new StringBuilder(), prefix, separator, postfix).toString();
+    }
+
+    default <R> R collectTo(@NotNull Collector<? super E, ?, ? extends R> collector) {
+        return AbstractTraversable.collectTo(this, collector);
+    }
+
+    default <R> R collectTo(@NotNull CollectionFactory<? super E, ?, ? extends R> factory) {
+        return AbstractTraversable.collectTo(this, factory);
     }
 
     @NotNull
@@ -149,7 +152,7 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
 
     @NotNull
     default E[] toArray(@NotNull Class<E> type) {
-        return toArray(size -> (E[]) Array.newInstance(type, size));
+        return toArray(JavaArray.generator(type));
     }
 
     @NotNull

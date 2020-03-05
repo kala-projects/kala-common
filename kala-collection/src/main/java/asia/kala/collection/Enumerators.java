@@ -395,33 +395,4 @@ final class Enumerators {
         }
     }
 
-    static final class OfArray<@Covariant E> extends AbstractEnumerator<E> {
-        @NotNull
-        private final E[] array;
-        private final int end;
-
-        private int index;
-
-        OfArray(@NotNull E[] array, int start, int end) {
-            assert array != null;
-
-            this.array = array;
-            this.index = start;
-            this.end = end;
-        }
-
-
-        @Override
-        public final boolean hasNext() {
-            return index < end;
-        }
-
-        @Override
-        public final E next() {
-            if (index >= end) {
-                throw new NoSuchElementException(this + ".next()");
-            }
-            return array[index++];
-        }
-    }
 }

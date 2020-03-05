@@ -30,12 +30,12 @@ final class SeqViews {
             return collection.isDefinedAt(index);
         }
 
-        public int indexOf(Object element) {
-            return collection.indexOf(element);
+        public int indexOf(Object value) {
+            return collection.indexOf(value);
         }
 
-        public int indexOf(Object element, int from) {
-            return collection.indexOf(element, from);
+        public int indexOf(Object value, int from) {
+            return collection.indexOf(value, from);
         }
 
         public int indexWhere(@NotNull Predicate<? super E> predicate) {
@@ -46,12 +46,12 @@ final class SeqViews {
             return collection.indexWhere(predicate, from);
         }
 
-        public int lastIndexOf(Object element) {
-            return collection.lastIndexOf(element);
+        public int lastIndexOf(Object value) {
+            return collection.lastIndexOf(value);
         }
 
-        public int lastIndexOf(Object element, int end) {
-            return collection.lastIndexOf(element, end);
+        public int lastIndexOf(Object value, int end) {
+            return collection.lastIndexOf(value, end);
         }
 
         public int lastIndexWhere(@NotNull Predicate<? super E> predicate) {
@@ -66,6 +66,7 @@ final class SeqViews {
             collection.forEachIndexed(action);
         }
 
+        @NotNull
         @Override
         public Enumerator<E> reverseIterator() {
             return collection.reverseIterator();
@@ -437,7 +438,7 @@ final class SeqViews {
             this.sortedSeq = LazyValue.of(() -> {
                 Object[] arr = source.toObjectArray();
                 Arrays.sort(arr, (Comparator<? super Object>) comparator);
-                return MutableArray.wrap((E[]) arr);
+                return ArraySeq.wrap((E[]) arr);
             });
         }
 

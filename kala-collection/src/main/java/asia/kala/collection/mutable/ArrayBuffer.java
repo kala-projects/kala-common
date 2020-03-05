@@ -17,7 +17,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
 
     private static final int DEFAULT_CAPACITY = 16;
 
-    public static final ArrayBuffer.Factory<?> FACTORY = new Factory<>();
+    private static final ArrayBuffer.Factory<?> FACTORY = new Factory<>();
 
     @NotNull
     private Object[] elements;
@@ -44,8 +44,14 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     }
 
     @NotNull
-    public static <E> ArrayBuffer.Factory<E> factory() {
+    public static <E> CollectionFactory<E, ?, ArrayBuffer<E>> factory() {
         return (Factory<E>) FACTORY;
+    }
+
+    @NotNull
+    @Contract("-> new")
+    public static <E> ArrayBuffer<E> of() {
+        return new ArrayBuffer<>();
     }
 
     @NotNull
@@ -56,12 +62,12 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
 
     @NotNull
     @Contract("_ -> new")
-    public static <E> ArrayBuffer<E> from(@NotNull E[] elements) {
+    public static <E> ArrayBuffer<E> from(E @NotNull [] elements) {
         Objects.requireNonNull(elements);
 
         int length = elements.length;
         if (length == 0) {
-            return new ArrayBuffer<>(MutableArray.EMPTY_ARRAY, 0);
+            return new ArrayBuffer<>();
         }
         Object[] newValues = new Object[length];
         System.arraycopy(elements, 0, newValues, 0, length);
@@ -128,17 +134,11 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     public final void appendAll(@NotNull Iterable<? extends E> collection) {
         Objects.requireNonNull(collection);
 
-        if (collection instanceof TraversableOnce<?>) {
-            int ks = ((TraversableOnce<?>) collection).knownSize();
-            if (ks > 0 && size + ks > elements.length) {
-                grow(size + ks);
-            }
-        } else if (collection instanceof List<?> && collection instanceof RandomAccess) {
-            int s = ((List<?>) collection).size();
-            if (size + s > elements.length) {
-                grow(size + s);
-            }
+        int knowSize = KalaCollectionUtils.knowSize(collection);
+        if (knowSize > 0 && size + knowSize > elements.length) {
+            grow(size + knowSize);
         }
+
         for (E e : collection) {
             this.append(e);
         }
@@ -236,7 +236,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     }
 
     @Override
-    public final void insertAll(int index, @NotNull E[] elements) {
+    public final void insertAll(int index, E @NotNull [] elements) {
         Objects.requireNonNull(elements);
         if (index < 0 || index > size) {
             throw new IndexOutOfBoundsException("Index out of range: " + index);
@@ -268,11 +268,15 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
 
     @Override
     public final void remove(int index, int count) {
+        if (count < 0) {
+            throw new IllegalArgumentException("count: " + count);
+        }
         if (index < 0 || index > size - count) {
             throw new IndexOutOfBoundsException(String.format("index: %d, count: %d", index, count));
         }
 
         System.arraycopy(elements, index + count, elements, index, size - (index + count));
+        Arrays.fill(elements, size - count, size, null);
         size -= count;
     }
 
@@ -280,6 +284,16 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     public final void clear() {
         Arrays.fill(elements, null);
         size = 0;
+    }
+
+    @Override
+    public final void takeInPlace(int n) {
+        if (n <= 0) {
+            clear();
+        } else if (n < size) {
+            Arrays.fill(elements, n, elements.length, null);
+            size = n;
+        }
     }
 
     //
@@ -314,12 +328,12 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
 
     @NotNull
     @Override
-    public final <U> ArrayBuffer.Factory<U> iterableFactory() {
+    public final <U> CollectionFactory<U, ?, ArrayBuffer<U>> iterableFactory() {
         return factory();
     }
 
     @Override
-    public int size() {
+    public final int size() {
         return size;
     }
 
@@ -366,10 +380,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         }
     }
 
-    public static final class Factory<E> extends AbstractBufferFactory<E, ArrayBuffer<E>> {
-        Factory() {
-        }
-
+    private static final class Factory<E> extends AbstractBufferFactory<E, ArrayBuffer<E>> {
         @Override
         public final ArrayBuffer<E> newBuilder() {
             return new ArrayBuffer<>();

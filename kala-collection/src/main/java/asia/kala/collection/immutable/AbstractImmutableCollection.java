@@ -135,6 +135,11 @@ public abstract class AbstractImmutableCollection<@Covariant E> extends Abstract
     }
 
     @NotNull
+    protected final <To extends ImmutableCollection<E>> To filterNotNullImpl() {
+        return (To) this.filter(Objects::nonNull);
+    }
+
+    @NotNull
     protected final <U, To extends ImmutableCollection<U>> To flatMapImpl(
             @NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         return (To) AbstractImmutableCollection.flatMap(this, mapper, iterableFactory());

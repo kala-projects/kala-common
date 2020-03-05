@@ -2,6 +2,7 @@ package asia.kala.collection.mutable;
 
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.IndexedSeq;
+import asia.kala.collection.JDKConverters;
 import asia.kala.collection.Seq;
 import kotlin.annotations.jvm.Mutable;
 import org.jetbrains.annotations.Contract;
@@ -24,7 +25,7 @@ public interface MutableSeq<E> extends MutableCollection<E>, Seq<E> {
     }
 
     @NotNull
-    static <E> MutableSeq<E> from(@NotNull E[] elements) {
+    static <E> MutableSeq<E> from(E @NotNull [] elements) {
         return MutableSeq.<E>factory().from(elements);
     }
 
@@ -38,9 +39,9 @@ public interface MutableSeq<E> extends MutableCollection<E>, Seq<E> {
     static <E> MutableSeq<E> wrapJava(@NotNull @Mutable List<E> list) {
         Objects.requireNonNull(list);
         if (list instanceof RandomAccess) {
-            return new JDKConverters.RandomAccessListWrapper<>(list);
+            return new JDKConverters.RandomAccessMutableListWrapper<>(list);
         }
-        return new JDKConverters.ListWrapper<>(list);
+        return new asia.kala.collection.JDKConverters.MutableListWrapper<>(list);
     }
 
     void set(int index, E newValue);
@@ -96,8 +97,8 @@ public interface MutableSeq<E> extends MutableCollection<E>, Seq<E> {
     @Override
     default List<E> asJava() {
         if (this instanceof IndexedSeq<?>) {
-            return new JDKConverters.MIndexedSeqAsJava<>((MutableSeq<E> & IndexedSeq<E>) this);
+            return new asia.kala.collection.JDKConverters.MutableIndexedSeqAsJava<>((MutableSeq<E> & IndexedSeq<E>) this);
         }
-        return new JDKConverters.MutableSeqAsJava<>(this);
+        return new asia.kala.collection.JDKConverters.MutableSeqAsJava<>(this);
     }
 }

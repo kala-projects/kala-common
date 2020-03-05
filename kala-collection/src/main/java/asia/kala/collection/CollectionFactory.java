@@ -67,7 +67,7 @@ public interface CollectionFactory<E, Builder, @Covariant R> extends Collector<E
         return build(builder);
     }
 
-    default R from(@NotNull E[] elements) {
+    default R from(E @NotNull [] elements) {
         Objects.requireNonNull(elements);
         if (elements.length == 0) {
             return empty();

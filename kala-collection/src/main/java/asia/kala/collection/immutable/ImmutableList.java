@@ -20,7 +20,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
     ImmutableList() {
     }
 
-    public static final ImmutableList.Factory<?> FACTORY = new Factory<>();
+    private static final ImmutableList.Factory<?> FACTORY = new Factory<>();
 
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")
@@ -29,7 +29,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
     }
 
     @SuppressWarnings("unchecked")
-    public static <E> ImmutableList.Factory<E> factory() {
+    public static <E> CollectionFactory<E, ?, ImmutableList<E>> factory() {
         return (Factory<E>) FACTORY;
     }
 
@@ -56,7 +56,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
     }
 
     @NotNull
-    public static <E> ImmutableList<E> from(@NotNull E[] elements) {
+    public static <E> ImmutableList<E> from(E @NotNull [] elements) {
         Objects.requireNonNull(elements);
         ImmutableList<E> list = nil();
 
@@ -122,7 +122,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
 
     @NotNull
     @Override
-    public final ImmutableList<E> prependedAll(@NotNull E[] prefix) {
+    public final ImmutableList<E> prependedAll(E @NotNull [] prefix) {
         Objects.requireNonNull(prefix);
 
         ImmutableList<E> result = this;
@@ -149,7 +149,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
 
     @NotNull
     @Override
-    public final ImmutableList<E> appendedAll(@NotNull E[] postfix) {
+    public final ImmutableList<E> appendedAll(E @NotNull [] postfix) {
         Objects.requireNonNull(postfix);
         if (postfix.length == 0) {
             return this;
@@ -235,13 +235,9 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
 
     @NotNull
     @Override
-    public <U> ImmutableList.Factory<U> iterableFactory() {
+    public <U> CollectionFactory<U, ?, ImmutableList<U>> iterableFactory() {
         return factory();
     }
-
-    @NotNull
-    @Override
-    public abstract Tuple2<ImmutableList<E>, ImmutableList<E>> span(@NotNull Predicate<? super E> predicate);
 
     @NotNull
     @Override
@@ -261,6 +257,15 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
         return filterNotImpl(predicate);
     }
 
+    @NotNull
+    @Override
+    public final ImmutableList<@NotNull E> filterNotNull() {
+        return this.filter(Objects::nonNull);
+    }
+
+    @NotNull
+    @Override
+    public abstract Tuple2<ImmutableList<E>, ImmutableList<E>> span(@NotNull Predicate<? super E> predicate);
 
     @NotNull
     @Override
@@ -381,7 +386,6 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
             return false;
         }
 
-
         @NotNull
         @Override
         public final Enumerator<E> iterator() {
@@ -389,7 +393,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
         }
     }
 
-    static final class MCons<E> extends Cons<E> {
+    static final class MutableCons<E> extends Cons<E> {
         private static final long serialVersionUID = 3721401019662509067L;
 
         E head;
@@ -397,7 +401,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
         @NotNull
         ImmutableList<? extends E> tail;
 
-        MCons(E head, @NotNull ImmutableList<? extends E> tail) {
+        MutableCons(E head, @NotNull ImmutableList<? extends E> tail) {
             this.head = head;
             this.tail = tail;
         }
@@ -439,7 +443,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
         }
     }
 
-    public static final class Factory<E> implements CollectionFactory<E, LinkedBuffer<E>, ImmutableList<E>> {
+    private static final class Factory<E> implements CollectionFactory<E, LinkedBuffer<E>, ImmutableList<E>> {
         Factory() {
         }
 
@@ -460,8 +464,8 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
 
         @Override
         public final LinkedBuffer<E> mergeBuilder(@NotNull LinkedBuffer<E> builder1, @NotNull LinkedBuffer<E> builder2) {
-            if (((Internal.LinkedBufferImpl<E>) builder2).first != null) {
-                for (E e : ((Internal.LinkedBufferImpl<E>) builder2).first) {
+            if (((ImmutableInternal.LinkedBufferImpl<E>) builder2).first != null) {
+                for (E e : ((ImmutableInternal.LinkedBufferImpl<E>) builder2).first) {
                     builder1.append(e);
                 }
             }
