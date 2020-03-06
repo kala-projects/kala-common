@@ -1,5 +1,6 @@
 package asia.kala;
 
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,7 +10,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public final class LazyValue<T> implements Value<T>, Serializable {
+public final class LazyValue<@Covariant T> implements Value<T>, Serializable {
     private static final long serialVersionUID = 7403692951772568981L;
 
     private transient volatile Supplier<? extends T> supplier;

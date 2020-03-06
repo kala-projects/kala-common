@@ -1,5 +1,6 @@
 package asia.kala;
 
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,7 +9,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface Value<T> extends Functor<T>, Foldable<T> {
+public interface Value<@Covariant T> extends Functor<T>, Foldable<T> {
 
     @Contract("_ -> param1")
     @SuppressWarnings("unchecked")

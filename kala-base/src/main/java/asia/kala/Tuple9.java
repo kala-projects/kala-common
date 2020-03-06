@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.IntFunction;
 
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <T9> type of the 9th element
  * @author Glavo
  */
-public final class Tuple9<T1, T2, T3, T4, T5, T6, T7, T8, T9> extends HList<T1, Tuple8<T2, T3, T4, T5, T6, T7, T8, T9>> implements Serializable {
+public final class Tuple9<@Covariant T1, @Covariant T2, @Covariant T3, @Covariant T4, @Covariant T5, @Covariant T6, @Covariant T7, @Covariant T8, @Covariant T9> extends HList<T1, Tuple8<T2, T3, T4, T5, T6, T7, T8, T9>> implements Serializable {
     private static final long serialVersionUID = 4767235624935269580L;
 
     /**

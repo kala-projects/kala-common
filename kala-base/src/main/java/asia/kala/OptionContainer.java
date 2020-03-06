@@ -1,5 +1,6 @@
 package asia.kala;
 
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,6 +10,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.*;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 /**
@@ -17,7 +19,7 @@ import java.util.stream.Stream;
  * @param <T> the type of value
  * @author Glavo
  */
-public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T> {
+public interface OptionContainer<@Covariant T> extends Iterable<T>, Functor<T>, Foldable<T> {
 
     /**
      * Returns {@code true} if the container contain a value, otherwise return {@code false}.
@@ -53,7 +55,6 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
     default T getOrElse(T defaultValue) {
         return isDefined() ? get() : defaultValue;
     }
-
 
     /**
      * Returns the value of the container if it is not empty, otherwise return the {@code null}.
@@ -112,6 +113,16 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
      */
     default Option<T> toOption() {
         return getOption();
+    }
+
+    @SuppressWarnings("unchecked")
+    default <R> R collectTo(@NotNull Collector<? super T, ?, ? extends R> factory) {
+        final Collector<T, Object, R> f = ((Collector<T, Object, R>) factory);
+        Object builder = f.supplier().get();
+        if (isDefined()) {
+            f.accumulator().accept(builder, get());
+        }
+        return f.finisher().apply(builder);
     }
 
     //
@@ -260,6 +271,11 @@ public interface OptionContainer<T> extends Iterable<T>, Functor<T>, Foldable<T>
             return Stream.empty();
         }
         return Stream.of(get());
+    }
+
+    @NotNull
+    default Stream<T> parallelStream() {
+        return stream().parallel();
     }
 
     //

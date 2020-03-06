@@ -31,6 +31,11 @@ public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<
     }
 
     @NotNull
+    static <E> ImmutableSeq<E> of() {
+        return empty();
+    }
+
+    @NotNull
     @SafeVarargs
     static <E> ImmutableSeq<E> of(E... elements) {
         return ImmutableSeq.<E>factory().from(elements);

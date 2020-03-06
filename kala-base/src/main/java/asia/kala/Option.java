@@ -1,5 +1,6 @@
 package asia.kala;
 
+import asia.kala.annotations.Covariant;
 import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,7 @@ import java.util.function.Predicate;
  * @author Glavo
  * @see Optional
  */
-public final class Option<T> implements OptionContainer<T>, Iterable<T>, Serializable {
+public final class Option<@Covariant T> implements OptionContainer<T>, Iterable<T>, Serializable {
     private static final long serialVersionUID = -4962768465676381896L;
 
     private static final int hashMagic = -1623337737;
@@ -97,7 +98,6 @@ public final class Option<T> implements OptionContainer<T>, Iterable<T>, Seriali
      */
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static <T> Option<T> fromJava(@NotNull Optional<? extends T> optional) {
-        Objects.requireNonNull(optional);
         return of(optional.orElse(null));
     }
 
@@ -129,7 +129,6 @@ public final class Option<T> implements OptionContainer<T>, Iterable<T>, Seriali
         return value;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -141,16 +140,21 @@ public final class Option<T> implements OptionContainer<T>, Iterable<T>, Seriali
     /**
      * {@inheritDoc}
      */
-    @Override
     @NotNull
+    @Override
     public final <U> Option<U> map(@NotNull Function<? super T, ? extends U> mapper) {
-        Objects.requireNonNull(mapper);
+        assert mapper != null;
         return isDefined() ? some(mapper.apply(value)) : none();
+    }
+
+    public final <U> Option<U> flatMap(@NotNull Function<? super T, ? extends Option<? extends U>> mapper) {
+        assert mapper != null;
+        return isDefined() ? narrow(mapper.apply(value)) : none();
     }
 
     @NotNull
     public final Option<T> filter(@NotNull Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate);
+        assert predicate != null;
         return isDefined() && predicate.test(value) ? this : none();
     }
 
@@ -173,7 +177,7 @@ public final class Option<T> implements OptionContainer<T>, Iterable<T>, Seriali
     @Override
     @NotNull
     public final Option<T> find(@NotNull Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate);
+        assert predicate != null;
         return isDefined() && predicate.test(value) ? this : none();
     }
 
@@ -200,7 +204,6 @@ public final class Option<T> implements OptionContainer<T>, Iterable<T>, Seriali
         Objects.requireNonNull(value);
         return Optional.of(value);
     }
-
 
     //
     // -- Iterable

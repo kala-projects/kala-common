@@ -1,5 +1,6 @@
 package asia.kala;
 
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,7 +12,7 @@ import java.util.function.Function;
  * @param <T> the type of value
  * @author Glavo
  */
-public interface Functor<T> {
+public interface Functor<@Covariant T> {
 
     /**
      * Returns a container consisting of the results of applying the given

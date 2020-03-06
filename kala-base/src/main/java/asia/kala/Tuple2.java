@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.IntFunction;
 
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <T2> type of the 2nd element
  * @author Glavo
  */
-public final class Tuple2<T1, T2> extends HList<T1, Tuple1<T2>> implements Serializable, Map.Entry<T1, T2> {
+public final class Tuple2<@Covariant T1, @Covariant T2> extends HList<T1, Tuple1<T2>> implements Serializable, Map.Entry<T1, T2> {
     private static final long serialVersionUID = -1620386824894229867L;
 
     /**

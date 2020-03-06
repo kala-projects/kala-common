@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.IntFunction;
 
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +18,8 @@ import org.jetbrains.annotations.NotNull;
  * @param <T5> type of the 5th element
  * @author Glavo
  */
-public final class Tuple5<T1, T2, T3, T4, T5> extends HList<T1, Tuple4<T2, T3, T4, T5>> implements Serializable {
+public final class Tuple5<@Covariant T1, @Covariant T2, @Covariant T3, @Covariant T4, @Covariant T5>
+        extends HList<T1, Tuple4<T2, T3, T4, T5>> implements Serializable {
     private static final long serialVersionUID = -3012974614168016497L;
 
     /**

@@ -1,5 +1,6 @@
 package asia.kala;
 
+import asia.kala.annotations.Covariant;
 import asia.kala.annotations.Sealed;
 import asia.kala.function.CheckedSupplier;
 import org.intellij.lang.annotations.Flow;
@@ -15,7 +16,7 @@ import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 @Sealed(subclasses = {Try.Success.class, Try.Failure.class})
-public abstract class Try<T> implements OptionContainer<T>, Serializable {
+public abstract class Try<@Covariant T> implements OptionContainer<T>, Serializable {
     Try() {
     }
 
@@ -60,7 +61,7 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
     @NotNull
     @Contract("_ -> new")
     public static <T> Try<T> run(@NotNull CheckedSupplier<T, ? extends Throwable> supplier) {
-        Objects.requireNonNull(supplier);
+        assert supplier != null;
         try {
             return success(supplier.get());
         } catch (Throwable throwable) {
@@ -71,7 +72,7 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
     @NotNull
     @Contract("_ -> new")
     public static <T> Try<T> runCallable(@NotNull Callable<? extends T> callable) {
-        Objects.requireNonNull(callable);
+        assert callable != null;
         try {
             return success(callable.call());
         } catch (Throwable throwable) {
@@ -293,8 +294,8 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
         }
 
         @NotNull
-        @Contract("-> new")
         @Override
+        @Contract("-> new")
         public final Either<Throwable, T> toEither() {
             return Either.right(value);
         }
@@ -464,8 +465,8 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
         }
 
         @NotNull
-        @Contract("-> new")
         @Override
+        @Contract("-> new")
         public final Either<Throwable, T> toEither() {
             return Either.left(throwable);
         }
@@ -477,8 +478,8 @@ public abstract class Try<T> implements OptionContainer<T>, Serializable {
         /**
          * {@inheritDoc}
          */
-        @Override
         @NotNull
+        @Override
         public final <U> Failure<U> map(@NotNull Function<? super T, ? extends U> mapper) {
             return (Failure<U>) this;
         }

@@ -1,5 +1,6 @@
 package asia.kala;
 
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <T>
  * @author Glavo
  */
-public abstract class HList<H, T extends Tuple> extends Tuple {
+public abstract class HList<@Covariant H, @Covariant T extends Tuple> extends Tuple {
     HList() {
     }
 

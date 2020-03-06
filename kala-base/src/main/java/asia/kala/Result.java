@@ -1,8 +1,10 @@
 package asia.kala;
 
+import asia.kala.annotations.Covariant;
 import asia.kala.annotations.Sealed;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.NoSuchElementException;
@@ -11,7 +13,7 @@ import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 @Sealed(subclasses = {Result.Ok.class, Result.Err.class})
-public abstract class Result<T, E> implements OptionContainer<T>, Serializable {
+public abstract class Result<@Covariant T, @Covariant E> implements OptionContainer<T>, Serializable {
     Result() {
     }
 
@@ -58,6 +60,9 @@ public abstract class Result<T, E> implements OptionContainer<T>, Serializable {
 
     public abstract E getErr();
 
+    @Nullable
+    public abstract E getErrOrNull();
+
     @NotNull
     @Override
     public abstract <U> Result<U, E> map(@NotNull Function<? super T, ? extends U> mapper);
@@ -101,6 +106,12 @@ public abstract class Result<T, E> implements OptionContainer<T>, Serializable {
         @Override
         public final E getErr() {
             throw new NoSuchElementException("Result.Ok.getErr");
+        }
+
+        @Nullable
+        @Override
+        public final E getErrOrNull() {
+            return null;
         }
 
         /**
@@ -201,6 +212,11 @@ public abstract class Result<T, E> implements OptionContainer<T>, Serializable {
          */
         @Override
         public final E getErr() {
+            return value;
+        }
+
+        @Override
+        public final E getErrOrNull() {
             return value;
         }
 

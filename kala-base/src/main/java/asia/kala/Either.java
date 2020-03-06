@@ -1,8 +1,10 @@
 package asia.kala;
 
+import asia.kala.annotations.Covariant;
 import asia.kala.annotations.Sealed;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.NoSuchElementException;
@@ -11,7 +13,7 @@ import java.util.function.Function;
 
 @Sealed(subclasses = {Either.Left.class, Either.Right.class})
 @SuppressWarnings("unchecked")
-public abstract class Either<A, B> implements Serializable {
+public abstract class Either<@Covariant A, @Covariant B> implements Serializable {
     Either() {
     }
 
@@ -57,6 +59,12 @@ public abstract class Either<A, B> implements Serializable {
     public abstract Option<B> getRightOption();
 
     @NotNull
+    public abstract <U, V> Either<U, V> map(
+            @NotNull Function<? super A, ? extends U> leftMapper,
+            @NotNull Function<? super B, ? extends V> rightMapper
+    );
+
+    @NotNull
     public abstract <U> Either<U, B> mapLeft(@NotNull Function<? super A, ? extends U> mapper);
 
     @NotNull
@@ -82,7 +90,7 @@ public abstract class Either<A, B> implements Serializable {
         return new RightProjection();
     }
 
-    public final static class Left<A, B> extends Either<A, B> {
+    public final static class Left<@Covariant A, @Covariant B> extends Either<A, B> {
         private static final long serialVersionUID = -1160729620210301179L;
 
         private static final int hashMagic = -1951578063;
@@ -142,6 +150,16 @@ public abstract class Either<A, B> implements Serializable {
         @Override
         public final Option<B> getRightOption() {
             return Option.none();
+        }
+
+        @NotNull
+        @Override
+        public final <U, V> Either<U, V> map(
+                @NotNull Function<? super A, ? extends U> leftMapper,
+                @NotNull Function<? super B, ? extends V> rightMapper) {
+            assert leftMapper != null;
+
+            return Either.left(leftMapper.apply(value));
         }
 
         /**
@@ -214,7 +232,7 @@ public abstract class Either<A, B> implements Serializable {
         }
     }
 
-    public final static class Right<A, B> extends Either<A, B> {
+    public final static class Right<@Covariant A, @Covariant B> extends Either<A, B> {
         private static final long serialVersionUID = -3372589401685464421L;
 
         private static final int hashMagic = 1973604283;
@@ -274,6 +292,16 @@ public abstract class Either<A, B> implements Serializable {
         @Override
         public final Option<B> getRightOption() {
             return Option.none();
+        }
+
+        @NotNull
+        @Override
+        public final <U, V> Either<U, V> map(
+                @NotNull Function<? super A, ? extends U> leftMapper,
+                @NotNull Function<? super B, ? extends V> rightMapper
+        ) {
+            assert rightMapper != null;
+            return Either.right(rightMapper.apply(value));
         }
 
         /**
@@ -346,7 +374,7 @@ public abstract class Either<A, B> implements Serializable {
         }
     }
 
-    public abstract class Projection<T> implements OptionContainer<T> {
+    public abstract class Projection<@Covariant T> implements OptionContainer<T> {
         Projection() {
         }
 

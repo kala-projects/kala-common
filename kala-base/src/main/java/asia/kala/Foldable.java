@@ -1,5 +1,6 @@
 package asia.kala;
 
+import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.NoSuchElementException;
@@ -13,7 +14,7 @@ import java.util.function.Predicate;
  * @param <T> the type of value
  * @author Glavo
  */
-public interface Foldable<T> {
+public interface Foldable<@Covariant T> {
 
     /**
      * Folds this elements by apply {@code op}, starting with {@code zero}, unknown folding order.
