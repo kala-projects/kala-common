@@ -9,12 +9,13 @@ import java.util.function.Predicate;
 
 public interface Set<E> extends Traversable<E> {
 
-    default boolean containsValue(E value) {
+    @Override
+    default boolean contains(Object value) {
         return iterator().contains(value);
     }
 
     default Predicate<E> asPredicate() {
-        return this::containsValue;
+        return this::contains;
     }
 
     //region Traversable members
@@ -30,6 +31,11 @@ public interface Set<E> extends Traversable<E> {
         return new SetViews.Of<>(this);
     }
 
+    @Override
+    default boolean canEqual(Object other) {
+        return other instanceof Set<?>;
+    }
+
     @NotNull
     @ReadOnly
     @Override
@@ -41,12 +47,6 @@ public interface Set<E> extends Traversable<E> {
     @Override
     default Spliterator<E> spliterator() {
         return Spliterators.spliterator(iterator(), size(), Spliterator.DISTINCT);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    default boolean contains(Object v) {
-        return containsValue((E) v);
     }
 
     //endregion

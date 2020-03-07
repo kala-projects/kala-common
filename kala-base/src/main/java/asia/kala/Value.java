@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 
 public interface Value<@Covariant T> extends Functor<T>, Foldable<T> {
 
-    @Contract("_ -> param1")
+    @Contract(value = "_ -> param1", pure = true)
     @SuppressWarnings("unchecked")
     static <T> Value<T> narrow(Value<? extends T> value) {
         return (Value<T>) value;

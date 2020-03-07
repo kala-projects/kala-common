@@ -1,5 +1,6 @@
 package asia.kala.collection;
 
+import asia.kala.Equals;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.ImmutableCollection;
 import kotlin.annotations.jvm.ReadOnly;
@@ -12,22 +13,22 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public interface Traversable<@Covariant E> extends TraversableOnce<E> {
+public interface Traversable<@Covariant E> extends TraversableOnce<E>, Equals {
 
     int SEQ_HASH_MAGIC = -1140647423;
 
     int SET_HASH_MAGIC = 1045751549;
 
+    @Contract(value = "_ -> param1", pure = true)
+    @SuppressWarnings("unchecked")
+    static <E> Traversable<E> narrow(Traversable<? extends E> traversable) {
+        return (Traversable<E>) traversable;
+    }
+
     @NotNull
     @Contract(pure = true)
     static <E> CollectionFactory<E, ?, ? extends Traversable<E>> factory() {
         return ImmutableCollection.factory();
-    }
-
-    @Contract("_ -> param1")
-    @SuppressWarnings("unchecked")
-    static <E> Traversable<E> narrow(Traversable<? extends E> traversable) {
-        return (Traversable<E>) traversable;
     }
 
     @NotNull
@@ -69,5 +70,10 @@ public interface Traversable<@Covariant E> extends TraversableOnce<E> {
     @NotNull
     default <U> CollectionFactory<U, ?, ? extends Traversable<U>> iterableFactory() {
         return factory();
+    }
+
+    @Override
+    default boolean canEqual(Object other) {
+        return other instanceof Traversable<?>;
     }
 }

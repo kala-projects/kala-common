@@ -18,18 +18,32 @@ import java.util.function.Predicate;
 public final class ImmutableArray<@Covariant E> extends ArraySeq<E> implements ImmutableSeq<E>, IndexedSeq<E>, Serializable {
     private static final long serialVersionUID = 1845940935381169058L;
 
-    public static final ImmutableArray<?> EMPTY = new ImmutableArray<>(ArraySeq.EMPTY_ARRAY);
+    public static final ImmutableArray<?> EMPTY = new ImmutableArray<>();
 
     private static final ImmutableArray.Factory<?> FACTORY = new Factory<>();
 
-    ImmutableArray(Object[] array) {
+    //region Constructors
+
+    private ImmutableArray() {
+        this(EMPTY_ARRAY);
+    }
+
+    private ImmutableArray(Object[] array) {
         super(array);
     }
 
-    @Contract("_ -> param1")
+    //endregion
+
+    //region Narrow method
+
+    @Contract(value = "_ -> param1", pure = true)
     public static <E> ImmutableArray<E> narrow(ImmutableArray<? extends E> array) {
         return (ImmutableArray<E>) array;
     }
+
+    //endregion
+
+    //region Factory methods
 
     @NotNull
     public static <E> CollectionFactory<E, ?, ImmutableArray<E>> factory() {
@@ -78,9 +92,9 @@ public final class ImmutableArray<@Covariant E> extends ArraySeq<E> implements I
         }
     }
 
-    //
-    // -- ImmutableSeq
-    //
+    //endregion
+
+    //region ImmutableSeq members
 
     @NotNull
     @Override
@@ -270,9 +284,9 @@ public final class ImmutableArray<@Covariant E> extends ArraySeq<E> implements I
         return new ImmutableArray<>(newValues);
     }
 
-    //
-    // -- ImmutableCollection
-    //
+    //endregion
+
+    //region ImmutableCollection members
 
     @Override
     public final String className() {
@@ -424,6 +438,14 @@ public final class ImmutableArray<@Covariant E> extends ArraySeq<E> implements I
     public final <U> CollectionFactory<U, ?, ImmutableArray<U>> iterableFactory() {
         return factory();
     }
+
+    @NotNull
+    @Override
+    public final ImmutableArray<E> toImmutableArray() {
+        return this;
+    }
+
+    //endregion
 
     private static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, ImmutableArray<E>> {
         Factory() {

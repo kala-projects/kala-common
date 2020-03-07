@@ -18,7 +18,7 @@ import java.util.function.*;
 @SuppressWarnings("unchecked")
 public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E>, Transformable<E> {
 
-    @Contract("_ -> param1")
+    @Contract(value = "_ -> param1", pure = true)
     @SuppressWarnings("unchecked")
     static <E> Enumerator<E> narrow(Enumerator<? extends E> enumerator) {
         return (Enumerator<E>) enumerator;
@@ -66,7 +66,7 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
         if (length < 0 || length + start > elements.length) {
             throw new IndexOutOfBoundsException("Index: " + length + start);
         }
-        return new JavaArray.Iterator<>(elements, start, start + length);
+        return new JavaArray.Itr<>(elements, start, start + length);
     }
 
     @NotNull
@@ -325,6 +325,7 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
     /**
      * {@inheritDoc}
      */
+    @NotNull
     @Override
     default <A extends Appendable> A joinTo(
             @NotNull A buffer,
@@ -469,9 +470,9 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
      * {@inheritDoc}
      */
     @Override
-    default boolean contains(Object v) {
+    default boolean contains(Object value) {
         while (hasNext()) {
-            if (Objects.equals(next(), v)) {
+            if (Objects.equals(next(), value)) {
                 return true;
             }
         }

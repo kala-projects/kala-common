@@ -21,6 +21,14 @@ public final class JavaArray {
 
     @NotNull
     @Contract(pure = true)
+    public static <E> IntFunction<E[]> generator(@NotNull Class<E> type) {
+        Objects.requireNonNull(type);
+
+        return length -> (E[]) Array.newInstance(type, length);
+    }
+
+    @NotNull
+    @Contract(pure = true)
     public static <E> CollectionFactory<E, ?, E[]> factory(@NotNull Class<E> type) {
         assert type != null;
         return factory(generator(type));
@@ -32,14 +40,6 @@ public final class JavaArray {
         Objects.requireNonNull(generator);
 
         return new JavaArray.Factory<>(generator);
-    }
-
-    @NotNull
-    @Contract(pure = true)
-    public static <E> IntFunction<E[]> generator(@NotNull Class<E> type) {
-        Objects.requireNonNull(type);
-
-        return length -> (E[]) Array.newInstance(type, length);
     }
 
     @NotNull
@@ -533,7 +533,7 @@ public final class JavaArray {
         if (l == 1) {
             return new Enumerators.Id<>(array[0]);
         }
-        return new JavaArray.Iterator<>(array, 0, array.length);
+        return new Itr<>(array, 0, array.length);
     }
 
     @NotNull
@@ -547,7 +547,7 @@ public final class JavaArray {
         if (length == 1) {
             return Enumerator.of(array[0]);
         }
-        return new JavaArray.ReverseIterator<>(array, length - 1);
+        return new ReverseItr<>(array, length - 1);
     }
 
     private static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, E[]> {
@@ -600,14 +600,14 @@ public final class JavaArray {
         }
     }
 
-    static final class Iterator<@Covariant E> extends AbstractEnumerator<E> {
+    static final class Itr<@Covariant E> extends AbstractEnumerator<E> {
         @NotNull
         private final E[] array;
         private final int end;
 
         private int index;
 
-        Iterator(E @NotNull [] array, int start, int end) {
+        Itr(E @NotNull [] array, int start, int end) {
             assert array != null;
 
             this.array = array;
@@ -630,18 +630,18 @@ public final class JavaArray {
         }
     }
 
-    static final class ReverseIterator<@Covariant E> extends AbstractEnumerator<E> {
+    static final class ReverseItr<@Covariant E> extends AbstractEnumerator<E> {
         @NotNull
         private final E[] array;
 
         private int index;
 
-        ReverseIterator(E @NotNull [] array, int index) {
+        ReverseItr(E @NotNull [] array, int index) {
             this.array = array;
             this.index = index;
         }
 
-        ReverseIterator(E @NotNull [] array) {
+        ReverseItr(E @NotNull [] array) {
             this(array, array.length - 1);
         }
 

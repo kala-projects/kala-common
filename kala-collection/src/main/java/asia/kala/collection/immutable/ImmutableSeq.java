@@ -4,7 +4,6 @@ import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Seq;
-import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -16,13 +15,22 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<E> {
-    @ApiStatus.Internal
-    ImmutableSeq.Factory<?> FACTORY = new Factory<>();
+    //region Narrow method
+
+    @Contract(value = "_ -> param1", pure = true)
+    @SuppressWarnings("unchecked")
+    static <E> ImmutableSeq<E> narrow(ImmutableSeq<? extends E> seq) {
+        return (ImmutableSeq<E>) seq;
+    }
+
+    //endregion
+
+    //region Factory methods
 
     @NotNull
     @SuppressWarnings("unchecked")
     static <E> CollectionFactory<E, ?, ? extends ImmutableSeq<E>> factory() {
-        return (CollectionFactory<E, ?, ? extends ImmutableSeq<E>>) FACTORY;
+        return (CollectionFactory<E, ?, ? extends ImmutableSeq<E>>) ImmutableSeqFactory.INSTANCE;
     }
 
     @NotNull
@@ -51,11 +59,7 @@ public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<
         return ImmutableSeq.<E>factory().from(iterable);
     }
 
-    @Contract("_ -> param1")
-    @SuppressWarnings("unchecked")
-    static <E> ImmutableSeq<E> narrow(ImmutableSeq<? extends E> seq) {
-        return (ImmutableSeq<E>) seq;
-    }
+    //endregion
 
     @NotNull
     @Contract(pure = true)
@@ -148,9 +152,7 @@ public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<
         return AbstractImmutableSeq.mapIndexed(this, mapper, this.<U>iterableFactory());
     }
 
-    //
-    // -- ImmutableCollection
-    //
+    //region ImmutableCollection members
 
     @Override
     default String className() {
@@ -199,50 +201,12 @@ public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<
         return AbstractImmutableCollection.span(this, predicate, iterableFactory());
     }
 
-    @ApiStatus.Internal
-    class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, ImmutableSeq<E>> {
-        Factory() {
-        }
-
-        @Override
-        public final ArrayBuffer<E> newBuilder() {
-            return new ArrayBuffer<>();
-        }
-
-        @Override
-        public final void addToBuilder(@NotNull ArrayBuffer<E> buffer, E value) {
-            buffer.append(value);
-        }
-
-        @Override
-        public final ArrayBuffer<E> mergeBuilder(@NotNull ArrayBuffer<E> builder1, @NotNull ArrayBuffer<E> builder2) {
-            builder1.appendAll(builder2);
-            return builder1;
-        }
-
-        @Override
-        public final void sizeHint(@NotNull ArrayBuffer<E> buffer, int size) {
-            buffer.sizeHint(size);
-        }
-
-        @Override
-        public final ImmutableSeq<E> build(@NotNull ArrayBuffer<E> buffer) {
-            switch (buffer.size()) {
-                case 0:
-                    return ImmutableSeq0.instance();
-                case 1:
-                    return new ImmutableSeq1<>(buffer.get(0));
-                case 2:
-                    return new ImmutableSeq2<>(buffer.get(0), buffer.get(1));
-                case 3:
-                    return new ImmutableSeq3<>(buffer.get(0), buffer.get(1), buffer.get(2));
-                case 4:
-                    return new ImmutableSeq4<>(buffer.get(0), buffer.get(1), buffer.get(2), buffer.get(3));
-                case 5:
-                    return new ImmutableSeq5<>(buffer.get(0), buffer.get(1), buffer.get(2), buffer.get(3), buffer.get(4));
-                default:
-                    return ImmutableVector.from(buffer);
-            }
-        }
+    @NotNull
+    @Override
+    default ImmutableSeq<E> toImmutableSeq() {
+        return this;
     }
+
+    //endregion
+
 }

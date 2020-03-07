@@ -56,11 +56,12 @@ public abstract class AbstractTraversable<@Covariant E> implements Traversable<E
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof Traversable<?>) || obj instanceof View<?>) {
+        if (!(obj instanceof Traversable<?>)
+                || !(canEqual(obj))
+                || !(((Traversable<?>) obj).canEqual(this))) {
             return false;
         }
-
-        return this.sameElements(((Traversable<?>) obj));
+        return sameElements(((Traversable<?>) obj));
     }
 
     @Override

@@ -12,11 +12,15 @@ import java.util.function.Predicate;
 
 public interface SeqView<@Covariant E> extends Seq<E>, View<E> {
 
-    @Contract("_ -> param1")
+    //region Narrow method
+
+    @Contract(value = "_ -> param1", pure = true)
     @SuppressWarnings("unchecked")
     static <E> SeqView<E> narrow(SeqView<? extends E> view) {
         return (SeqView<E>) view;
     }
+
+    //endregion
 
     @NotNull
     default SeqView<E> updated(int index, E newValue) {
@@ -47,54 +51,61 @@ public interface SeqView<@Covariant E> extends Seq<E>, View<E> {
         return new SeqViews.TakeWhile<>(this, predicate);
     }
 
+    @NotNull
     default SeqView<E> concat(@NotNull Seq<? extends E> other) {
         Objects.requireNonNull(other);
 
         return new SeqViews.Concat<>(this, narrow(other.view()));
     }
 
+    @NotNull
     default SeqView<E> prepended(E value) {
         return new SeqViews.Prepended<>(this, value);
     }
 
+    @NotNull
     default SeqView<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
         Objects.requireNonNull(prefix);
         return new SeqViews.Concat<>(KalaCollectionUtils.asSeq(prefix), this);
     }
 
+    @NotNull
     default SeqView<E> prependedAll(E @NotNull [] prefix) {
         Objects.requireNonNull(prefix);
         return new SeqViews.Concat<>(ArraySeq.wrap(prefix), this);
     }
 
+    @NotNull
     default SeqView<E> appended(E value) {
         return new SeqViews.Appended<>(this, value);
     }
 
+    @NotNull
     default SeqView<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
         Objects.requireNonNull(postfix);
         return new SeqViews.Concat<>(this, KalaCollectionUtils.asSeq(postfix));
     }
 
+    @NotNull
     default SeqView<E> appendedAll(E @NotNull [] postfix) {
         Objects.requireNonNull(postfix);
         return new SeqViews.Concat<>(this, ArraySeq.wrap(postfix));
     }
 
+    @NotNull
     @SuppressWarnings("unchecked")
     default SeqView<E> sorted() {
         return sorted((Comparator<? super E>) Comparator.naturalOrder());
     }
 
+    @NotNull
     default SeqView<E> sorted(@NotNull Comparator<? super E> comparator) {
         Objects.requireNonNull(comparator);
 
         return new SeqViews.Sorted<>(this, comparator);
     }
 
-    //
-    // -- View
-    //
+    //region View members
 
     @NotNull
     @Override
@@ -106,6 +117,11 @@ public interface SeqView<@Covariant E> extends Seq<E>, View<E> {
     @Override
     default String className() {
         return "SeqView";
+    }
+
+    @Override
+    default boolean canEqual(Object other) {
+        return other instanceof SeqView<?>;
     }
 
     @NotNull
@@ -142,4 +158,6 @@ public interface SeqView<@Covariant E> extends Seq<E>, View<E> {
     default Tuple2<? extends SeqView<E>, ? extends SeqView<E>> span(@NotNull Predicate<? super E> predicate) {
         return new Tuple2<>(this.filter(predicate), this.filterNot(predicate));
     }
+
+    //endregion
 }

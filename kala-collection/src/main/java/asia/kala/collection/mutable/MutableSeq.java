@@ -13,6 +13,8 @@ import java.util.function.Function;
 
 public interface MutableSeq<E> extends MutableCollection<E>, Seq<E> {
 
+    //region Factory methods
+
     @NotNull
     static <E> CollectionFactory<E, ?, ? extends MutableSeq<E>> factory() {
         return MutableArray.factory();
@@ -44,8 +46,12 @@ public interface MutableSeq<E> extends MutableCollection<E>, Seq<E> {
         return new asia.kala.collection.JDKConverters.MutableListWrapper<>(list);
     }
 
+    //endregion
+
+    @Contract(mutates = "this")
     void set(int index, E newValue);
 
+    @Contract(mutates = "this")
     default void mapInPlace(@NotNull Function<? super E, ? extends E> mapper) {
         Objects.requireNonNull(mapper);
 
@@ -55,11 +61,13 @@ public interface MutableSeq<E> extends MutableCollection<E>, Seq<E> {
         }
     }
 
+    @Contract(mutates = "this")
     @SuppressWarnings("unchecked")
     default void sort() {
         sort((Comparator<? super E>) Comparator.naturalOrder());
     }
 
+    @Contract(mutates = "this")
     @SuppressWarnings("unchecked")
     default void sort(@NotNull Comparator<? super E> comparator) {
         Objects.requireNonNull(comparator);

@@ -88,6 +88,7 @@ final class Views {
             return collection.joinTo(buffer, separator);
         }
 
+        @NotNull
         @Override
         public final <A extends Appendable> A joinTo(@NotNull A buffer, @NotNull CharSequence separator, @NotNull CharSequence prefix, @NotNull CharSequence postfix) {
             return collection.joinTo(buffer, separator, prefix, postfix);
@@ -152,8 +153,8 @@ final class Views {
         }
 
         @Override
-        public final boolean contains(Object v) {
-            return collection.contains(v);
+        public final boolean contains(Object value) {
+            return collection.contains(value);
         }
 
         @Override
@@ -287,5 +288,4 @@ final class Views {
             return new Enumerators.Concat<>(source.map(it -> mapper.apply(it).iterator()).iterator());
         }
     }
-
 }

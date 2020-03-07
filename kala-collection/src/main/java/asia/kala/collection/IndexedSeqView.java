@@ -8,9 +8,7 @@ import java.util.function.Function;
 
 public interface IndexedSeqView<@Covariant E> extends SeqView<E>, IndexedSeq<E> {
 
-    //
-    // -- SeqView
-    //
+    //region SeqView members
 
     @NotNull
     @Override
@@ -30,19 +28,21 @@ public interface IndexedSeqView<@Covariant E> extends SeqView<E>, IndexedSeq<E> 
         return new IndexedSeqViews.Take<>(this, n);
     }
 
+    @NotNull
     @Override
     default IndexedSeqView<E> prepended(E value) {
         return new IndexedSeqViews.Prepended<>(this, value);
     }
 
+    @NotNull
     @Override
     default IndexedSeqView<E> appended(E value) {
         return new IndexedSeqViews.Appended<>(this, value);
     }
 
-    //
-    // -- View
-    //
+    //endregion
+
+    //region View members
 
     @NotNull
     @Override
@@ -62,4 +62,6 @@ public interface IndexedSeqView<@Covariant E> extends SeqView<E>, IndexedSeq<E> 
 
         return new IndexedSeqViews.Mapped<>(this, mapper);
     }
+
+    //endregion
 }

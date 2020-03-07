@@ -27,6 +27,7 @@ import java.util.function.Predicate;
 
 @SuppressWarnings({"unchecked", "SuspiciousSystemArraycopy"})
 public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E> implements IndexedSeq<E>, Serializable {
+
     private static final long serialVersionUID = -4395603284341829523L;
 
     private static final int VECTOR_SHIFT = 5;
@@ -35,12 +36,18 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
 
     private static final ImmutableVector.Factory<?> FACTORY = new Factory<>();
 
-    public static final ImmutableVector<?> EMPTY = new ImmutableVector<>(ImmutableArray.empty(), 0, 0, 0);
+    private static final ImmutableVector<?> EMPTY = new ImmutableVector<>(ImmutableArray.empty(), 0, 0, 0);
+
+    //region Fields
 
     private final Object array;
     private final int offset;
     private final int length;
     private final int depthShift;
+
+    //endregion
+
+    //region Constructors
 
     ImmutableVector(@NotNull Object array, int offset, int length, int depthShift) {
         this.array = array;
@@ -49,11 +56,19 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
         this.depthShift = depthShift;
     }
 
-    @Contract("_ -> param1")
+    //endregion
+
+    //region Narrow method
+
+    @Contract(value = "_ -> param1", pure = true)
     @SuppressWarnings("unchecked")
     static <E> ImmutableVector<E> narrow(ImmutableVector<? extends E> vector) {
         return (ImmutableVector<E>) vector;
     }
+
+    //endregion
+
+    //region Factory methods
 
     @NotNull
     public static <E> CollectionFactory<E, ?, ImmutableVector<E>> factory() {
@@ -104,6 +119,10 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
         }
         return ImmutableVector.<E>factory().from(elements);
     }
+
+    //endregion
+
+    //region ImmutableVector helpers
 
     private static int treeSize(int branchCount, int depthShift) {
         final int fullBranchSize = 1 << depthShift;
@@ -222,9 +241,9 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
         return new ImmutableVector<>(array, offset, length, shift);
     }
 
-    //
-    // -- ImmutableSeq
-    //
+    //endregion
+
+    //region ImmutableSeq members
 
     @Override
     public final int size() {
@@ -437,9 +456,9 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
         return mapIndexedImpl(mapper);
     }
 
-    //
-    // -- ImmutableCollection
-    //
+    //endregion
+
+    //region ImmutableCollection members
 
     @Override
     public final String className() {
@@ -488,7 +507,9 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
         return this;
     }
 
-    public static final class Builder<E> {
+    //endregion
+
+    private static final class Builder<E> {
         ArrayBuffer<E> values;
 
         public Builder() {
@@ -556,7 +577,7 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
     }
 
     @FunctionalInterface
-    interface NodeModifier {
+    private interface NodeModifier {
         Object apply(Object array, int index);
 
         NodeModifier COPY_NODE = (o, i) -> Arrays.copyOf((Object[]) o, Math.max(i + 1, Array.getLength(o)));

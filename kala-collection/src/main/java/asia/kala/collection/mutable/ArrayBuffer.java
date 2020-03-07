@@ -19,9 +19,15 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
 
     private static final ArrayBuffer.Factory<?> FACTORY = new Factory<>();
 
+    //region Fields
+
     @NotNull
     private Object[] elements;
     private int size;
+
+    //endregion
+
+    //region Constructors
 
     ArrayBuffer(@NotNull Object[] elements, int size) {
         assert elements != null;
@@ -42,6 +48,10 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         this.elements = initialCapacity == 0 ? MutableArray.EMPTY_ARRAY : new Object[initialCapacity];
         this.size = 0;
     }
+
+    //endregion
+
+    //region Factory methods
 
     @NotNull
     public static <E> CollectionFactory<E, ?, ArrayBuffer<E>> factory() {
@@ -81,6 +91,10 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         return buffer;
     }
 
+    //endregion
+
+    //region ArrayBuffer helpers
+
     private void grow() {
         grow(size + 1);
     }
@@ -118,9 +132,9 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         }
     }
 
-    //
-    // -- Buffer
-    //
+    //endregion
+
+    //region Buffer members
 
     @Override
     public final void append(E value) {
@@ -296,9 +310,9 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         }
     }
 
-    //
-    // -- MutableSeq
-    //
+    //endregion
+
+    //region MutableSeq members
 
     @Override
     public final E get(int index) {
@@ -317,9 +331,9 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         Arrays.sort(elements, 0, size, (Comparator<? super Object>) comparator);
     }
 
-    //
-    // -- MutableCollection
-    //
+    //endregion
+
+    //region MutableCollection
 
     @Override
     public final String className() {
@@ -359,9 +373,9 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
         return arr;
     }
 
-    //
-    // -- Serializable
-    //
+    //endregion
+
+    //region Serialization
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.write(size);
@@ -379,6 +393,8 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
             elements = (Object[]) in.readObject();
         }
     }
+
+    //endregion
 
     private static final class Factory<E> extends AbstractBufferFactory<E, ArrayBuffer<E>> {
         @Override

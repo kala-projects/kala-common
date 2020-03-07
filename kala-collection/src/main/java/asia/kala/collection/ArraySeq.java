@@ -15,6 +15,8 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
 public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
+    private static final long serialVersionUID = 4981379062449237945L;
+
     public static final Object[] EMPTY_ARRAY = new Object[0];
     public static final ArraySeq<?> EMPTY = new ArraySeq<>(EMPTY_ARRAY);
 
@@ -26,6 +28,8 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
     protected ArraySeq(@NotNull Object[] array) {
         this.array = array;
     }
+
+    //region Factory methods
 
     @NotNull
     public static <E> CollectionFactory<E, ?, ? extends ArraySeq<E>> factory() {
@@ -63,6 +67,8 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
     public static <E> ArraySeq<E> from(@NotNull Iterable<? extends E> elements) {
         return ArraySeq.<E>factory().from(elements);
     }
+
+    //endregion
 
     public final E get(int index) {
         return (E) array[index];
@@ -263,13 +269,13 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
     }
 
     @Override
-    public final boolean contains(Object v) {
+    public final boolean contains(Object value) {
         final Object[] array = this.array;
 
         if (array.length == 0) {
             return false;
         }
-        if (v == null) {
+        if (value == null) {
             for (Object e : array) {
                 if (e == null) {
                     return true;
@@ -277,7 +283,7 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
             }
         } else {
             for (Object e : array) {
-                if (v.equals(e)) {
+                if (value.equals(e)) {
                     return true;
                 }
             }
@@ -494,6 +500,14 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
         @Override
         public final ArraySeq<E> empty() {
             return ArraySeq.empty();
+        }
+
+        @Override
+        public final ArraySeq<E> from(E @NotNull [] values) {
+            if (values.length == 0) {
+                return empty();
+            }
+            return new ArraySeq<>(values.clone());
         }
 
         @Override

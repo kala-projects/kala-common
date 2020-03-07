@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractImmutableCollection<@Covariant E> extends AbstractTraversable<E> implements ImmutableCollection<E> {
+
     static <E, U, T, Builder> T map(
             @NotNull ImmutableCollection<? extends E> collection,
             @NotNull Function<? super E, ? extends U> mapper,

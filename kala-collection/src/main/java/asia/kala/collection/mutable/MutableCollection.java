@@ -9,22 +9,31 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
 public interface MutableCollection<E> extends Traversable<E> {
+
+    //region Factory methods
+
+    @NotNull
     static <E> CollectionFactory<E, ?, ? extends MutableCollection<E>> factory() {
         return MutableSeq.factory();
     }
 
+    @NotNull
     @SafeVarargs
     static <E> MutableCollection<E> of(E... elements) {
         return MutableCollection.<E>factory().from(elements);
     }
 
+    @NotNull
     static <E> MutableCollection<E> from(E @NotNull [] elements) {
         return MutableCollection.<E>factory().from(elements);
     }
 
+    @NotNull
     static <E> MutableCollection<E> from(@NotNull Iterable<? extends E> iterable) {
         return MutableCollection.<E>factory().from(iterable);
     }
+
+    //endregion
 
     @Override
     default String className() {

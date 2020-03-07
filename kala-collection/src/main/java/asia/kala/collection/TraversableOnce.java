@@ -3,10 +3,13 @@ package asia.kala.collection;
 import asia.kala.Foldable;
 import asia.kala.Option;
 import asia.kala.annotations.Covariant;
+import asia.kala.collection.immutable.ImmutableArray;
 import asia.kala.collection.immutable.ImmutableList;
+import asia.kala.collection.immutable.ImmutableSeq;
 import asia.kala.collection.immutable.ImmutableVector;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.NoSuchElementException;
@@ -16,11 +19,16 @@ import java.util.stream.Collector;
 
 @SuppressWarnings("unchecked")
 public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> {
-    @Contract("_ -> param1")
+
+    //region Narrow method
+
+    @Contract(value = "_ -> param1", pure = true)
     @SuppressWarnings("unchecked")
     static <E> TraversableOnce<E> narrow(TraversableOnce<? extends E> traversable) {
         return (TraversableOnce<E>) traversable;
     }
+
+    //endregion
 
     @NotNull
     @Override
@@ -160,6 +168,16 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
     }
 
     @NotNull
+    default ImmutableSeq<E> toImmutableSeq() {
+        return toImmutableVector();
+    }
+
+    @NotNull
+    default ImmutableArray<E> toImmutableArray() {
+        return (ImmutableArray<E>) ImmutableArray.Unsafe.wrap(toObjectArray());
+    }
+
+    @NotNull
     default ImmutableList<E> toImmutableList() {
         return ImmutableList.from(this);
     }
@@ -240,8 +258,8 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
      * {@inheritDoc}
      */
     @Override
-    default boolean contains(Object v) {
-        return iterator().contains(v);
+    default boolean contains(Object value) {
+        return iterator().contains(value);
     }
 
     default boolean containsAll(@NotNull Iterable<?> values) {
@@ -257,6 +275,11 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
             }
         }
         return true;
+    }
+
+    default boolean containsAll(@NotNull Object[] values) {
+        Objects.requireNonNull(values);
+        return containsAll(ArraySeq.wrap(values));
     }
 
     /**

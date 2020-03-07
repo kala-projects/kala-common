@@ -57,11 +57,11 @@ public interface CollectionFactory<E, Builder, @Covariant R> extends Collector<E
         return build(newBuilder());
     }
 
-    default R from(@NotNull @ReadOnly Iterable<? extends E> iterable) {
+    default R from(@NotNull @ReadOnly Iterable<? extends E> values) {
         Builder builder = newBuilder();
-        sizeHint(builder, iterable);
+        sizeHint(builder, values);
 
-        for (E e : iterable) {
+        for (E e : values) {
             addToBuilder(builder, e);
         }
         return build(builder);

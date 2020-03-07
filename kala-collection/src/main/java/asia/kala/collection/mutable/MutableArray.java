@@ -20,6 +20,8 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
 
     private final boolean isChecked;
 
+    //region Constructors
+
     MutableArray(@NotNull Object[] array) {
         this(array, false);
     }
@@ -28,6 +30,10 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
         super(array);
         this.isChecked = isChecked;
     }
+
+    //endregion
+
+    //region Factory methods
 
     @NotNull
     public static <E> CollectionFactory<E, ?, MutableArray<E>> factory() {
@@ -78,6 +84,10 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
         return new MutableArray<>(array, true);
     }
 
+    //endregion
+
+    //region MutableArray members
+
     public final Object[] getArray() {
         return array;
     }
@@ -86,9 +96,9 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
         return isChecked;
     }
 
-    //
-    // -- MutableSeq
-    //
+    //endregion
+
+    //region MutableSeq members
 
     @Override
     public final void set(int index, E newValue) {
@@ -108,9 +118,9 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
         Arrays.sort(array, (Comparator<? super Object>) comparator);
     }
 
-    //
-    // -- MutableCollection
-    //
+    //endregion
+
+    //region MutableCollection members
 
     @Override
     public final String className() {
@@ -123,6 +133,8 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
         return factory();
     }
 
+    //endregion
+
     private static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, MutableArray<E>> {
         Factory() {
         }
@@ -133,8 +145,8 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
         }
 
         @Override
-        public final MutableArray<E> from(@NotNull Iterable<? extends E> iterable) {
-            return MutableArray.from(iterable);
+        public final MutableArray<E> from(@NotNull Iterable<? extends E> values) {
+            return MutableArray.from(values);
         }
 
         @Override

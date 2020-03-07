@@ -8,9 +8,8 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 public interface SetView<@Covariant E> extends View<E>, Set<E> {
-    //
-    // -- View
-    //
+
+    //region View members
 
     @NotNull
     @Override
@@ -22,6 +21,11 @@ public interface SetView<@Covariant E> extends View<E>, Set<E> {
     @Override
     default String className() {
         return "SetView";
+    }
+
+    @Override
+    default boolean canEqual(Object other) {
+        return other instanceof SetView<?>;
     }
 
     @NotNull
@@ -37,4 +41,6 @@ public interface SetView<@Covariant E> extends View<E>, Set<E> {
         Objects.requireNonNull(predicate);
         return new SetViews.Filter<>(this, predicate.negate());
     }
+
+    //endregion
 }

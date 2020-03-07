@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface Transformable<@Covariant E> extends Functor<E> {
-    @Contract("_ -> param1")
+    @Contract(value = "_ -> param1", pure = true)
     @SuppressWarnings("unchecked")
     static <E> Transformable<E> narrow(Transformable<? extends E> transformable) {
         return (Transformable<E>) transformable;

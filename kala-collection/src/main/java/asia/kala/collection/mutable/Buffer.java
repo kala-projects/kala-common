@@ -15,6 +15,8 @@ import java.util.function.Predicate;
 
 public interface Buffer<E> extends MutableSeq<E> {
 
+    //region Factory methods
+
     @NotNull
     static <E> CollectionFactory<E, ?, ? extends Buffer<E>> factory() {
         return ArrayBuffer.factory();
@@ -46,11 +48,15 @@ public interface Buffer<E> extends MutableSeq<E> {
         return new asia.kala.collection.JDKConverters.ResizableListWrapper<>(list);
     }
 
-    @Contract(mutates = "this")
-    void append(E value);
+    //endregion
 
     @Contract(mutates = "this")
-    default void appendAll(@NotNull Iterable<? extends E> collection) {
+    void append(@Flow(targetIsContainer = true) E value);
+
+    @Contract(mutates = "this")
+    default void appendAll(
+            @NotNull @Flow(sourceIsContainer = true, targetIsContainer = true) Iterable<? extends E> collection
+    ) {
         Objects.requireNonNull(collection);
         for (E e : collection) {
             this.append(e);
@@ -58,7 +64,7 @@ public interface Buffer<E> extends MutableSeq<E> {
     }
 
     @Contract(mutates = "this")
-    default void appendAll(E @NotNull [] elements) {
+    default void appendAll(@Flow(sourceIsContainer = true, targetIsContainer = true) E @NotNull [] elements) {
         this.appendAll(ArraySeq.wrap(elements));
     }
 
@@ -67,7 +73,9 @@ public interface Buffer<E> extends MutableSeq<E> {
 
     @Contract(mutates = "this")
     @SuppressWarnings("unchecked")
-    default void prependAll(@NotNull Iterable<? extends E> collection) {
+    default void prependAll(
+            @NotNull @Flow(sourceIsContainer = true, targetIsContainer = true) Iterable<? extends E> collection
+    ) {
         Objects.requireNonNull(collection);
         if (collection instanceof Seq<?>) {
             Enumerator<?> iterator = ((Seq<?>) collection).reverseIterator();
@@ -94,15 +102,18 @@ public interface Buffer<E> extends MutableSeq<E> {
     }
 
     @Contract(mutates = "this")
-    default void prependAll(E @NotNull [] elements) {
+    default void prependAll(@Flow(sourceIsContainer = true, targetIsContainer = true) E @NotNull [] elements) {
         this.prependAll(ArraySeq.wrap(elements));
     }
 
     @Contract(mutates = "this")
-    void insert(int index, E element);
+    void insert(int index, @Flow(targetIsContainer = true) E element);
 
     @Contract(mutates = "this")
-    default void insertAll(int index, @NotNull Iterable<? extends E> elements) {
+    default void insertAll(
+            int index,
+            @NotNull @Flow(sourceIsContainer = true, targetIsContainer = true) Iterable<? extends E> elements
+    ) {
         Objects.requireNonNull(elements);
 
         for (E e : elements) {
@@ -111,8 +122,10 @@ public interface Buffer<E> extends MutableSeq<E> {
     }
 
     @Contract(mutates = "this")
-    default void insertAll(int index, E @NotNull [] elements) {
-        insertAll(index, MutableArray.wrap(elements));
+    default void insertAll(
+            int index,
+            @Flow(sourceIsContainer = true, targetIsContainer = true) E @NotNull [] elements) {
+        insertAll(index, ArraySeq.wrap(elements));
     }
 
     @Contract(mutates = "this")
@@ -168,9 +181,7 @@ public interface Buffer<E> extends MutableSeq<E> {
         }
     }
 
-    //
-    // -- MutableCollection
-    //
+    //region MutableCollection members
 
     @Override
     default String className() {
@@ -198,4 +209,6 @@ public interface Buffer<E> extends MutableSeq<E> {
         }
         return new asia.kala.collection.JDKConverters.BufferAsJava<>(this);
     }
+
+    //endregion
 }

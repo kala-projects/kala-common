@@ -12,12 +12,12 @@ import java.util.Comparator;
 
 @ApiStatus.Internal
 public final class ImmutableInternal {
+
     /**
      * Internal implementation of {@link LinkedBuffer}.
      *
      * @see LinkedBuffer
      */
-    @ApiStatus.Internal
     public static abstract class LinkedBufferImpl<E> extends AbstractBuffer<E> {
         ImmutableList.MutableCons<E> first = null;
         ImmutableList.MutableCons<E> last = null;

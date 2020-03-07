@@ -12,11 +12,13 @@ import java.io.Serializable;
 import java.util.function.IntFunction;
 
 
-public final class LinkedBuffer<E> extends ImmutableInternal.LinkedBufferImpl<E>
-        implements Serializable {
-    private static final long serialVersionUID = 1621067498993048170L;
+public final class LinkedBuffer<E> extends ImmutableInternal.LinkedBufferImpl<E> implements Serializable {
+
+    private static final long serialVersionUID = -711764064295266660L;
 
     private static final LinkedBuffer.Factory<?> FACTORY = new LinkedBuffer.Factory<>();
+
+    //region Factory methods
 
     @SuppressWarnings("unchecked")
     public static <E> CollectionFactory<E, ?, LinkedBuffer<E>> factory() {
@@ -47,9 +49,9 @@ public final class LinkedBuffer<E> extends ImmutableInternal.LinkedBufferImpl<E>
         return LinkedBuffer.<E>factory().from(iterable);
     }
 
-    //
-    // -- MutableCollection
-    //
+    //endregion
+
+    //region MutableCollection
 
     @Override
     public final String className() {
@@ -80,21 +82,26 @@ public final class LinkedBuffer<E> extends ImmutableInternal.LinkedBufferImpl<E>
         return arr;
     }
 
-    //
-    // -- Serializable
-    //
+    //endregion
+
+    //region Serialization
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeObject(toArray(Object[]::new));
+        out.write(size());
+        for (E e : this) {
+            out.writeObject(e);
+        }
     }
 
     @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        Object[] values = (Object[]) in.readObject();
-        for (Object e : values) {
-            this.append((E) e);
+        int size = in.readInt();
+        for (int i = 0; i < size; i++) {
+            this.append((E) in.readObject());
         }
     }
+
+    //endregion
 
     private static final class Factory<E> extends AbstractBufferFactory<E, LinkedBuffer<E>> {
         @Override

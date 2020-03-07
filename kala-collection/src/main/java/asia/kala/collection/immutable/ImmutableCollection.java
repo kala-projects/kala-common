@@ -15,6 +15,19 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface ImmutableCollection<@Covariant E> extends Traversable<E>, Transformable<E> {
+
+    //region Narrow method
+
+    @Contract(value = "_ -> param1", pure = true)
+    @SuppressWarnings("unchecked")
+    static <E> ImmutableCollection<E> narrow(ImmutableCollection<? extends E> collection) {
+        return (ImmutableCollection<E>) collection;
+    }
+
+    //endregion
+
+    //region Factory methods
+
     @NotNull
     static <E> CollectionFactory<E, ?, ? extends ImmutableCollection<E>> factory() {
         return ImmutableSeq.factory();
@@ -36,11 +49,7 @@ public interface ImmutableCollection<@Covariant E> extends Traversable<E>, Trans
         return ImmutableCollection.<E>factory().from(iterable);
     }
 
-    @Contract("_ -> param1")
-    @SuppressWarnings("unchecked")
-    static <E> ImmutableCollection<E> narrow(ImmutableCollection<? extends E> collection) {
-        return (ImmutableCollection<E>) collection;
-    }
+    //endregion
 
     @Override
     default String className() {

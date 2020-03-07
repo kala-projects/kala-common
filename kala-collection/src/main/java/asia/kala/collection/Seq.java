@@ -18,6 +18,18 @@ import java.util.function.Predicate;
 
 public interface Seq<@Covariant E> extends Traversable<E> {
 
+    //region Narrow method
+
+    @Contract(value = "_ -> param1", pure = true)
+    @SuppressWarnings("unchecked")
+    static <E> Seq<E> narrow(Seq<? extends E> seq) {
+        return (Seq<E>) seq;
+    }
+
+    //endregion
+
+    //region Factory methods
+
     @NotNull
     static <E> CollectionFactory<E, ?, ? extends Seq<E>> factory() {
         return ImmutableSeq.factory();
@@ -25,32 +37,30 @@ public interface Seq<@Covariant E> extends Traversable<E> {
 
     @NotNull
     @SafeVarargs
-    static <E> Seq<E> of(E... elements) {
-        return Seq.<E>factory().from(elements);
+    static <E> Seq<E> of(E... values) {
+        return Seq.<E>factory().from(values);
     }
 
     @NotNull
-    static <E> Seq<E> from(E @NotNull [] elements) {
-        return Seq.<E>factory().from(elements);
+    static <E> Seq<E> from(E @NotNull [] values) {
+        return Seq.<E>factory().from(values);
     }
 
     @NotNull
-    static <E> Seq<E> from(@NotNull Iterable<? extends E> iterable) {
-        return Seq.<E>factory().from(iterable);
+    static <E> Seq<E> from(@NotNull Iterable<? extends E> values) {
+        return Seq.<E>factory().from(values);
     }
 
-    @Contract("_ -> param1")
-    @SuppressWarnings("unchecked")
-    static <E> Seq<E> narrow(Seq<? extends E> seq) {
-        return (Seq<E>) seq;
-    }
+    //endregion
 
+    @Contract(pure = true)
     @Flow(sourceIsContainer = true)
     default E get(@Range(from = 0, to = Integer.MAX_VALUE) int index) {
         return getOption(index).getOrThrow(IndexOutOfBoundsException::new);
     }
 
     @NotNull
+    @Contract(pure = true)
     @Flow(sourceIsContainer = true, targetIsContainer = true)
     default Option<E> getOption(int index) {
         if (index < 0) {
@@ -73,14 +83,17 @@ public interface Seq<@Covariant E> extends Traversable<E> {
     }
 
     @Nullable
+    @Contract(pure = true)
     default E getOrNull(int index) {
         return getOption(index).getOrNull();
     }
 
+    @Contract(pure = true)
     default boolean isDefinedAt(int index) {
         return index >= 0 && index < size();
     }
 
+    @Contract(pure = true)
     default int indexOf(Object value) {
         int idx = 0;
         for (E e : this) {
@@ -92,6 +105,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return -1;
     }
 
+    @Contract(pure = true)
     default int indexOf(Object value, int from) {
         int idx = 0;
         for (E e : this) {
@@ -103,6 +117,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return -1;
     }
 
+    @Contract(pure = true)
     default int indexWhere(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
 
@@ -116,6 +131,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return -1;
     }
 
+    @Contract(pure = true)
     default int indexWhere(@NotNull Predicate<? super E> predicate, int from) {
         Objects.requireNonNull(predicate);
 
@@ -129,6 +145,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return -1;
     }
 
+    @Contract(pure = true)
     default int lastIndexOf(Object value) {
         int idx = size() - 1;
         Enumerator<E> it = reverseIterator();
@@ -141,6 +158,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return -1;
     }
 
+    @Contract(pure = true)
     default int lastIndexOf(Object value, int end) {
         int idx = size() - 1;
         Enumerator<E> it = reverseIterator();
@@ -153,6 +171,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return -1;
     }
 
+    @Contract(pure = true)
     default int lastIndexWhere(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
 
@@ -167,6 +186,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return -1;
     }
 
+    @Contract(pure = true)
     default int lastIndexWhere(@NotNull Predicate<? super E> predicate, int end) {
         Objects.requireNonNull(predicate);
 
@@ -181,13 +201,15 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return -1;
     }
 
+    @Contract(pure = true)
     @Flow(sourceIsContainer = true, target = "array", targetIsContainer = true)
-    default int copyToArray(@NotNull Object[] array) {
+    default int copyToArray(Object @NotNull [] array) {
         return copyToArray(array, 0);
     }
 
+    @Contract(pure = true)
     @Flow(sourceIsContainer = true, target = "array", targetIsContainer = true)
-    default int copyToArray(@NotNull Object[] array, int start) {
+    default int copyToArray(Object @NotNull [] array, int start) {
         int arrayLength = array.length;
         Enumerator<E> it = iterator();
 
@@ -198,8 +220,9 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return i - start;
     }
 
+    @Contract(pure = true)
     @Flow(sourceIsContainer = true, target = "array", targetIsContainer = true)
-    default int copyToArray(@NotNull Object[] array, int start, int length) {
+    default int copyToArray(Object @NotNull [] array, int start, int length) {
         Enumerator<E> it = iterator();
         int i = start;
         int end = start + Math.min(length, array.length - start);
@@ -209,6 +232,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return i - start;
     }
 
+    @Contract(pure = true)
     default void forEachIndexed(@NotNull IndexedConsumer<? super E> action) {
         iterator().forEachIndexed(action);
     }
@@ -240,6 +264,11 @@ public interface Seq<@Covariant E> extends Traversable<E> {
     @Override
     default <U> CollectionFactory<U, ?, ? extends Seq<U>> iterableFactory() {
         return factory();
+    }
+
+    @Override
+    default boolean canEqual(Object other) {
+        return other instanceof Seq<?>;
     }
 
     @NotNull

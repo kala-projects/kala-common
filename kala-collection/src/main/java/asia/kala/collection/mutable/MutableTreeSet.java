@@ -46,7 +46,7 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
 
     //endregion
 
-    //region Factory members
+    //region Factory methods
 
     @NotNull
     public static <E extends Comparable<? super E>> CollectionFactory<E, ?, MutableTreeSet<E>> factory() {
@@ -501,8 +501,8 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
     }
 
     @Override
-    public final boolean containsValue(E value) {
-        return getNode(value) != null;
+    public final boolean contains(Object value) {
+        return getNode((E) value) != null;
     }
 
     //endregion
@@ -544,6 +544,12 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
 
     @NotNull
     @Override
+    public final <U> CollectionFactory<U, ?, MutableTreeSet<U>> iterableFactory() {
+        return ((Factory<U>) DEFAULT_FACTORY);
+    }
+
+    @NotNull
+    @Override
     public final Enumerator<E> iterator() {
         return new MutableTreeSet.Itr<>(firstNode());
     }
@@ -571,7 +577,7 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
 
     //endregion
 
-    //region Serialization members
+    //region Serialization
 
     private void writeObject(java.io.ObjectOutputStream out)
             throws IOException {
@@ -612,7 +618,6 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
 
     private static final class Itr<E> extends AbstractEnumerator<E> {
         private Node<E> node;
-
 
         Itr(Node<E> node) {
             this.node = node;

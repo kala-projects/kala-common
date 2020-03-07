@@ -10,7 +10,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface View<@Covariant E> extends Traversable<E>, Transformable<E> {
-
     @NotNull
     @Override
     @Contract(value = "-> this", pure = true)
@@ -21,6 +20,11 @@ public interface View<@Covariant E> extends Traversable<E>, Transformable<E> {
     @Override
     default String className() {
         return "View";
+    }
+
+    @Override
+    default boolean canEqual(Object other) {
+        return other instanceof View<?>;
     }
 
     @NotNull

@@ -16,7 +16,7 @@ public final class LazyValue<@Covariant T> implements Value<T>, Serializable {
     private transient volatile Supplier<? extends T> supplier;
     private T value;
 
-    @Contract("_ -> param1")
+    @Contract(value = "_ -> param1", pure = true)
     @SuppressWarnings("unchecked")
     public static <T> LazyValue<T> narrow(LazyValue<? extends T> value) {
         return (LazyValue<T>) value;

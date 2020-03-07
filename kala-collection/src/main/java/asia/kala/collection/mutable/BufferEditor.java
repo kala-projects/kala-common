@@ -120,9 +120,7 @@ public class BufferEditor<E, C extends Buffer<E>> extends MutableSeqEditor<E, C>
         return this;
     }
 
-    //
-    // -- MutableSeqEditor
-    //
+    //region MutableSeqEditor members
 
     @NotNull
     @Override
@@ -155,4 +153,6 @@ public class BufferEditor<E, C extends Buffer<E>> extends MutableSeqEditor<E, C>
         source.sort(comparator);
         return this;
     }
+
+    //endregion
 }

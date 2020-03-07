@@ -412,8 +412,8 @@ public final class JDKConverters {
 
         @Override
         @SuppressWarnings("SuspiciousMethodCalls")
-        public boolean contains(Object v) {
-            return list.contains(v);
+        public boolean contains(Object value) {
+            return list.contains(value);
         }
 
         @NotNull

@@ -92,7 +92,6 @@ final class ImmutableSeq0<E> extends ImmutableSeqN<E> {
     }
 }
 
-
 final class ImmutableSeq1<E> extends ImmutableSeqN<E> {
     private static final long serialVersionUID = 0L;
 
@@ -183,7 +182,6 @@ final class ImmutableSeq2<E> extends ImmutableSeqN<E> {
         return new ImmutableSeq2<>(mapper.apply($0), mapper.apply($1));
     }
 }
-
 
 final class ImmutableSeq3<E> extends ImmutableSeqN<E> {
     private static final long serialVersionUID = 0L;
