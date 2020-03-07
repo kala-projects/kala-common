@@ -2,8 +2,6 @@ package asia.kala.collection;
 
 import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
-import asia.kala.collection.mutable.MutableArray;
-import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -59,7 +57,7 @@ public interface SeqView<@Covariant E> extends Seq<E>, View<E> {
         return new SeqViews.Prepended<>(this, value);
     }
 
-    default SeqView<E> prependedAll(@NotNull @ReadOnly Iterable<? extends E> prefix) {
+    default SeqView<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
         Objects.requireNonNull(prefix);
         return new SeqViews.Concat<>(KalaCollectionUtils.asSeq(prefix), this);
     }
@@ -73,7 +71,7 @@ public interface SeqView<@Covariant E> extends Seq<E>, View<E> {
         return new SeqViews.Appended<>(this, value);
     }
 
-    default SeqView<E> appendedAll(@NotNull @ReadOnly Iterable<? extends E> postfix) {
+    default SeqView<E> appendedAll(@NotNull Iterable<? extends E> postfix) {
         Objects.requireNonNull(postfix);
         return new SeqViews.Concat<>(this, KalaCollectionUtils.asSeq(postfix));
     }

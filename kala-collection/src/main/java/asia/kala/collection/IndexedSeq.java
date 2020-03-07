@@ -5,6 +5,7 @@ import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.ImmutableArray;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -47,6 +48,16 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
             return Option.none();
         }
         return Option.some(get(index));
+    }
+
+    @Nullable
+    @Override
+    default E getOrNull(int index) {
+        int size = size();
+        if (index < 0 || index >= size) {
+            return null;
+        }
+        return get(index);
     }
 
     @Override
@@ -109,9 +120,7 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
         };
     }
 
-    //
-    // -- Traversable
-    //
+    //region Traversable members
 
     @Override
     @NotNull
@@ -132,4 +141,6 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
         }
         return arr;
     }
+
+    //endregion
 }

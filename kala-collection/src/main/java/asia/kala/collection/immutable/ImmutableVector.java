@@ -12,7 +12,6 @@ import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.*;
 import asia.kala.collection.mutable.ArrayBuffer;
-import asia.kala.collection.mutable.MutableArray;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -530,8 +529,8 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
 
         @NotNull
         @Override
-        public final ImmutableVector<E> from(E @NotNull [] elements) {
-            return ImmutableVector.from(elements);
+        public final ImmutableVector<E> from(E @NotNull [] values) {
+            return ImmutableVector.from(values);
         }
 
         @Override

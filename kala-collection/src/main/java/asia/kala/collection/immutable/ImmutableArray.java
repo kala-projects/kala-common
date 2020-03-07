@@ -1,23 +1,18 @@
 package asia.kala.collection.immutable;
 
-import asia.kala.Option;
 import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
 import asia.kala.annotations.StaticClass;
 import asia.kala.collection.*;
 import asia.kala.collection.mutable.ArrayBuffer;
-import asia.kala.function.IndexedConsumer;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.IntFunction;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
 public final class ImmutableArray<@Covariant E> extends ArraySeq<E> implements ImmutableSeq<E>, IndexedSeq<E>, Serializable {
@@ -184,7 +179,8 @@ public final class ImmutableArray<@Covariant E> extends ArraySeq<E> implements I
     public final ImmutableArray<E> prependedAll(@NotNull Iterable<? extends E> prefix) {
         Objects.requireNonNull(prefix);
 
-        Object[] data = prefix instanceof ImmutableArray<?> ? ((ImmutableArray<?>) prefix).array : KalaCollectionUtils.asArray(prefix);
+        Object[] data = prefix instanceof ImmutableArray<?> ?
+                ((ImmutableArray<?>) prefix).array : KalaCollectionUtils.asArray(prefix);
         Object[] newValues = new Object[data.length + array.length];
 
         System.arraycopy(data, 0, newValues, 0, data.length);
@@ -439,8 +435,8 @@ public final class ImmutableArray<@Covariant E> extends ArraySeq<E> implements I
         }
 
         @Override
-        public final ImmutableArray<E> from(E @NotNull [] elements) {
-            return ImmutableArray.from(elements);
+        public final ImmutableArray<E> from(E @NotNull [] values) {
+            return ImmutableArray.from(values);
         }
 
         @Override

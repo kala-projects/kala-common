@@ -3,7 +3,6 @@ package asia.kala.collection;
 import asia.kala.LazyValue;
 import asia.kala.Option;
 import asia.kala.annotations.Covariant;
-import asia.kala.collection.mutable.MutableArray;
 import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.NotNull;
 

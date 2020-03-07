@@ -25,7 +25,7 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
     }
 
     @NotNull
-    static <E> Enumerator<E> fromJava(@NotNull @ReadOnly Iterator<? extends E> iterator) {
+    static <E> Enumerator<E> fromJava(@NotNull Iterator<? extends E> iterator) {
         Objects.requireNonNull(iterator);
         if (iterator instanceof Enumerator<?>) {
             return (Enumerator<E>) iterator;

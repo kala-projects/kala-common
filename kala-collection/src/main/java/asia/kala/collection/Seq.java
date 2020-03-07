@@ -9,6 +9,7 @@ import kotlin.annotations.jvm.ReadOnly;
 import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
 import java.util.List;
@@ -69,6 +70,11 @@ public interface Seq<@Covariant E> extends Traversable<E> {
             }
         }
         return Option.none();
+    }
+
+    @Nullable
+    default E getOrNull(int index) {
+        return getOption(index).getOrNull();
     }
 
     default boolean isDefinedAt(int index) {
@@ -217,9 +223,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         return l.iterator();
     }
 
-    //
-    // -- Traversable
-    //
+    //region Traversable members
 
     @Override
     default String className() {
@@ -247,4 +251,6 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         }
         return new JDKConverters.SeqAsJava<>(this);
     }
+
+    //endregion
 }

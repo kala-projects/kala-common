@@ -138,7 +138,7 @@ public final class JDKConverters {
         }
 
         @Override
-        public boolean containsAll(Collection<?> c) {
+        public boolean containsAll(@NotNull Collection<?> c) {
             return collection.containsAll(c);
         }
 
@@ -203,7 +203,12 @@ public final class JDKConverters {
         public SetAsJava(@NotNull C collection) {
             super(collection);
         }
+    }
 
+    public static class SortedSetAsJava<E, C extends Set<E>> extends TraversableAsJava<E, C> {
+        public SortedSetAsJava(@NotNull C collection) {
+            super(collection);
+        }
     }
 
     public static class MutableCollectionAsJava<E, C extends MutableCollection<E>> extends AbstractCollection<E> {

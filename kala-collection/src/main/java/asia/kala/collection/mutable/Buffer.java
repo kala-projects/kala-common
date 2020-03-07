@@ -3,7 +3,6 @@ package asia.kala.collection.mutable;
 import asia.kala.collection.*;
 import asia.kala.collection.JDKConverters;
 import kotlin.annotations.jvm.Mutable;
-import kotlin.annotations.jvm.ReadOnly;
 import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +50,7 @@ public interface Buffer<E> extends MutableSeq<E> {
     void append(E value);
 
     @Contract(mutates = "this")
-    default void appendAll(@NotNull @ReadOnly Iterable<? extends E> collection) {
+    default void appendAll(@NotNull Iterable<? extends E> collection) {
         Objects.requireNonNull(collection);
         for (E e : collection) {
             this.append(e);
@@ -68,7 +67,7 @@ public interface Buffer<E> extends MutableSeq<E> {
 
     @Contract(mutates = "this")
     @SuppressWarnings("unchecked")
-    default void prependAll(@NotNull @ReadOnly Iterable<? extends E> collection) {
+    default void prependAll(@NotNull Iterable<? extends E> collection) {
         Objects.requireNonNull(collection);
         if (collection instanceof Seq<?>) {
             Enumerator<?> iterator = ((Seq<?>) collection).reverseIterator();
@@ -103,7 +102,7 @@ public interface Buffer<E> extends MutableSeq<E> {
     void insert(int index, E element);
 
     @Contract(mutates = "this")
-    default void insertAll(int index, @NotNull @ReadOnly Iterable<? extends E> elements) {
+    default void insertAll(int index, @NotNull Iterable<? extends E> elements) {
         Objects.requireNonNull(elements);
 
         for (E e : elements) {

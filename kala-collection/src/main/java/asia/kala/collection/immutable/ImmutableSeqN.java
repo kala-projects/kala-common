@@ -2,7 +2,6 @@ package asia.kala.collection.immutable;
 
 import asia.kala.collection.Enumerator;
 import asia.kala.collection.IndexedSeq;
-import asia.kala.collection.KalaCollectionUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;

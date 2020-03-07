@@ -3,7 +3,6 @@ package asia.kala.collection;
 import asia.kala.Option;
 import org.jetbrains.annotations.NotNull;
 
-import javax.crypto.spec.PSource;
 import java.util.function.Function;
 
 final class IndexedSeqViews {

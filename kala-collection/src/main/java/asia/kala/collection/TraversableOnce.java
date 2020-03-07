@@ -5,7 +5,6 @@ import asia.kala.Option;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.ImmutableList;
 import asia.kala.collection.immutable.ImmutableVector;
-import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

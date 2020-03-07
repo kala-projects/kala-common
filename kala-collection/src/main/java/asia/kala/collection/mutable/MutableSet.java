@@ -56,23 +56,10 @@ public interface MutableSet<E> extends MutableCollection<E>, Set<E> {
     void clear();
 
     @Contract(mutates = "this")
-    @SuppressWarnings("unchecked")
     default boolean retainIf(@NotNull Predicate<? super E> predicate) {
-        Objects.requireNonNull(predicate);
-
-        if (isEmpty()) {
-            return false;
-        }
-
-        boolean m = false;
-        Object[] arr = toObjectArray();
-        for (Object e : arr) {
-            if (!predicate.test((E) e)) {
-                this.remove((E) e);
-                m = true;
-            }
-        }
-        return m;
+        int oldSize = size();
+        filterInPlace(predicate);
+        return size() != oldSize;
     }
 
     @Contract(mutates = "this")
@@ -107,8 +94,20 @@ public interface MutableSet<E> extends MutableCollection<E>, Set<E> {
     }
 
     @Contract(mutates = "this")
+    @SuppressWarnings("unchecked")
     default void filterInPlace(@NotNull Predicate<? super E> predicate) {
-        retainIf(predicate);
+        Objects.requireNonNull(predicate);
+
+        if (isEmpty()) {
+            return;
+        }
+
+        Object[] arr = toObjectArray();
+        for (Object e : arr) {
+            if (!predicate.test((E) e)) {
+                this.remove((E) e);
+            }
+        }
     }
 
     //

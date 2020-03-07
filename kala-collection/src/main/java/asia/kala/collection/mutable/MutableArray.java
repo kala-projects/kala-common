@@ -46,7 +46,12 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
 
     @NotNull
     public static <E> MutableArray<E> of(@NotNull E... values) {
-        Objects.requireNonNull(values);
+        return from(values);
+    }
+
+    @NotNull
+    public static <E> MutableArray<E> from(@NotNull E[] values) {
+        assert values != null;
         if (values.length == 0) {
             return empty();
         }
@@ -54,6 +59,17 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
         Object[] newValues = new Object[values.length];
         System.arraycopy(values, 0, newValues, 0, values.length);
         return new MutableArray<>(newValues);
+    }
+
+    @NotNull
+    public static <E> MutableArray<E> from(@NotNull Iterable<? extends E> values) {
+        assert values != null;
+        ArrayBuffer<E> buffer = new ArrayBuffer<>();
+        buffer.appendAll(values);
+        if (buffer.size() == 0) {
+            return empty();
+        }
+        return new MutableArray<>(buffer.toObjectArray());
     }
 
     @NotNull
@@ -112,28 +128,38 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
         }
 
         @Override
-        public ArrayBuffer<E> newBuilder() {
+        public final MutableArray<E> from(E @NotNull [] values) {
+            return MutableArray.from(values);
+        }
+
+        @Override
+        public final MutableArray<E> from(@NotNull Iterable<? extends E> iterable) {
+            return MutableArray.from(iterable);
+        }
+
+        @Override
+        public final ArrayBuffer<E> newBuilder() {
             return new ArrayBuffer<>();
         }
 
         @Override
-        public void addToBuilder(@NotNull ArrayBuffer<E> buffer, E value) {
+        public final void addToBuilder(@NotNull ArrayBuffer<E> buffer, E value) {
             buffer.append(value);
         }
 
         @Override
-        public void sizeHint(@NotNull ArrayBuffer<E> buffer, int size) {
+        public final void sizeHint(@NotNull ArrayBuffer<E> buffer, int size) {
             buffer.sizeHint(size);
         }
 
         @Override
-        public ArrayBuffer<E> mergeBuilder(@NotNull ArrayBuffer<E> builder1, @NotNull ArrayBuffer<E> builder2) {
+        public final ArrayBuffer<E> mergeBuilder(@NotNull ArrayBuffer<E> builder1, @NotNull ArrayBuffer<E> builder2) {
             builder1.appendAll(builder2);
             return builder1;
         }
 
         @Override
-        public MutableArray<E> build(@NotNull ArrayBuffer<E> buffer) {
+        public final MutableArray<E> build(@NotNull ArrayBuffer<E> buffer) {
             return new MutableArray<>(buffer.toArray(Object[]::new));
         }
     }

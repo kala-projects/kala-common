@@ -315,9 +315,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
             return Option.none();
         }
 
-        //
-        // -- Traversable
-        //
+        //region Traversable members
 
         @NotNull
         @Override
@@ -346,6 +344,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
             return "ImmutableList[]";
         }
 
+        //endregion
 
         //
         // -- Serializable

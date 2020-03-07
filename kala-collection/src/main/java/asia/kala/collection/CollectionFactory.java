@@ -67,15 +67,15 @@ public interface CollectionFactory<E, Builder, @Covariant R> extends Collector<E
         return build(builder);
     }
 
-    default R from(E @NotNull [] elements) {
-        Objects.requireNonNull(elements);
-        if (elements.length == 0) {
+    default R from(E @NotNull [] values) {
+        Objects.requireNonNull(values);
+        if (values.length == 0) {
             return empty();
         }
 
         Builder builder = newBuilder();
-        sizeHint(builder, elements.length);
-        for (E element : elements) {
+        sizeHint(builder, values.length);
+        for (E element : values) {
             addToBuilder(builder, element);
         }
         return build(builder);

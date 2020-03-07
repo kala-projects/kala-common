@@ -5,7 +5,6 @@ import asia.kala.annotations.Covariant;
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.Transformable;
 import asia.kala.collection.Traversable;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

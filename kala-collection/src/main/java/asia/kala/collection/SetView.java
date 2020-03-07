@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 public interface SetView<@Covariant E> extends View<E>, Set<E> {
-
     //
     // -- View
     //

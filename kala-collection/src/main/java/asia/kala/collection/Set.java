@@ -7,19 +7,17 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Predicate;
 
-public interface Set<E> extends Traversable<E>, Predicate<E> {
-    //
-    // -- Predicate
-    //
+public interface Set<E> extends Traversable<E> {
 
-    @Override
-    default boolean test(E e) {
-        return contains(e);
+    default boolean containsValue(E value) {
+        return iterator().contains(value);
     }
 
-    //
-    // -- Traversable
-    //
+    default Predicate<E> asPredicate() {
+        return this::containsValue;
+    }
+
+    //region Traversable members
 
     @Override
     default String className() {
@@ -44,4 +42,12 @@ public interface Set<E> extends Traversable<E>, Predicate<E> {
     default Spliterator<E> spliterator() {
         return Spliterators.spliterator(iterator(), size(), Spliterator.DISTINCT);
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    default boolean contains(Object v) {
+        return containsValue((E) v);
+    }
+
+    //endregion
 }

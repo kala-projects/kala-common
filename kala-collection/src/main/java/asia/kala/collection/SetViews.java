@@ -3,7 +3,6 @@ package asia.kala.collection;
 import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 final class SetViews {
