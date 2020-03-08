@@ -23,19 +23,55 @@ public interface Buffer<E> extends MutableSeq<E> {
     }
 
     @NotNull
+    @Contract("-> new")
+    static <E> Buffer<E> of() {
+        return ArrayBuffer.of();
+    }
+
+    @NotNull
+    @Contract("_ -> new")
+    static <E> Buffer<E> of(E value1) {
+        return ArrayBuffer.of(value1);
+    }
+
+    @NotNull
+    @Contract("_, _ -> new")
+    static <E> Buffer<E> of(E value1, E value2) {
+        return ArrayBuffer.of(value1, value2);
+    }
+
+    @NotNull
+    @Contract("_, _, _ -> new")
+    static <E> Buffer<E> of(E value1, E value2, E value3) {
+        return ArrayBuffer.of(value1, value2, value3);
+    }
+
+    @NotNull
+    @Contract("_, _, _, _ -> new")
+    static <E> Buffer<E> of(E value1, E value2, E value3, E value4) {
+        return ArrayBuffer.of(value1, value2, value3, value4);
+    }
+
+    @NotNull
+    @Contract("_, _, _, _, _ -> new")
+    static <E> Buffer<E> of(E value1, E value2, E value3, E value4, E value5) {
+        return ArrayBuffer.of(value1, value2, value3, value4, value5);
+    }
+
+    @NotNull
     @SafeVarargs
-    static <E> Buffer<E> of(E... elements) {
-        return Buffer.<E>factory().from(elements);
+    static <E> Buffer<E> of(E... values) {
+        return from(values);
     }
 
     @NotNull
-    static <E> Buffer<E> from(E @NotNull [] elements) {
-        return Buffer.<E>factory().from(elements);
+    static <E> Buffer<E> from(E @NotNull [] values) {
+        return ArrayBuffer.from(values);
     }
 
     @NotNull
-    static <E> Buffer<E> from(@NotNull Iterable<? extends E> iterable) {
-        return Buffer.<E>factory().from(iterable);
+    static <E> Buffer<E> from(@NotNull Iterable<? extends E> values) {
+        return ArrayBuffer.from(values);
     }
 
     @NotNull
@@ -74,19 +110,19 @@ public interface Buffer<E> extends MutableSeq<E> {
     @Contract(mutates = "this")
     @SuppressWarnings("unchecked")
     default void prependAll(
-            @NotNull @Flow(sourceIsContainer = true, targetIsContainer = true) Iterable<? extends E> collection
+            @NotNull @Flow(sourceIsContainer = true, targetIsContainer = true) Iterable<? extends E> values
     ) {
-        Objects.requireNonNull(collection);
-        if (collection instanceof Seq<?>) {
-            Enumerator<?> iterator = ((Seq<?>) collection).reverseIterator();
+        Objects.requireNonNull(values);
+        if (values instanceof Seq<?>) {
+            Enumerator<?> iterator = ((Seq<?>) values).reverseIterator();
             while (iterator.hasNext()) {
                 this.prepend((E) iterator.next());
             }
             return;
         }
 
-        if (collection instanceof List<?> && collection instanceof RandomAccess) {
-            List<?> seq = (List<?>) collection;
+        if (values instanceof List<?> && values instanceof RandomAccess) {
+            List<?> seq = (List<?>) values;
             int s = seq.size();
             for (int i = s - 1; i >= 0; i--) {
                 prepend((E) seq.get(i));
@@ -94,7 +130,7 @@ public interface Buffer<E> extends MutableSeq<E> {
             return;
         }
 
-        Object[] cv = KalaCollectionUtils.asArray(collection);
+        Object[] cv = KalaCollectionUtils.asArray(values);
 
         for (int i = cv.length - 1; i >= 0; i--) {
             prepend((E) cv[i]);
@@ -102,21 +138,21 @@ public interface Buffer<E> extends MutableSeq<E> {
     }
 
     @Contract(mutates = "this")
-    default void prependAll(@Flow(sourceIsContainer = true, targetIsContainer = true) E @NotNull [] elements) {
-        this.prependAll(ArraySeq.wrap(elements));
+    default void prependAll(@Flow(sourceIsContainer = true, targetIsContainer = true) E @NotNull [] values) {
+        this.prependAll(ArraySeq.wrap(values));
     }
 
     @Contract(mutates = "this")
-    void insert(int index, @Flow(targetIsContainer = true) E element);
+    void insert(int index, @Flow(targetIsContainer = true) E value);
 
     @Contract(mutates = "this")
     default void insertAll(
             int index,
-            @NotNull @Flow(sourceIsContainer = true, targetIsContainer = true) Iterable<? extends E> elements
+            @NotNull @Flow(sourceIsContainer = true, targetIsContainer = true) Iterable<? extends E> values
     ) {
-        Objects.requireNonNull(elements);
+        Objects.requireNonNull(values);
 
-        for (E e : elements) {
+        for (E e : values) {
             insert(index++, e);
         }
     }
@@ -124,8 +160,8 @@ public interface Buffer<E> extends MutableSeq<E> {
     @Contract(mutates = "this")
     default void insertAll(
             int index,
-            @Flow(sourceIsContainer = true, targetIsContainer = true) E @NotNull [] elements) {
-        insertAll(index, ArraySeq.wrap(elements));
+            @Flow(sourceIsContainer = true, targetIsContainer = true) E @NotNull [] values) {
+        insertAll(index, ArraySeq.wrap(values));
     }
 
     @Contract(mutates = "this")
@@ -164,7 +200,12 @@ public interface Buffer<E> extends MutableSeq<E> {
 
     @Contract(mutates = "this")
     default void takeInPlace(int n) {
-        int size = this.size();
+        if (n <= 0) {
+            clear();
+            return;
+        }
+
+        final int size = this.size();
         if (n >= size) {
             return;
         }

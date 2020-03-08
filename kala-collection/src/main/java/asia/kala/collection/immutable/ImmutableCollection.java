@@ -35,18 +35,18 @@ public interface ImmutableCollection<@Covariant E> extends Traversable<E>, Trans
 
     @NotNull
     @SafeVarargs
-    static <E> ImmutableCollection<E> of(E... elements) {
-        return ImmutableCollection.<E>factory().from(elements);
+    static <E> ImmutableCollection<E> of(E... values) {
+        return ImmutableCollection.<E>factory().from(values);
     }
 
     @NotNull
-    static <E> ImmutableCollection<E> from(E @NotNull [] elements) {
-        return ImmutableCollection.<E>factory().from(elements);
+    static <E> ImmutableCollection<E> from(E @NotNull [] values) {
+        return ImmutableCollection.<E>factory().from(values);
     }
 
     @NotNull
-    static <E> ImmutableCollection<E> from(@NotNull Iterable<? extends E> iterable) {
-        return ImmutableCollection.<E>factory().from(iterable);
+    static <E> ImmutableCollection<E> from(@NotNull Iterable<? extends E> values) {
+        return ImmutableCollection.<E>factory().from(values);
     }
 
     //endregion

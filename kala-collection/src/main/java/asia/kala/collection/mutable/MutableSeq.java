@@ -21,19 +21,54 @@ public interface MutableSeq<E> extends MutableCollection<E>, Seq<E> {
     }
 
     @NotNull
+    static <E> MutableSeq<E> of() {
+        return MutableArray.of();
+    }
+
+    @NotNull
+    @Contract("_ -> new")
+    static <E> MutableSeq<E> of(E value1) {
+        return MutableArray.of(value1);
+    }
+
+    @NotNull
+    @Contract("_, _ -> new")
+    static <E> MutableSeq<E> of(E value1, E value2) {
+        return MutableArray.of(value1, value2);
+    }
+
+    @NotNull
+    @Contract("_, _, _ -> new")
+    static <E> MutableSeq<E> of(E value1, E value2, E value3) {
+        return MutableArray.of(value1, value2, value3);
+    }
+
+    @NotNull
+    @Contract("_, _, _, _ -> new")
+    static <E> MutableSeq<E> of(E value1, E value2, E value3, E value4) {
+        return MutableArray.of(value1, value2, value3, value4);
+    }
+
+    @NotNull
+    @Contract("_, _, _, _, _ -> new")
+    static <E> MutableSeq<E> of(E value1, E value2, E value3, E value4, E value5) {
+        return MutableArray.of(value1, value2, value3, value4, value5);
+    }
+
+    @NotNull
     @SafeVarargs
-    static <E> MutableSeq<E> of(E... elements) {
-        return MutableSeq.<E>factory().from(elements);
+    static <E> MutableSeq<E> of(E... values) {
+        return from(values);
     }
 
     @NotNull
-    static <E> MutableSeq<E> from(E @NotNull [] elements) {
-        return MutableSeq.<E>factory().from(elements);
+    static <E> MutableSeq<E> from(E @NotNull [] values) {
+        return MutableArray.from(values);
     }
 
     @NotNull
-    static <E> MutableSeq<E> from(@NotNull Iterable<? extends E> iterable) {
-        return MutableSeq.<E>factory().from(iterable);
+    static <E> MutableSeq<E> from(@NotNull Iterable<? extends E> values) {
+        return MutableArray.from(values);
     }
 
     @NotNull

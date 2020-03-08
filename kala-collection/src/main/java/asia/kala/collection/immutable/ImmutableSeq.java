@@ -44,19 +44,44 @@ public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<
     }
 
     @NotNull
+    static <E> ImmutableSeq<E> of(E value1) {
+        return new ImmutableSeq1<>(value1);
+    }
+
+    @NotNull
+    static <E> ImmutableSeq<E> of(E value1, E values2) {
+        return new ImmutableSeq2<>(value1, values2);
+    }
+
+    @NotNull
+    static <E> ImmutableSeq<E> of(E value1, E values2, E value3) {
+        return new ImmutableSeq3<>(value1, values2, value3);
+    }
+
+    @NotNull
+    static <E> ImmutableSeq<E> of(E value1, E values2, E value3, E value4) {
+        return new ImmutableSeq4<>(value1, values2, value3, value4);
+    }
+
+    @NotNull
+    static <E> ImmutableSeq<E> of(E value1, E values2, E value3, E value4, E value5) {
+        return new ImmutableSeq5<>(value1, values2, value3, value4, value5);
+    }
+
+    @NotNull
     @SafeVarargs
-    static <E> ImmutableSeq<E> of(E... elements) {
-        return ImmutableSeq.<E>factory().from(elements);
+    static <E> ImmutableSeq<E> of(E... values) {
+        return ImmutableSeq.<E>factory().from(values);
     }
 
     @NotNull
-    static <E> ImmutableSeq<E> from(E @NotNull [] elements) {
-        return ImmutableSeq.<E>factory().from(elements);
+    static <E> ImmutableSeq<E> from(E @NotNull [] values) {
+        return ImmutableSeq.<E>factory().from(values);
     }
 
     @NotNull
-    static <E> ImmutableSeq<E> from(@NotNull Iterable<? extends E> iterable) {
-        return ImmutableSeq.<E>factory().from(iterable);
+    static <E> ImmutableSeq<E> from(@NotNull Iterable<? extends E> values) {
+        return ImmutableSeq.<E>factory().from(values);
     }
 
     //endregion

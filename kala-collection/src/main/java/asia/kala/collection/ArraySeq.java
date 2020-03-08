@@ -1,8 +1,11 @@
 package asia.kala.collection;
 
 import asia.kala.Option;
+import asia.kala.collection.immutable.ImmutableArray;
+import asia.kala.collection.immutable.ImmutableSeq;
 import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.function.IndexedConsumer;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -37,6 +40,7 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
     }
 
     @NotNull
+    @Contract("_ -> new")
     public static <E> ArraySeq<E> wrap(@NotNull E[] array) {
         Objects.requireNonNull(array);
         return new ArraySeq<>(array);
@@ -53,19 +57,89 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
     }
 
     @NotNull
-    public static <E> ArraySeq<E> of(E... elements) {
-        return from(elements);
+    @Contract(value = "_ -> new", pure = true)
+    public static <E> ArraySeq<E> of(E value1) {
+        return new ArraySeq<>(new Object[]{value1});
     }
 
     @NotNull
-    public static <E> ArraySeq<E> from(E @NotNull [] elements) {
-        assert elements != null;
-        return new ArraySeq<>(elements.clone());
+    @Contract(value = "_, _ -> new", pure = true)
+    public static <E> ArraySeq<E> of(E value1, E value2) {
+        return new ArraySeq<>(new Object[]{value1, value2});
     }
 
     @NotNull
-    public static <E> ArraySeq<E> from(@NotNull Iterable<? extends E> elements) {
-        return ArraySeq.<E>factory().from(elements);
+    @Contract(value = "_, _, _ -> new", pure = true)
+    public static <E> ArraySeq<E> of(E value1, E value2, E value3) {
+        return new ArraySeq<>(new Object[]{value1, value2, value3});
+    }
+
+    @NotNull
+    @Contract(value = "_, _, _, _ -> new", pure = true)
+    public static <E> ArraySeq<E> of(E value1, E value2, E value3, E value4) {
+        return new ArraySeq<>(new Object[]{value1, value2, value3, value4});
+    }
+
+    @NotNull
+    @Contract(value = "_, _, _, _, _ -> new", pure = true)
+    public static <E> ArraySeq<E> of(E value1, E value2, E value3, E value4, E value5) {
+        return new ArraySeq<>(new Object[]{value1, value2, value3, value4, value5});
+    }
+
+    @NotNull
+    @SafeVarargs
+    @Contract(pure = true)
+    public static <E> ArraySeq<E> of(E... values) {
+        return from(values);
+    }
+
+    @NotNull
+    @Contract(pure = true)
+    public static <E> ArraySeq<E> from(E @NotNull [] values) {
+        assert values != null;
+        if (values.length == 0) {
+            return empty();
+        }
+        return new ArraySeq<>(values.clone());
+    }
+
+    @NotNull
+    public static <E> ArraySeq<E> from(@NotNull TraversableOnce<? extends E> values) {
+        if (values instanceof ImmutableArray<?> || values.getClass() == ArraySeq.class) {
+            return (ArraySeq<E>) values;
+        }
+
+        if (values.knownSize() == 0) {
+            return empty();
+        }
+
+        Object[] arr = values.toObjectArray();
+        if (arr.length == 0) {
+            return empty();
+        }
+        return new ArraySeq<>(arr);
+    }
+
+    @NotNull
+    public static <E> ArraySeq<E> from(@NotNull java.util.Collection<? extends E> values) {
+        if (values.size() == 0) {
+            return empty();
+        }
+        return new ArraySeq<>(values.toArray());
+    }
+
+    @NotNull
+    public static <E> ArraySeq<E> from(@NotNull Iterable<? extends E> values) {
+        Objects.requireNonNull(values);
+
+        if (values instanceof TraversableOnce<?>) {
+            return from((TraversableOnce<E>) values);
+        }
+        if (values instanceof java.util.Collection<?>) {
+            return from(((java.util.Collection<E>) values));
+        }
+
+        return ArrayBuffer.<E>from(values).toImmutableArray();
     }
 
     //endregion

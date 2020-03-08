@@ -4,6 +4,7 @@ import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.JDKConverters;
 import asia.kala.collection.Traversable;
 import kotlin.annotations.jvm.Mutable;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -18,19 +19,54 @@ public interface MutableCollection<E> extends Traversable<E> {
     }
 
     @NotNull
+    static <E> MutableCollection<E> of() {
+        return MutableSeq.of();
+    }
+
+    @NotNull
+    @Contract("_ -> new")
+    static <E> MutableCollection<E> of(E value1) {
+        return MutableSeq.of(value1);
+    }
+
+    @NotNull
+    @Contract("_, _ -> new")
+    static <E> MutableCollection<E> of(E value1, E value2) {
+        return MutableSeq.of(value1, value2);
+    }
+
+    @NotNull
+    @Contract("_, _, _ -> new")
+    static <E> MutableCollection<E> of(E value1, E value2, E value3) {
+        return MutableSeq.of(value1, value2, value3);
+    }
+
+    @NotNull
+    @Contract("_, _, _, _ -> new")
+    static <E> MutableCollection<E> of(E value1, E value2, E value3, E value4) {
+        return MutableSeq.of(value1, value2, value3, value4);
+    }
+
+    @NotNull
+    @Contract("_, _, _, _, _ -> new")
+    static <E> MutableCollection<E> of(E value1, E value2, E value3, E value4, E value5) {
+        return MutableSeq.of(value1, value2, value3, value4, value5);
+    }
+
+    @NotNull
     @SafeVarargs
-    static <E> MutableCollection<E> of(E... elements) {
-        return MutableCollection.<E>factory().from(elements);
+    static <E> MutableCollection<E> of(E... values) {
+        return from(values);
     }
 
     @NotNull
-    static <E> MutableCollection<E> from(E @NotNull [] elements) {
-        return MutableCollection.<E>factory().from(elements);
+    static <E> MutableCollection<E> from(E @NotNull [] values) {
+        return MutableSeq.from(values);
     }
 
     @NotNull
-    static <E> MutableCollection<E> from(@NotNull Iterable<? extends E> iterable) {
-        return MutableCollection.<E>factory().from(iterable);
+    static <E> MutableCollection<E> from(@NotNull Iterable<? extends E> values) {
+        return MutableSeq.from(values);
     }
 
     //endregion

@@ -10,6 +10,7 @@ import asia.kala.collection.immutable.ImmutableVector;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.util.Comparator;
 import java.util.NoSuchElementException;
@@ -47,6 +48,7 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
         return iterator().isEmpty();
     }
 
+    @Range(from = -1, to = Integer.MAX_VALUE)
     default int knownSize() {
         return -1;
     }
@@ -152,6 +154,11 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
         return AbstractTraversable.collectTo(this, factory);
     }
 
+    @Override
+    default void forEach(@NotNull Consumer<? super E> action) {
+        iterator().forEach(action);
+    }
+
     @NotNull
     default Object[] toObjectArray() {
         return toArray(Object[]::new);
@@ -164,7 +171,21 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
 
     @NotNull
     default <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
+        int s = knownSize();
+        if (s > 0) {
+            U[] arr = generator.apply(s);
+            int i = 0;
+            for (E e : this) {
+                arr[i] = (U) e;
+            }
+            return arr;
+        }
         return iterator().toArray(generator);
+    }
+
+    @NotNull
+    default Seq<E> toSeq() {
+        return toImmutableSeq();
     }
 
     @NotNull
@@ -185,11 +206,6 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
     @NotNull
     default ImmutableVector<E> toImmutableVector() {
         return ImmutableVector.from(this);
-    }
-
-    @Override
-    default void forEach(@NotNull Consumer<? super E> action) {
-        iterator().forEach(action);
     }
 
     //

@@ -5,6 +5,7 @@ import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.ImmutableArray;
 import asia.kala.collection.immutable.ImmutableList;
 import asia.kala.collection.immutable.ImmutableSeq;
+import asia.kala.collection.immutable.ImmutableVector;
 import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -38,23 +39,23 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
     @NotNull
     @Contract(pure = true)
     static <E> CollectionFactory<E, ?, ? extends IndexedSeq<E>> factory() {
-        return ImmutableArray.factory();
+        return ImmutableVector.factory();
     }
 
     @NotNull
     @SafeVarargs
-    static <E> IndexedSeq<E> of(E... elements) {
-        return IndexedSeq.<E>factory().from(elements);
+    static <E> IndexedSeq<E> of(E... values) {
+        return IndexedSeq.<E>factory().from(values);
     }
 
     @NotNull
-    static <E> IndexedSeq<E> from(E @NotNull [] elements) {
-        return IndexedSeq.<E>factory().from(elements);
+    static <E> IndexedSeq<E> from(E @NotNull [] values) {
+        return IndexedSeq.<E>factory().from(values);
     }
 
     @NotNull
-    static <E> IndexedSeq<E> from(@NotNull Iterable<? extends E> iterable) {
-        return IndexedSeq.<E>factory().from(iterable);
+    static <E> IndexedSeq<E> from(@NotNull Iterable<? extends E> values) {
+        return IndexedSeq.<E>factory().from(values);
     }
 
     //endregion
@@ -86,11 +87,6 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
     @Override
     default boolean isDefinedAt(int index) {
         return index >= 0 && index < size();
-    }
-
-    @Override
-    default int knownSize() {
-        return size();
     }
 
     @Override

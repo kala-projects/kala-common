@@ -86,6 +86,31 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
     }
 
     @NotNull
+    public static <E> ImmutableVector<E> of(E value1) {
+        return new ImmutableVector<>(new Object[]{value1}, 0, 1, 0);
+    }
+
+    @NotNull
+    public static <E> ImmutableVector<E> of(E value1, E value2) {
+        return new ImmutableVector<>(new Object[]{value1, value2}, 0, 2, 0);
+    }
+
+    @NotNull
+    public static <E> ImmutableVector<E> of(E value1, E value2, E value3) {
+        return new ImmutableVector<>(new Object[]{value1, value2, value3}, 0, 3, 0);
+    }
+
+    @NotNull
+    public static <E> ImmutableVector<E> of(E value1, E value2, E value3, E value4) {
+        return new ImmutableVector<>(new Object[]{value1, value2, value3, value4}, 0, 4, 0);
+    }
+
+    @NotNull
+    public static <E> ImmutableVector<E> of(E value1, E value2, E value3, E value4, E value5) {
+        return new ImmutableVector<>(new Object[]{value1, value2, value3, value4, value5}, 0, 4, 0);
+    }
+
+    @NotNull
     public static <E> ImmutableVector<E> of(E... elements) {
         return from(elements);
     }

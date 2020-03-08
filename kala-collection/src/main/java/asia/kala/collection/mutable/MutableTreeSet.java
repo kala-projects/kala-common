@@ -7,6 +7,7 @@ import asia.kala.collection.SortedSet;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -62,31 +63,164 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
     }
 
     @NotNull
-    @Contract(" -> new")
+    @Contract(value = " -> new", pure = true)
     public static <E extends Comparable<? super E>> MutableTreeSet<E> of() {
         return new MutableTreeSet<>();
     }
 
     @NotNull
-    @Contract("_ -> new")
+    @Contract(value = "_ -> new", pure = true)
+    public static <E extends Comparable<? super E>> MutableTreeSet<E> of(E value1) {
+        MutableTreeSet<E> s = new MutableTreeSet<>();
+        s.add(value1);
+        return s;
+    }
+
+    @NotNull
+    @Contract(value = "_, _ -> new", pure = true)
+    public static <E extends Comparable<? super E>> MutableTreeSet<E> of(E value1, E value2) {
+        MutableTreeSet<E> s = new MutableTreeSet<>();
+        s.add(value1);
+        s.add(value2);
+        return s;
+    }
+
+    @NotNull
+    @Contract(value = "_, _, _ -> new", pure = true)
+    public static <E extends Comparable<? super E>> MutableTreeSet<E> of(E value1, E value2, E value3) {
+        MutableTreeSet<E> s = new MutableTreeSet<>();
+        s.add(value1);
+        s.add(value2);
+        s.add(value3);
+        return s;
+    }
+
+    @NotNull
+    @Contract(value = "_, _, _, _ -> new", pure = true)
+    public static <E extends Comparable<? super E>> MutableTreeSet<E> of(E value1, E value2, E value3, E value4) {
+        MutableTreeSet<E> s = new MutableTreeSet<>();
+        s.add(value1);
+        s.add(value2);
+        s.add(value3);
+        s.add(value4);
+        return s;
+    }
+
+    @NotNull
+    @Contract(value = "_, _, _, _, _ -> new", pure = true)
+    public static <E extends Comparable<? super E>> MutableTreeSet<E> of(E value1, E value2, E value3, E value4, E value5) {
+        MutableTreeSet<E> s = new MutableTreeSet<>();
+        s.add(value1);
+        s.add(value2);
+        s.add(value3);
+        s.add(value4);
+        s.add(value5);
+        return s;
+    }
+
+    @NotNull
+    @Contract(value = "_ -> new", pure = true)
     public static <E extends Comparable<? super E>> MutableTreeSet<E> of(E... values) {
         return from(values);
     }
 
     @NotNull
-    @Contract("_ -> new")
+    @Contract(value = "_ -> new", pure = true)
     public static <E> MutableTreeSet<E> of(Comparator<? super E> comparator) {
         return new MutableTreeSet<>(comparator);
     }
 
     @NotNull
-    @Contract("_, _ -> new")
+    @Contract(value = "_, _ -> new", pure = true)
+    public static <E extends Comparable<? super E>> MutableTreeSet<E> of(
+            Comparator<? super E> comparator,
+            E value1
+    ) {
+        MutableTreeSet<E> s = new MutableTreeSet<>(comparator);
+        s.add(value1);
+        return s;
+    }
+
+    @NotNull
+    @Contract(value = "_, _, _ -> new", pure = true)
+    public static <E extends Comparable<? super E>> MutableTreeSet<E> of(
+            Comparator<? super E> comparator,
+            E value1, E value2
+    ) {
+        MutableTreeSet<E> s = new MutableTreeSet<>(comparator);
+        s.add(value1);
+        s.add(value2);
+        return s;
+    }
+
+    @NotNull
+    @Contract(value = "_, _, _, _ -> new", pure = true)
+    public static <E extends Comparable<? super E>> MutableTreeSet<E> of(
+            Comparator<? super E> comparator,
+            E value1, E value2, E value3) {
+        MutableTreeSet<E> s = new MutableTreeSet<>(comparator);
+        s.add(value1);
+        s.add(value2);
+        s.add(value3);
+        return s;
+    }
+
+    @NotNull
+    @Contract(value = "_, _, _, _, _ -> new", pure = true)
+    public static <E extends Comparable<? super E>> MutableTreeSet<E> of(
+            Comparator<? super E> comparator,
+            E value1, E value2, E value3, E value4
+    ) {
+        MutableTreeSet<E> s = new MutableTreeSet<>(comparator);
+        s.add(value1);
+        s.add(value2);
+        s.add(value3);
+        s.add(value4);
+        return s;
+    }
+
+    @NotNull
+    @Contract(value = "_, _, _, _, _, _ -> new", pure = true)
+    public static <E extends Comparable<? super E>> MutableTreeSet<E> of(
+            Comparator<? super E> comparator,
+            E value1, E value2, E value3, E value4, E value5
+    ) {
+        MutableTreeSet<E> s = new MutableTreeSet<>(comparator);
+        s.add(value1);
+        s.add(value2);
+        s.add(value3);
+        s.add(value4);
+        s.add(value5);
+        return s;
+    }
+
+
+    @NotNull
+    @Contract(value = "_, _ -> new", pure = true)
     public static <E> MutableTreeSet<E> of(Comparator<? super E> comparator, E... values) {
         return from(comparator, values);
     }
 
     @NotNull
-    @Contract("_ -> new")
+    @Contract(value = "_ -> new", pure = true)
+    public static <E> MutableTreeSet<E> from(@NotNull SortedSet<? extends E> values) {
+        final Comparator<E> comparator = (Comparator<E>) values.comparator();
+        MutableTreeSet<E> s = new MutableTreeSet<>(comparator);
+        s.addAll(values);
+        return s;
+    }
+
+    @NotNull
+    @Contract(value = "_ -> new", pure = true)
+    public static <E> MutableTreeSet<E> from(@NotNull java.util.SortedSet<? extends E> values) {
+        final Comparator<E> comparator = (Comparator<E>) values.comparator();
+        MutableTreeSet<E> s = new MutableTreeSet<>(comparator);
+        s.addAll(values);
+        return s;
+    }
+
+    @NotNull
+    @Contract(value = "_ -> new", pure = true)
     public static <E extends Comparable<? super E>> MutableTreeSet<E> from(Iterable<? extends E> values) {
         Objects.requireNonNull(values);
         Comparator<? super E> comparator = null;
@@ -103,7 +237,7 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
     }
 
     @NotNull
-    @Contract("_ -> new")
+    @Contract(value = "_ -> new", pure = true)
     public static <E extends Comparable<? super E>> MutableTreeSet<E> from(E @NotNull [] values) {
         Objects.requireNonNull(values);
         MutableTreeSet<E> s = new MutableTreeSet<>();
@@ -112,7 +246,7 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
     }
 
     @NotNull
-    @Contract("_, _ -> new")
+    @Contract(value = "_, _ -> new", pure = true)
     public static <E> MutableTreeSet<E> from(Comparator<? super E> comparator, @NotNull Iterable<? extends E> values) {
         Objects.requireNonNull(values);
         MutableTreeSet<E> s = new MutableTreeSet<>(comparator);
@@ -121,7 +255,7 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
     }
 
     @NotNull
-    @Contract("_, _ -> new")
+    @Contract(value = "_, _ -> new", pure = true)
     public static <E> MutableTreeSet<E> from(Comparator<? super E> comparator, E @NotNull [] values) {
         Objects.requireNonNull(values);
         MutableTreeSet<E> s = new MutableTreeSet<>(comparator);
@@ -550,6 +684,12 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
 
     @NotNull
     @Override
+    public final MutableSetEditor<E, MutableTreeSet<E>> edit() {
+        return new MutableSetEditor<>(this);
+    }
+
+    @NotNull
+    @Override
     public final Enumerator<E> iterator() {
         return new MutableTreeSet.Itr<>(firstNode());
     }
@@ -559,10 +699,9 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
         return size;
     }
 
-    @NotNull
     @Override
-    public final MutableSetEditor<E, MutableTreeSet<E>> edit() {
-        return new MutableSetEditor<>(this);
+    public final int knownSize() {
+        return size;
     }
 
     //endregion
@@ -582,7 +721,7 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
     private void writeObject(java.io.ObjectOutputStream out)
             throws IOException {
         out.defaultWriteObject();
-        out.write(size);
+        out.writeInt(size);
         for (E e : this) {
             out.writeObject(e);
         }

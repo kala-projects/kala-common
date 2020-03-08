@@ -85,18 +85,18 @@ public final class ImmutableInternal {
         }
 
         @Override
-        public void insert(int index, E element) {
+        public void insert(int index, E value) {
             ensureUnaliased();
             if (index < 0 || index > len) {
                 throw new IndexOutOfBoundsException("Index out of range: " + index);
             }
             if (index == len) {
-                append(element);
+                append(value);
                 return;
             }
 
             if (index == 0) {
-                prepend(element);
+                prepend(value);
                 return;
             }
             ensureUnaliased();
@@ -107,7 +107,7 @@ public final class ImmutableInternal {
                 i = i.tail();
             }
 
-            ((ImmutableList.MutableCons<E>) i).tail = new ImmutableList.MutableCons<>(element, i.tail());
+            ((ImmutableList.MutableCons<E>) i).tail = new ImmutableList.MutableCons<>(value, i.tail());
             ++len;
         }
 

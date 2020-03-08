@@ -1,8 +1,7 @@
 package asia.kala.collection.mutable;
 
-import asia.kala.collection.ArraySeq;
-import asia.kala.collection.CollectionFactory;
-import asia.kala.collection.IndexedSeq;
+import asia.kala.collection.*;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -31,6 +30,10 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
         this.isChecked = isChecked;
     }
 
+    public MutableArray(int size) {
+        this(new Object[size]);
+    }
+
     //endregion
 
     //region Factory methods
@@ -51,6 +54,36 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
     }
 
     @NotNull
+    @Contract("_ -> new")
+    public static <E> MutableArray<E> of(E value1) {
+        return new MutableArray<>(new Object[]{value1});
+    }
+
+    @NotNull
+    @Contract("_, _ -> new")
+    public static <E> MutableArray<E> of(E value1, E value2) {
+        return new MutableArray<>(new Object[]{value1, value2});
+    }
+
+    @NotNull
+    @Contract("_, _, _ -> new")
+    public static <E> MutableArray<E> of(E value1, E value2, E value3) {
+        return new MutableArray<>(new Object[]{value1, value2, value3});
+    }
+
+    @NotNull
+    @Contract("_, _, _, _ -> new")
+    public static <E> MutableArray<E> of(E value1, E value2, E value3, E value4) {
+        return new MutableArray<>(new Object[]{value1, value2, value3, value4});
+    }
+
+    @NotNull
+    @Contract("_, _, _, _, _ -> new")
+    public static <E> MutableArray<E> of(E value1, E value2, E value3, E value4, E value5) {
+        return new MutableArray<>(new Object[]{value1, value2, value3, value4, value5});
+    }
+
+    @NotNull
     public static <E> MutableArray<E> of(@NotNull E... values) {
         return from(values);
     }
@@ -68,8 +101,39 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
     }
 
     @NotNull
+    public static <E> MutableArray<E> from(@NotNull TraversableOnce<? extends E> values) {
+        Objects.requireNonNull(values);
+
+        if (KalaCollectionUtils.knowSize(values) == 0) {
+            return empty();
+        }
+
+        return new MutableArray<>(values.toObjectArray());
+    }
+
+    @NotNull
+    public static <E> MutableArray<E> from(@NotNull Collection<? extends E> values) {
+        Objects.requireNonNull(values);
+
+        if (values.size() == 0) {
+            return empty();
+        }
+
+        return new MutableArray<>(values.toArray());
+    }
+
+    @NotNull
     public static <E> MutableArray<E> from(@NotNull Iterable<? extends E> values) {
-        assert values != null;
+        Objects.requireNonNull(values);
+
+        if (values instanceof TraversableOnce<?>) {
+            return from((TraversableOnce<E>) values);
+        }
+
+        if (values instanceof Collection<?>) {
+            return from(((Collection<E>) values));
+        }
+
         ArrayBuffer<E> buffer = new ArrayBuffer<>();
         buffer.appendAll(values);
         if (buffer.size() == 0) {

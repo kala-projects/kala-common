@@ -61,25 +61,83 @@ public final class ImmutableArray<@Covariant E> extends ArraySeq<E> implements I
     }
 
     @NotNull
+    public static <E> ImmutableArray<E> of(E value1) {
+        return new ImmutableArray<>(new Object[]{value1});
+    }
+
+    @NotNull
+    public static <E> ImmutableArray<E> of(E value1, E value2) {
+        return new ImmutableArray<>(new Object[]{value1, value2});
+    }
+
+    @NotNull
+    public static <E> ImmutableArray<E> of(E value1, E value2, E value3) {
+        return new ImmutableArray<>(new Object[]{value1, value2, value3});
+    }
+
+    @NotNull
+    public static <E> ImmutableArray<E> of(E value1, E value2, E value3, E value4) {
+        return new ImmutableArray<>(new Object[]{value1, value2, value3, value4});
+    }
+
+    @NotNull
+    public static <E> ImmutableArray<E> of(E value1, E value2, E value3, E value4, E value5) {
+        return new ImmutableArray<>(new Object[]{value1, value2, value3, value4, value5});
+    }
+
+    @NotNull
     @SafeVarargs
     @Contract("_ -> new")
-    public static <E> ImmutableArray<E> of(E... elements) {
-        return from(elements);
+    public static <E> ImmutableArray<E> of(E... values) {
+        return from(values);
     }
 
     @NotNull
-    @Contract("_ -> new")
-    public static <E> ImmutableArray<E> from(E @NotNull [] elements) {
-        Objects.requireNonNull(elements);
-        if (elements.length == 0) {
+    public static <E> ImmutableArray<E> from(E @NotNull [] values) {
+        assert values != null;
+        if (values.length == 0) {
             return empty();
         }
-        return new ImmutableArray<>(elements.clone());
+        return new ImmutableArray<>(values.clone());
     }
 
     @NotNull
-    public static <E> ImmutableArray<E> from(@NotNull Iterable<? extends E> iterable) {
-        return ImmutableArray.<E>factory().from(iterable);
+    public static <E> ImmutableArray<E> from(@NotNull TraversableOnce<? extends E> values) {
+        if (values instanceof ImmutableArray<?>) {
+            return (ImmutableArray<E>) values;
+        }
+
+        if (values.knownSize() == 0) {
+            return empty();
+        }
+
+        Object[] arr = values.toObjectArray();
+        if (arr.length == 0) {
+            return empty();
+        }
+        return new ImmutableArray<>(arr);
+    }
+
+    @NotNull
+    public static <E> ImmutableArray<E> from(@NotNull java.util.Collection<? extends E> values) {
+        if (values.size() == 0) {
+            return empty();
+        }
+        return new ImmutableArray<>(values.toArray());
+    }
+
+    @NotNull
+    public static <E> ImmutableArray<E> from(@NotNull Iterable<? extends E> values) {
+        Objects.requireNonNull(values);
+
+        if (values instanceof TraversableOnce<?>) {
+            return from((TraversableOnce<E>) values);
+        }
+        if (values instanceof java.util.Collection<?>) {
+            return from(((java.util.Collection<E>) values));
+        }
+
+        return ArrayBuffer.<E>from(values).toImmutableArray();
     }
 
     @StaticClass
@@ -458,6 +516,11 @@ public final class ImmutableArray<@Covariant E> extends ArraySeq<E> implements I
 
         @Override
         public final ImmutableArray<E> from(E @NotNull [] values) {
+            return ImmutableArray.from(values);
+        }
+
+        @Override
+        public final ImmutableArray<E> from(@NotNull Iterable<? extends E> values) {
             return ImmutableArray.from(values);
         }
 

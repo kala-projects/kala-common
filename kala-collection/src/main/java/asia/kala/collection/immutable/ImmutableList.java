@@ -55,6 +55,31 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
     }
 
     @NotNull
+    public static <E> ImmutableList<E> of(E value1) {
+        return new ImmutableCons<>(value1, nil());
+    }
+
+    @NotNull
+    public static <E> ImmutableList<E> of(E value1, E value2) {
+        return new ImmutableCons<>(value1, new ImmutableCons<>(value2, nil()));
+    }
+
+    @NotNull
+    public static <E> ImmutableList<E> of(E value1, E value2, E value3) {
+        return new ImmutableCons<>(value1, new ImmutableCons<>(value2, new ImmutableCons<>(value3, nil())));
+    }
+
+    @NotNull
+    public static <E> ImmutableList<E> of(E value1, E value2, E value3, E value4) {
+        return new ImmutableCons<>(value1, new ImmutableCons<>(value2, new ImmutableCons<>(value3, new ImmutableCons<>(value4, nil()))));
+    }
+
+    @NotNull
+    public static <E> ImmutableList<E> of(E value1, E value2, E value3, E value4, E value5) {
+        return new ImmutableCons<>(value1, new ImmutableCons<>(value2, new ImmutableCons<>(value3, new ImmutableCons<>(value4, new ImmutableCons<>(value5, nil())))));
+    }
+
+    @NotNull
     @SafeVarargs
     public static <E> ImmutableList<E> of(E... elements) {
         return from(elements);
@@ -73,6 +98,29 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
     }
 
     @NotNull
+    public static <E> ImmutableList<E> from(@NotNull IndexedSeq<? extends E> values) {
+        ImmutableList<E> res = nil();
+        for (int i = values.size() - 1; i >= 0; i--) {
+            res = res.cons(values.get(i));
+        }
+        return res;
+    }
+
+    @NotNull
+    public static <E> ImmutableList<E> from(@NotNull java.util.List<? extends E> values) {
+        final int size = values.size();
+        if (size == 0) {
+            return empty();
+        }
+        ListIterator<? extends E> it = values.listIterator(size);
+        ImmutableList<E> res = nil();
+        while (it.hasPrevious()) {
+            res = res.cons(it.previous());
+        }
+        return res;
+    }
+
+    @NotNull
     @SuppressWarnings("unchecked")
     public static <E> ImmutableList<E> from(@NotNull Iterable<? extends E> values) {
         Objects.requireNonNull(values);
@@ -81,12 +129,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
             return (ImmutableList<E>) values;
         }
         if (values instanceof IndexedSeq<?>) {
-            IndexedSeq<E> seq = (IndexedSeq<E>) values;
-            ImmutableList<E> res = nil();
-            for (int i = seq.size() - 1; i >= 0; i--) {
-                res = res.cons(seq.get(i));
-            }
-            return res;
+            return from((IndexedSeq<E>) values);
         }
         if (values instanceof java.util.List<?>) {
             List<E> list = (List<E>) values;
@@ -107,6 +150,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
 
     public abstract E head();
 
+    @NotNull
     public abstract Option<E> headOption();
 
     @NotNull
@@ -313,6 +357,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
             throw new NoSuchElementException("ImmutableList.Nil.head()");
         }
 
+        @NotNull
         @Override
         public final Option<Object> headOption() {
             return Option.none();
@@ -389,6 +434,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
         Cons() {
         }
 
+        @NotNull
         @Override
         public final Option<E> headOption() {
             return Option.some(head());

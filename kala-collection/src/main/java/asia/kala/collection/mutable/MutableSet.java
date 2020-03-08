@@ -11,11 +11,78 @@ import java.util.function.Predicate;
 
 public interface MutableSet<E> extends MutableCollection<E>, Set<E> {
 
-    @Contract(mutates = "this")
-    boolean add(E value);
+    //region Factory methods
+
+    @NotNull
+    @Contract(pure = true)
+    static <E> CollectionFactory<E, ?, ? extends MutableSet<E>> factory() {
+        return MutableHashSet.factory();
+    }
+
+    @NotNull
+    @Contract(value = "-> new", pure = true)
+    static <E> MutableSet<E> of() {
+        return MutableHashSet.of();
+    }
+
+    @NotNull
+    @Contract(value = "_ -> new", pure = true)
+    static <E> MutableSet<E> of(E value1) {
+        return MutableHashSet.of(value1);
+    }
+
+    @NotNull
+    @Contract(value = "_, _ -> new", pure = true)
+    static <E> MutableSet<E> of(E value1, E value2) {
+        return MutableHashSet.of(value1, value2);
+    }
+
+    @NotNull
+    @Contract(value = "_, _, _ -> new", pure = true)
+    static <E> MutableSet<E> of(E value1, E value2, E value3) {
+        return MutableHashSet.of(value1, value2, value3);
+    }
+
+    @NotNull
+    @Contract(value = "_, _, _, _ -> new", pure = true)
+    static <E> MutableSet<E> of(E value1, E value2, E value3, E value4) {
+        return MutableHashSet.of(value1, value2, value3, value4);
+    }
+
+    @NotNull
+    @Contract(value = "_, _, _, _, _ -> new", pure = true)
+    static <E> MutableSet<E> of(E value1, E value2, E value3, E value4, E value5) {
+        return MutableHashSet.of(value1, value2, value3, value4, value5);
+    }
+
+    @NotNull
+    @SafeVarargs
+    @Contract(value = "_ -> new", pure = true)
+    static <E> MutableSet<E> of(E... values) {
+        return from(values);
+    }
+
+    @NotNull
+    @Contract(value = "_ -> new", pure = true)
+    static <E> MutableSet<E> from(E @NotNull [] values) {
+        return MutableHashSet.from(values);
+    }
+
+    @NotNull
+    @Contract(value = "_ -> new", pure = true)
+    static <E> MutableSet<E> from(@NotNull Iterable<? extends E> values) {
+        return MutableHashSet.from(values);
+    }
+
+    //endregion
 
     @Contract(mutates = "this")
-    default boolean addAll(@NotNull Iterable<? extends E> values) {
+    boolean add(@Flow(targetIsContainer = true) E value);
+
+    @Contract(mutates = "this")
+    default boolean addAll(
+            @NotNull @Flow(sourceIsContainer = true, targetIsContainer = true) Iterable<? extends E> values
+    ) {
         boolean m = false;
         for (E value : values) {
             if (this.add(value)) {
@@ -26,7 +93,7 @@ public interface MutableSet<E> extends MutableCollection<E>, Set<E> {
     }
 
     @Contract(mutates = "this")
-    default boolean addAll(E @NotNull [] values) {
+    default boolean addAll(@Flow(sourceIsContainer = true, targetIsContainer = true) E @NotNull [] values) {
         Objects.requireNonNull(values);
 
         return addAll(ArraySeq.wrap(values));
@@ -116,6 +183,12 @@ public interface MutableSet<E> extends MutableCollection<E>, Set<E> {
     @Override
     default String className() {
         return "MutableSet";
+    }
+
+    @Override
+    @NotNull
+    default <U> CollectionFactory<U, ?, ? extends MutableSet<U>> iterableFactory() {
+        return factory();
     }
 
     @NotNull

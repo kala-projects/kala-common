@@ -2,8 +2,7 @@ package asia.kala.collection;
 
 import asia.kala.Option;
 import asia.kala.annotations.Covariant;
-import asia.kala.collection.immutable.ImmutableList;
-import asia.kala.collection.immutable.ImmutableSeq;
+import asia.kala.collection.immutable.*;
 import asia.kala.function.IndexedConsumer;
 import kotlin.annotations.jvm.ReadOnly;
 import org.intellij.lang.annotations.Flow;
@@ -36,19 +35,49 @@ public interface Seq<@Covariant E> extends Traversable<E> {
     }
 
     @NotNull
+    static <E> Seq<E> of() {
+        return ImmutableSeq.of();
+    }
+
+    @NotNull
+    static <E> Seq<E> of(E value1) {
+        return ImmutableSeq.of(value1);
+    }
+
+    @NotNull
+    static <E> Seq<E> of(E value1, E values2) {
+        return ImmutableSeq.of(value1, values2);
+    }
+
+    @NotNull
+    static <E> Seq<E> of(E value1, E values2, E value3) {
+        return ImmutableSeq.of(value1, values2, value3);
+    }
+
+    @NotNull
+    static <E> Seq<E> of(E value1, E values2, E value3, E value4) {
+        return ImmutableSeq.of(value1, values2, value3, value4);
+    }
+
+    @NotNull
+    static <E> Seq<E> of(E value1, E values2, E value3, E value4, E value5) {
+        return ImmutableSeq.of(value1, values2, value3, value4, value5);
+    }
+
+    @NotNull
     @SafeVarargs
     static <E> Seq<E> of(E... values) {
-        return Seq.<E>factory().from(values);
+        return ImmutableSeq.from(values);
     }
 
     @NotNull
     static <E> Seq<E> from(E @NotNull [] values) {
-        return Seq.<E>factory().from(values);
+        return ImmutableSeq.from(values);
     }
 
     @NotNull
     static <E> Seq<E> from(@NotNull Iterable<? extends E> values) {
-        return Seq.<E>factory().from(values);
+        return ImmutableSeq.from(values);
     }
 
     //endregion

@@ -128,14 +128,6 @@ public final class KalaCollectionUtils {
         throw new IllegalArgumentException();
     }
 
-    public static int hash(@NotNull Object[] arr, int start, int count) {
-        int ans = 0;
-        for (int i = start; i < start + count; i++) {
-            ans = 31 * ans + Objects.hashCode(arr[i]);
-        }
-        return ans;
-    }
-
     public static int knowSize(@NotNull Object collection) {
         if (collection instanceof TraversableOnce<?>) {
             return ((TraversableOnce<?>) collection).knownSize();

@@ -13,7 +13,7 @@ import java.util.function.IntFunction;
 
 @SuppressWarnings("unchecked")
 public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSeq<E>, Serializable {
-    private static final long serialVersionUID = 6323541372807433607L;
+    private static final long serialVersionUID = 2545219250020890853L;
 
     private static final int DEFAULT_CAPACITY = 16;
 
@@ -66,6 +66,56 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
 
     @NotNull
     @Contract("_ -> new")
+    public static <E> ArrayBuffer<E> of(E value1) {
+        Object[] arr = new Object[DEFAULT_CAPACITY];
+        arr[0] = value1;
+        return new ArrayBuffer<>(arr, 1);
+    }
+
+    @NotNull
+    @Contract("_, _ -> new")
+    public static <E> ArrayBuffer<E> of(E value1, E value2) {
+        Object[] arr = new Object[DEFAULT_CAPACITY];
+        arr[0] = value1;
+        arr[1] = value2;
+        return new ArrayBuffer<>(arr, 2);
+    }
+
+    @NotNull
+    @Contract("_, _, _ -> new")
+    public static <E> ArrayBuffer<E> of(E value1, E value2, E value3) {
+        Object[] arr = new Object[DEFAULT_CAPACITY];
+        arr[0] = value1;
+        arr[1] = value2;
+        arr[2] = value3;
+        return new ArrayBuffer<>(arr, 3);
+    }
+
+    @NotNull
+    @Contract("_, _, _, _ -> new")
+    public static <E> ArrayBuffer<E> of(E value1, E value2, E value3, E value4) {
+        Object[] arr = new Object[DEFAULT_CAPACITY];
+        arr[0] = value1;
+        arr[1] = value2;
+        arr[2] = value3;
+        arr[3] = value4;
+        return new ArrayBuffer<>(arr, 4);
+    }
+
+    @NotNull
+    @Contract("_, _, _, _, _ -> new")
+    public static <E> ArrayBuffer<E> of(E value1, E value2, E value3, E value4, E value5) {
+        Object[] arr = new Object[DEFAULT_CAPACITY];
+        arr[0] = value1;
+        arr[1] = value2;
+        arr[2] = value3;
+        arr[3] = value4;
+        arr[4] = value5;
+        return new ArrayBuffer<>(arr, 5);
+    }
+
+    @NotNull
+    @Contract("_ -> new")
     public static <E> ArrayBuffer<E> of(E... elements) {
         return from(elements);
     }
@@ -85,9 +135,9 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     }
 
     @NotNull
-    public static <E> ArrayBuffer<E> from(@NotNull Iterable<? extends E> iterable) {
+    public static <E> ArrayBuffer<E> from(@NotNull Iterable<? extends E> values) {
         ArrayBuffer<E> buffer = new ArrayBuffer<>();
-        buffer.appendAll(iterable);
+        buffer.appendAll(values);
         return buffer;
     }
 
@@ -207,20 +257,20 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     }
 
     @Override
-    public final void insert(int index, E element) {
+    public final void insert(int index, E value) {
         int size = this.size;
         if (index < 0 || index > size) {
             throw new IndexOutOfBoundsException();
         }
         if (index == size) {
-            append(element);
+            append(value);
         }
         if (elements.length == size) {
             grow();
         }
 
         System.arraycopy(elements, index, elements, index + 1, size - index);
-        elements[index] = element;
+        elements[index] = value;
         ++this.size;
     }
 
@@ -378,7 +428,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     //region Serialization
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-        out.write(size);
+        out.writeInt(size);
         if (size != 0) {
             Object[] values = elements.length == size ? elements : Arrays.copyOf(elements, size);
             out.writeObject(values);
