@@ -4,7 +4,6 @@ import asia.kala.Option;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.*;
 import asia.kala.function.IndexedConsumer;
-import kotlin.annotations.jvm.ReadOnly;
 import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -301,7 +300,6 @@ public interface Seq<@Covariant E> extends Traversable<E> {
     }
 
     @NotNull
-    @ReadOnly
     @Override
     default List<E> asJava() {
         if (this instanceof IndexedSeq<?>) {

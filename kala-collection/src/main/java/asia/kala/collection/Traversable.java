@@ -3,7 +3,6 @@ package asia.kala.collection;
 import asia.kala.Equals;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.ImmutableCollection;
-import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,6 +32,10 @@ public interface Traversable<@Covariant E> extends TraversableOnce<E>, Equals {
 
     @NotNull
     default Spliterator<E> spliterator() {
+        final int knownSize = knownSize();
+        if (knownSize != 0) {
+            return Spliterators.spliterator(iterator(), knownSize, 0);
+        }
         return Spliterators.spliterator(iterator(), size(), 0);
     }
 
@@ -61,7 +64,6 @@ public interface Traversable<@Covariant E> extends TraversableOnce<E>, Equals {
     }
 
     @NotNull
-    @ReadOnly
     @Override
     default Collection<E> asJava() {
         return new JDKConverters.TraversableAsJava<>(this);

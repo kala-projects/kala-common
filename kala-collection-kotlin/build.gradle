@@ -9,3 +9,9 @@ compileJava.dependsOn(':kala-collection:publishToMavenLocal')
 
 compileKotlin.dependsOn(':kala-base-kotlin:publishToMavenLocal')
 compileJava.dependsOn(':kala-base-kotlin:publishToMavenLocal')
+
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xuse-experimental=kotlin.Experimental"]
+    }
+}

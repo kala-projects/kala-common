@@ -3,7 +3,6 @@ package asia.kala.collection.mutable;
 import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.JDKConverters;
 import asia.kala.collection.Traversable;
-import kotlin.annotations.jvm.Mutable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -88,7 +87,6 @@ public interface MutableCollection<E> extends Traversable<E> {
     }
 
     @NotNull
-    @Mutable
     @Override
     default Collection<E> asJava() {
         return new JDKConverters.MutableCollectionAsJava<>(this);

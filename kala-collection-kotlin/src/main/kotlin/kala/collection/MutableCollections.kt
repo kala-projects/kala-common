@@ -4,11 +4,19 @@ package kala.collection
 
 typealias MutableCollection<E> = asia.kala.collection.mutable.MutableCollection<E>
 
+inline fun <E> MutableCollection<E>.asKotlin(): kotlin.collections.MutableCollection<E> {
+    return this.asJava()
+}
+
 //
 // -- MutableSeq
 //
 
 typealias MutableSeq<E> = asia.kala.collection.mutable.MutableSeq<E>
+
+inline fun <E> MutableSeq<E>.asKotlin(): MutableList<E> {
+    return this.asJava()
+}
 
 inline fun <E> MutableList<E>.asKala(): MutableSeq<E> {
     return MutableSeq.wrapJava(this)

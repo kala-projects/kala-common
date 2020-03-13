@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.function.Function;
 
 @ApiStatus.Internal
 public final class ImmutableInternal {
@@ -18,6 +19,7 @@ public final class ImmutableInternal {
      *
      * @see LinkedBuffer
      */
+    @SuppressWarnings("unchecked")
     public static abstract class LinkedBufferImpl<E> extends AbstractBuffer<E> {
         ImmutableList.MutableCons<E> first = null;
         ImmutableList.MutableCons<E> last = null;
@@ -205,7 +207,7 @@ public final class ImmutableInternal {
 
         @Override
         public final void set(int index, E newValue) {
-            int len = this.len;
+            final int len = this.len;
             if (index < 0 || index >= len) {
                 throw new IndexOutOfBoundsException("Index out of range: " + index);
             }
@@ -224,7 +226,6 @@ public final class ImmutableInternal {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public final void sort(@NotNull Comparator<? super E> comparator) {
             if (len == 0) {
                 return;
@@ -232,6 +233,7 @@ public final class ImmutableInternal {
             Object[] values = toObjectArray();
             Arrays.sort(values, (Comparator<? super Object>) comparator);
 
+            ensureUnaliased();
             ImmutableList.MutableCons<E> c = first;
             for (Object value : values) {
                 //noinspection ConstantConditions
@@ -239,6 +241,20 @@ public final class ImmutableInternal {
                 c = c.tail instanceof ImmutableList.MutableCons<?>
                         ? (ImmutableList.MutableCons<E>) c.tail
                         : null;
+            }
+        }
+
+        @Override
+        public final void mapInPlace(@NotNull Function<? super E, ? extends E> mapper) {
+            ImmutableList<E> n = first;
+            if (n == null || n == ImmutableList.nil()) {
+                return;
+            }
+            ensureUnaliased();
+            while (n instanceof ImmutableList.MutableCons<?>) {
+                ImmutableList.MutableCons<E> c = (ImmutableList.MutableCons<E>) n;
+                c.head = mapper.apply(c.head);
+                n = (ImmutableList<E>) c.tail;
             }
         }
 

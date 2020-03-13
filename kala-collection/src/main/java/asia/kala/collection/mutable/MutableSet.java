@@ -1,7 +1,6 @@
 package asia.kala.collection.mutable;
 
 import asia.kala.collection.*;
-import kotlin.annotations.jvm.Mutable;
 import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -198,7 +197,6 @@ public interface MutableSet<E> extends MutableCollection<E>, Set<E> {
     }
 
     @NotNull
-    @Mutable
     @Override
     default java.util.Set<E> asJava() {
         return new JDKConverters.MutableSetAsJava<>(this);

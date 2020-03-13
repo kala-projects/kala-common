@@ -59,6 +59,10 @@ public interface ImmutableCollection<@Covariant E> extends Traversable<E>, Trans
     @NotNull
     @Override
     default Spliterator<E> spliterator() {
+        final int knownSize = knownSize();
+        if (knownSize != 0) {
+            return Spliterators.spliterator(iterator(), knownSize, Spliterator.IMMUTABLE);
+        }
         return Spliterators.spliterator(iterator(), size(), Spliterator.IMMUTABLE);
     }
 

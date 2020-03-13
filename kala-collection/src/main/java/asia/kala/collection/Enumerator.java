@@ -6,7 +6,6 @@ import asia.kala.annotations.Covariant;
 import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.collection.mutable.LinkedBuffer;
 import asia.kala.function.IndexedConsumer;
-import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -198,7 +197,6 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
     }
 
     @NotNull
-    @ReadOnly
     @Override
     default Iterator<E> asJava() {
         return this;

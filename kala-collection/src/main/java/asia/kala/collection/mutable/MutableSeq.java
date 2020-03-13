@@ -4,7 +4,6 @@ import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.IndexedSeq;
 import asia.kala.collection.JDKConverters;
 import asia.kala.collection.Seq;
-import kotlin.annotations.jvm.Mutable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -73,7 +72,7 @@ public interface MutableSeq<E> extends MutableCollection<E>, Seq<E> {
 
     @NotNull
     @Contract("_ -> new")
-    static <E> MutableSeq<E> wrapJava(@NotNull @Mutable List<E> list) {
+    static <E> MutableSeq<E> wrapJava(@NotNull List<E> list) {
         Objects.requireNonNull(list);
         if (list instanceof RandomAccess) {
             return new JDKConverters.RandomAccessMutableListWrapper<>(list);
@@ -136,7 +135,6 @@ public interface MutableSeq<E> extends MutableCollection<E>, Seq<E> {
     }
 
     @NotNull
-    @Mutable
     @Override
     default List<E> asJava() {
         if (this instanceof IndexedSeq<?>) {

@@ -1,7 +1,6 @@
 package asia.kala.collection;
 
 import asia.kala.annotations.Covariant;
-import kotlin.annotations.jvm.ReadOnly;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -57,7 +56,7 @@ public interface CollectionFactory<E, Builder, @Covariant R> extends Collector<E
         return build(newBuilder());
     }
 
-    default R from(@NotNull @ReadOnly Iterable<? extends E> values) {
+    default R from(@NotNull Iterable<? extends E> values) {
         Builder builder = newBuilder();
         sizeHint(builder, values);
 

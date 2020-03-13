@@ -2,7 +2,6 @@ package asia.kala.collection;
 
 import asia.kala.Option;
 import asia.kala.collection.immutable.ImmutableArray;
-import asia.kala.collection.immutable.ImmutableSeq;
 import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.Contract;
@@ -38,6 +37,7 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
     public static <E> CollectionFactory<E, ?, ? extends ArraySeq<E>> factory() {
         return (Factory<E>) FACTORY;
     }
+
 
     @NotNull
     @Contract("_ -> new")

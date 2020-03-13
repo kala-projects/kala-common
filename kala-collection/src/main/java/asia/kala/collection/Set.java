@@ -1,6 +1,7 @@
 package asia.kala.collection;
 
-import kotlin.annotations.jvm.ReadOnly;
+import asia.kala.collection.immutable.ImmutableSeq;
+import asia.kala.collection.immutable.ImmutableSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Spliterator;
@@ -8,6 +9,10 @@ import java.util.Spliterators;
 import java.util.function.Predicate;
 
 public interface Set<E> extends Traversable<E> {
+
+    static <E> CollectionFactory<E, ?, ? extends Set<E>> factory() {
+        return ImmutableSet.factory();
+    }
 
     @Override
     default boolean contains(Object value) {
@@ -27,6 +32,12 @@ public interface Set<E> extends Traversable<E> {
 
     @NotNull
     @Override
+    default <U> CollectionFactory<U, ?, ? extends Set<U>> iterableFactory() {
+        return factory();
+    }
+
+    @NotNull
+    @Override
     default SetView<E> view() {
         return new SetViews.Of<>(this);
     }
@@ -37,7 +48,6 @@ public interface Set<E> extends Traversable<E> {
     }
 
     @NotNull
-    @ReadOnly
     @Override
     default java.util.Set<E> asJava() {
         return new JDKConverters.SetAsJava<>(this);

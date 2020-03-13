@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.*;
@@ -48,10 +49,120 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
         return iterator().isEmpty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default int size() {
+        return iterator().size();
+    }
+
     @Range(from = -1, to = Integer.MAX_VALUE)
     default int knownSize() {
         return -1;
     }
+
+    //region Size compare operators
+
+    default int sizeCompare(int otherSize) {
+        if (otherSize < 0) {
+            return 1;
+        }
+        final int knownSize = knownSize();
+        if (knownSize >= 0) {
+            return Integer.compare(knownSize, otherSize);
+        }
+        int i = 0;
+        for (E e : this) {
+            if (i == otherSize) {
+                return 1;
+            }
+            ++i;
+        }
+        return i - otherSize;
+    }
+
+    default int sizeCompare(@NotNull Iterable<?> other) {
+        final int os = KalaCollectionUtils.knowSize(other);
+        if (os >= 0) {
+            return sizeCompare(os);
+        }
+        int ks = this.knownSize();
+        if (ks == 0) {
+            return other.iterator().hasNext() ? -1 : 0;
+        } else if (ks > 0) {
+            Iterator<?> it = other.iterator();
+            while (it.hasNext()) {
+                it.next();
+                --ks;
+                if (ks == 0) {
+                    return it.hasNext() ? -1 : 0;
+                }
+            }
+            return 1;
+        }
+
+        Iterator<?> it1 = this.iterator();
+        Iterator<?> it2 = other.iterator();
+        while (it1.hasNext() && it2.hasNext()) {
+            it1.next();
+            it2.next();
+        }
+
+        if (it1.hasNext()) {
+            return 1;
+        }
+        if (it2.hasNext()) {
+            return -1;
+        }
+        return 0;
+    }
+
+    default boolean sizeIs(int otherSize) {
+        return sizeCompare(otherSize) == 0;
+    }
+
+    default boolean sizeEquals(int otherSize) {
+        return sizeIs(otherSize);
+    }
+
+    default boolean sizeEquals(@NotNull Iterable<?> other) {
+        return sizeCompare(other) == 0;
+    }
+
+    default boolean sizeLessThan(int otherSize) {
+        return sizeCompare(otherSize) < 0;
+    }
+
+    default boolean sizeLessThan(@NotNull Iterable<?> other) {
+        return sizeCompare(other) < 0;
+    }
+
+    default boolean sizeLessThanOrEquals(int otherSize) {
+        return sizeCompare(otherSize) <= 0;
+    }
+
+    default boolean sizeLessThanOrEquals(@NotNull Iterable<?> other) {
+        return sizeCompare(other) <= 0;
+    }
+
+    default boolean sizeGreaterThan(int otherSize) {
+        return sizeCompare(otherSize) > 0;
+    }
+
+    default boolean sizeGreaterThan(@NotNull Iterable<?> other) {
+        return sizeCompare(other) > 0;
+    }
+
+    default boolean sizeGreaterThanOrEquals(int otherSize) {
+        return sizeCompare(otherSize) >= 0;
+    }
+
+    default boolean sizeGreaterThanOrEquals(@NotNull Iterable<?> other) {
+        return sizeCompare(other) >= 0;
+    }
+
+    //endregion
 
     default boolean sameElements(@NotNull Iterable<?> other) {
         return iterator().sameElements(other);
@@ -244,14 +355,6 @@ public interface TraversableOnce<@Covariant E> extends Iterable<E>, Foldable<E> 
     @Override
     default Option<E> reduceRightOption(@NotNull BiFunction<? super E, ? super E, ? extends E> op) {
         return iterator().reduceRightOption(op);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    default int size() {
-        return iterator().size();
     }
 
     /**

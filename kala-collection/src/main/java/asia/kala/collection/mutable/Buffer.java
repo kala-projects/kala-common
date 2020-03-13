@@ -2,7 +2,6 @@ package asia.kala.collection.mutable;
 
 import asia.kala.collection.*;
 import asia.kala.collection.JDKConverters;
-import kotlin.annotations.jvm.Mutable;
 import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -76,7 +75,7 @@ public interface Buffer<E> extends MutableSeq<E> {
 
     @NotNull
     @Contract("_ -> new")
-    static <E> Buffer<E> wrapJava(@NotNull @Mutable List<E> list) {
+    static <E> Buffer<E> wrapJava(@NotNull List<E> list) {
         Objects.requireNonNull(list);
         if (list instanceof RandomAccess) {
             return new JDKConverters.RandomAccessResizableListWrapper<>(list);
@@ -242,7 +241,6 @@ public interface Buffer<E> extends MutableSeq<E> {
     }
 
     @NotNull
-    @Mutable
     @Override
     default List<E> asJava() {
         if (this instanceof IndexedSeq<?>) {

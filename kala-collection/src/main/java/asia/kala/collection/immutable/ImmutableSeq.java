@@ -8,8 +8,10 @@ import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -188,6 +190,13 @@ public interface ImmutableSeq<@Covariant E> extends ImmutableCollection<E>, Seq<
     @Override
     default <U> CollectionFactory<U, ?, ? extends ImmutableSeq<U>> iterableFactory() {
         return factory();
+    }
+
+    @NotNull
+    @Override
+    @Unmodifiable
+    default List<E> asJava() {
+        return Seq.super.asJava();
     }
 
     @NotNull
