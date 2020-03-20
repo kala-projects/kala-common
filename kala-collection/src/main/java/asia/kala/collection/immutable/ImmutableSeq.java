@@ -2,8 +2,9 @@ package asia.kala.collection.immutable;
 
 import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
-import asia.kala.collection.CollectionFactory;
+import asia.kala.factory.CollectionFactory;
 import asia.kala.collection.Seq;
+import asia.kala.factory.CollectionFactory;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;

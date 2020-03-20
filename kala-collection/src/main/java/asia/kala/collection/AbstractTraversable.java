@@ -1,6 +1,7 @@
 package asia.kala.collection;
 
 import asia.kala.annotations.Covariant;
+import asia.kala.factory.CollectionFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;

@@ -1,9 +1,9 @@
 package asia.kala.collection.immutable;
 
 import asia.kala.Tuple2;
+import asia.kala.factory.CollectionFactory;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.AbstractTraversable;
-import asia.kala.collection.CollectionFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;

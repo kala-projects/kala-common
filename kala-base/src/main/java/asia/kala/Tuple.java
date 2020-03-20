@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.IntFunction;
 
+import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +23,7 @@ public abstract class Tuple implements Serializable {
      *
      * @return the number of elements of this {@code Tuple}
      */
+    @Contract(pure = true)
     public abstract int arity();
 
     /**
@@ -33,6 +35,8 @@ public abstract class Tuple implements Serializable {
      * @apiNote this method is not type safe, please use {@code Tuple.componentN(tuple)} to get the
      * Nth element of the tuple (when {@code N <= 18}).
      */
+    @Contract(pure = true)
+    @Flow(sourceIsContainer = true)
     public abstract <U> U elementAt(int index);
 
     /**
@@ -40,6 +44,7 @@ public abstract class Tuple implements Serializable {
      *
      * @return a new tuple by prepending the head to `this` tuple
      */
+    @Contract(pure = true)
     public abstract <H> HList<H, ? extends Tuple> cons(H head);
 
     /**
@@ -48,7 +53,7 @@ public abstract class Tuple implements Serializable {
      * @return an array containing all of the elements in this tuple
      */
     @NotNull
-    @Contract("-> new")
+    @Contract(value = "-> new", pure = true)
     public Object[] toJavaArray() {
         return toJavaArray(Object[]::new);
     }
@@ -62,8 +67,10 @@ public abstract class Tuple implements Serializable {
      *                             array because the runtime type does not match
      */
     @NotNull
+    @Contract(pure = true)
     public abstract <U> U[] toJavaArray(@NotNull IntFunction<U[]> generator);
 
+    @NotNull
     public static Tuple0 of() {
         return Tuple0.INSTANCE;
     }

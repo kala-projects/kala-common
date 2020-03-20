@@ -2,6 +2,7 @@ package asia.kala.collection.mutable;
 
 import asia.kala.collection.*;
 import asia.kala.collection.JDKConverters;
+import asia.kala.factory.CollectionFactory;
 import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

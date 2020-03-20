@@ -12,6 +12,7 @@ import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.*;
 import asia.kala.collection.mutable.ArrayBuffer;
+import asia.kala.factory.CollectionFactory;
 import asia.kala.function.IndexedFunction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

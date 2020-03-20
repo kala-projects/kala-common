@@ -3,6 +3,7 @@ package asia.kala.collection;
 import asia.kala.control.Option;
 import asia.kala.collection.immutable.ImmutableArray;
 import asia.kala.collection.mutable.ArrayBuffer;
+import asia.kala.factory.CollectionFactory;
 import asia.kala.function.IndexedConsumer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

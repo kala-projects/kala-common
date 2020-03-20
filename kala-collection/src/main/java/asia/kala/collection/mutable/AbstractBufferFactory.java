@@ -1,6 +1,6 @@
 package asia.kala.collection.mutable;
 
-import asia.kala.collection.CollectionFactory;
+import asia.kala.factory.CollectionFactory;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractBufferFactory<E, B extends Buffer<E>> implements CollectionFactory<E, B, B> {

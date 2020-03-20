@@ -1,7 +1,7 @@
 package asia.kala.collection.mutable;
 
 import asia.kala.collection.AbstractEnumerator;
-import asia.kala.collection.CollectionFactory;
+import asia.kala.factory.CollectionFactory;
 import asia.kala.collection.Enumerator;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

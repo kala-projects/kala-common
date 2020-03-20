@@ -1,6 +1,6 @@
 package asia.kala.collection.mutable;
 
-import asia.kala.collection.CollectionFactory;
+import asia.kala.factory.CollectionFactory;
 import asia.kala.collection.JDKConverters;
 import asia.kala.collection.Traversable;
 import org.jetbrains.annotations.Contract;

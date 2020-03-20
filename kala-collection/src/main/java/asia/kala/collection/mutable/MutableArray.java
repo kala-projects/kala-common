@@ -1,6 +1,7 @@
 package asia.kala.collection.mutable;
 
 import asia.kala.collection.*;
+import asia.kala.factory.CollectionFactory;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

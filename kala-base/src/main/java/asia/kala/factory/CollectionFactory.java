@@ -1,21 +1,59 @@
-package asia.kala.collection;
+package asia.kala.factory;
 
 import asia.kala.annotations.Covariant;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
-public interface CollectionFactory<E, Builder, @Covariant R> extends Collector<E, Builder, R> {
+public interface CollectionFactory<E, Builder, @Covariant R>
+        extends Factory<Builder, R>, Collector<E, Builder, R> {
+
+    @NotNull
+    @Contract(pure = true)
+    static <E, Builder, R> CollectionFactory<E, Builder, R> ofCollector(
+            @NotNull Collector<E, Builder, R> collector
+    ) {
+        Objects.requireNonNull(collector);
+        if (collector instanceof CollectionFactory<?, ?, ?>) {
+            return ((CollectionFactory<E, Builder, R>) collector);
+        }
+        return new CollectionFactory<E, Builder, R>() {
+            @Override
+            public final Builder newBuilder() {
+                return collector.supplier().get();
+            }
+
+            @Override
+            public final R build(@NotNull Builder builder) {
+                return collector.finisher().apply(builder);
+            }
+
+            @Override
+            public final void addToBuilder(@NotNull Builder builder, E value) {
+                collector.accumulator().accept(builder, value);
+            }
+
+            @Override
+            public final Builder mergeBuilder(@NotNull Builder builder1, @NotNull Builder builder2) {
+                return collector.combiner().apply(builder1, builder2);
+            }
+
+            @Override
+            public final Set<Characteristics> characteristics() {
+                return collector.characteristics();
+            }
+        };
+    }
 
     Builder newBuilder();
+
+    R build(@NotNull Builder builder);
 
     void addToBuilder(@NotNull Builder builder, E value);
 
@@ -26,9 +64,14 @@ public interface CollectionFactory<E, Builder, @Covariant R> extends Collector<E
         }
     }
 
-    Builder mergeBuilder(@NotNull Builder builder1, @NotNull Builder builder2);
+    default void addAllToBuilder(@NotNull Builder builder, E @NotNull [] values) {
+        Objects.requireNonNull(values);
+        for (E value : values) {
+            addToBuilder(builder, value);
+        }
+    }
 
-    R build(@NotNull Builder builder);
+    Builder mergeBuilder(@NotNull Builder builder1, @NotNull Builder builder2);
 
     default void sizeHint(@NotNull Builder builder, int size) {
 
@@ -41,12 +84,7 @@ public interface CollectionFactory<E, Builder, @Covariant R> extends Collector<E
     default void sizeHint(@NotNull Builder builder, @NotNull Iterable<?> it, int delta) {
         Objects.requireNonNull(it);
 
-        if (it instanceof TraversableOnce<?>) {
-            int s = ((TraversableOnce<?>) it).knownSize();
-            if (s != -1) {
-                this.sizeHint(builder, s + delta);
-            }
-        } else if (it instanceof Collection<?>) {
+        if (it instanceof Collection<?>) {
             int s = ((Collection<?>) it).size();
             this.sizeHint(builder, s + delta);
         }
@@ -57,17 +95,21 @@ public interface CollectionFactory<E, Builder, @Covariant R> extends Collector<E
     }
 
     default R from(@NotNull Iterable<? extends E> values) {
+        Iterator<? extends E> iterator = values.iterator();
+        if (!iterator.hasNext()) {
+            return empty();
+        }
         Builder builder = newBuilder();
         sizeHint(builder, values);
 
-        for (E e : values) {
+        while (iterator.hasNext()) {
+            E e = iterator.next();
             addToBuilder(builder, e);
         }
         return build(builder);
     }
 
     default R from(E @NotNull [] values) {
-        Objects.requireNonNull(values);
         if (values.length == 0) {
             return empty();
         }
@@ -81,38 +123,8 @@ public interface CollectionFactory<E, Builder, @Covariant R> extends Collector<E
     }
 
     default <U> CollectionFactory<E, Builder, U> mapResult(@NotNull Function<? super R, ? extends U> mapper) {
-        CollectionFactory<E, Builder, R> source = this;
-        return new CollectionFactory<E, Builder, U>() {
-            @Override
-            public U empty() {
-                return mapper.apply(source.empty());
-            }
-
-            @Override
-            public Builder newBuilder() {
-                return source.newBuilder();
-            }
-
-            @Override
-            public void addToBuilder(@NotNull Builder builder, E value) {
-                source.addToBuilder(builder, value);
-            }
-
-            @Override
-            public Builder mergeBuilder(@NotNull Builder builder1, @NotNull Builder builder2) {
-                return source.mergeBuilder(builder1, builder2);
-            }
-
-            @Override
-            public U build(@NotNull Builder builder) {
-                return mapper.apply(source.build(builder));
-            }
-
-            @Override
-            public Set<Characteristics> characteristics() {
-                return source.characteristics();
-            }
-        };
+        Objects.requireNonNull(mapper);
+        return new MappedCollectionFactory<>(this, mapper);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package asia.kala.collection.immutable;
 
 import asia.kala.annotations.Covariant;
-import asia.kala.collection.CollectionFactory;
+import asia.kala.factory.CollectionFactory;
 import asia.kala.collection.Set;
 import org.jetbrains.annotations.NotNull;
 

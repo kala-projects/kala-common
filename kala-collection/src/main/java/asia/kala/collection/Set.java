@@ -2,6 +2,7 @@ package asia.kala.collection;
 
 import asia.kala.collection.immutable.ImmutableSeq;
 import asia.kala.collection.immutable.ImmutableSet;
+import asia.kala.factory.CollectionFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Spliterator;

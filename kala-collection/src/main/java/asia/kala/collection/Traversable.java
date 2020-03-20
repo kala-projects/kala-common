@@ -3,6 +3,7 @@ package asia.kala.collection;
 import asia.kala.Equals;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.ImmutableCollection;
+import asia.kala.factory.CollectionFactory;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

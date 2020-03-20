@@ -3,6 +3,7 @@ package asia.kala.collection;
 import asia.kala.control.Option;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.*;
+import asia.kala.factory.CollectionFactory;
 import asia.kala.function.IndexedConsumer;
 import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;

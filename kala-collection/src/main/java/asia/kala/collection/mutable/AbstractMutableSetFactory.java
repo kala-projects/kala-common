@@ -1,6 +1,6 @@
 package asia.kala.collection.mutable;
 
-import asia.kala.collection.CollectionFactory;
+import asia.kala.factory.CollectionFactory;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractMutableSetFactory<E, S extends MutableSet<E>> implements CollectionFactory<E, S, S> {

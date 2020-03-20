@@ -4,6 +4,7 @@ import asia.kala.control.Option;
 import asia.kala.annotations.Covariant;
 import asia.kala.annotations.StaticClass;
 import asia.kala.collection.mutable.ArrayBuffer;
+import asia.kala.factory.CollectionFactory;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

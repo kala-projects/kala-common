@@ -1,8 +1,7 @@
 package asia.kala.collection.immutable;
 
-import asia.kala.collection.CollectionFactory;
 import asia.kala.collection.mutable.ArrayBuffer;
-import org.jetbrains.annotations.ApiStatus;
+import asia.kala.factory.CollectionFactory;
 import org.jetbrains.annotations.NotNull;
 
 final class ImmutableSeqFactory<E> implements CollectionFactory<E, ArrayBuffer<E>, ImmutableSeq<E>> {

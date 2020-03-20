@@ -3,8 +3,9 @@ package asia.kala.collection.immutable;
 import asia.kala.Transformable;
 import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
-import asia.kala.collection.CollectionFactory;
+import asia.kala.factory.CollectionFactory;
 import asia.kala.collection.Traversable;
+import asia.kala.factory.CollectionFactory;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
