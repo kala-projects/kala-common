@@ -1,6 +1,7 @@
 package asia.kala;
 
 import asia.kala.annotations.Covariant;
+import asia.kala.control.Option;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,5 +1,6 @@
 package asia.kala;
 
+import asia.kala.control.Option;
 import org.junit.jupiter.api.*;
 
 import java.io.ByteArrayInputStream;
@@ -8,7 +9,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OptionTest {

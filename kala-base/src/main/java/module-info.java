@@ -4,4 +4,5 @@ module asia.kala.base {
     exports asia.kala;
     exports asia.kala.annotations;
     exports asia.kala.function;
+    exports asia.kala.control;
 }

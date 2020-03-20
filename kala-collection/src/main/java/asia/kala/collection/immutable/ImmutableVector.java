@@ -126,7 +126,7 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
         int shift = 0;
         Object[] arr = elements;
         while (arr.length > VECTOR_FACTOR) {
-            arr = JavaArray.spilt(arr, VECTOR_FACTOR);
+            arr = JavaArray.grouped(arr, VECTOR_FACTOR);
             shift += VECTOR_SHIFT;
         }
         return new ImmutableVector<>(arr, 0, elements.length, shift);
@@ -557,7 +557,7 @@ public final class ImmutableVector<@Covariant E> extends AbstractImmutableSeq<E>
             int shift = 0;
             Object[] arr = values.toArray(Object[]::new);
             while (arr.length > VECTOR_FACTOR) {
-                arr = JavaArray.spilt(arr, VECTOR_FACTOR);
+                arr = JavaArray.grouped(arr, VECTOR_FACTOR);
                 shift += VECTOR_SHIFT;
             }
             return new ImmutableVector<>(arr, 0, values.size(), shift);

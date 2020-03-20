@@ -468,27 +468,35 @@ public final class ImmutableArray<@Covariant E> extends ArraySeq<E> implements I
     public final Tuple2<ImmutableArray<E>, ImmutableArray<E>> span(@NotNull Predicate<? super E> predicate) {
         Objects.requireNonNull(predicate);
 
-        if (array.length == 0) {
+        final Object[] array = this.array;
+        final int arrayLength = array.length;
+
+        if (arrayLength == 0) {
             return new Tuple2<>(empty(), empty());
         }
 
-        Object[] newArr1 = new Object[array.length];
-        Object[] newArr2 = new Object[array.length];
-        int idx1 = 0;
-        int idx2 = 0;
-
-        for (Object value : array) {
-            if (predicate.test((E) value)) {
-                newArr1[idx1++] = value;
-            } else {
-                newArr2[idx2++] = value;
+        int idx = 0;
+        while (idx < arrayLength) {
+            if (!predicate.test((E) array[idx])) {
+                break;
             }
+            ++idx;
         }
 
-        ImmutableArray<E> ia1 = idx1 == 0 ? empty() : new ImmutableArray<>(Arrays.copyOf(newArr1, idx1));
-        ImmutableArray<E> ia2 = idx2 == 0 ? empty() : new ImmutableArray<>(Arrays.copyOf(newArr2, idx2));
+        final int l1 = idx;
+        final int l2 = arrayLength - idx;
 
-        return new Tuple2<>(ia1, ia2);
+        if (idx == 0) {
+            return new Tuple2<>(empty(), this);
+        } else if (idx == arrayLength) {
+            return new Tuple2<>(this, empty());
+        } else {
+            return new Tuple2<>(
+                    new ImmutableArray<>(Arrays.copyOfRange(array, 0, idx)),
+                    new ImmutableArray<>(Arrays.copyOfRange(array, idx, arrayLength))
+            );
+        }
+
     }
 
     @NotNull

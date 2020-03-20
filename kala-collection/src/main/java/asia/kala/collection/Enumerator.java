@@ -1,6 +1,7 @@
 package asia.kala.collection;
 
-import asia.kala.Option;
+import asia.kala.Transformable;
+import asia.kala.control.Option;
 import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.mutable.ArrayBuffer;
@@ -247,7 +248,6 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
      * {@inheritDoc}
      */
     @NotNull
-    @Override
     default <U> Enumerator<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         Objects.requireNonNull(mapper);
 
@@ -262,10 +262,17 @@ public interface Enumerator<@Covariant E> extends Iterator<E>, TraversableOnce<E
         LinkedBuffer<E> buffer1 = new LinkedBuffer<>();
         LinkedBuffer<E> buffer2 = new LinkedBuffer<>();
 
+        boolean flag = true;
+
         while (hasNext()) {
             E e = next();
-            if (predicate.test(e)) {
-                buffer1.append(e);
+            if (flag) {
+                if (predicate.test(e)) {
+                    buffer1.append(e);
+                } else {
+                    buffer2.append(e);
+                    flag = false;
+                }
             } else {
                 buffer2.append(e);
             }

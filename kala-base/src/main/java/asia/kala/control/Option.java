@@ -1,5 +1,7 @@
-package asia.kala;
+package asia.kala.control;
 
+import asia.kala.Transformable;
+import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
 import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
@@ -24,15 +26,17 @@ import java.util.function.Predicate;
  * @author Glavo
  * @see Optional
  */
-public final class Option<@Covariant T> implements OptionContainer<T>, Iterable<T>, Serializable {
+public final class Option<@Covariant T> implements OptionContainer<T>, Transformable<T>, Iterable<T>, Serializable {
     private static final long serialVersionUID = -4962768465676381896L;
 
-    private static final int hashMagic = -1623337737;
+    static final int hashMagic = -1623337737;
 
     /**
      * The single instance of empty {@code Option}.
      */
     public static final Option<?> NONE = new Option<>(InternalEmptyTag.INSTANCE);
+
+    private static final Tuple2<Option<?>, Option<?>> NONE_PAIR = new Tuple2<>(NONE, NONE);
 
     /**
      * The value if this {@code Option} is not empty, otherwise {@link InternalEmptyTag#INSTANCE}.
@@ -156,6 +160,35 @@ public final class Option<@Covariant T> implements OptionContainer<T>, Iterable<
     public final Option<T> filter(@NotNull Predicate<? super T> predicate) {
         assert predicate != null;
         return isDefined() && predicate.test(value) ? this : none();
+    }
+
+    @NotNull
+    @Override
+    public final Option<T> filterNot(@NotNull Predicate<? super T> predicate) {
+        assert predicate != null;
+        return isDefined() && !predicate.test(value) ? this : none();
+    }
+
+    @NotNull
+    @Override
+    public final Option<@NotNull T> filterNotNull() {
+        return value == null ? none() : this;
+    }
+
+
+    @NotNull
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public final Tuple2<Option<T>, Option<T>> span(@NotNull Predicate<? super T> predicate) {
+        if (isDefined()) {
+            if (predicate.test(value)) {
+                return new Tuple2<>(this, none());
+            } else {
+                return new Tuple2<>(none(), this);
+            }
+        } else {
+            return ((Tuple2) NONE_PAIR);
+        }
     }
 
     //

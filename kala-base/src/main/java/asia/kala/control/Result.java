@@ -1,4 +1,4 @@
-package asia.kala;
+package asia.kala.control;
 
 import asia.kala.annotations.Covariant;
 import asia.kala.annotations.Sealed;

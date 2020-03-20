@@ -12,6 +12,6 @@ compileJava.dependsOn(':kala-base-kotlin:publishToMavenLocal')
 
 compileKotlin {
     kotlinOptions {
-        freeCompilerArgs = ["-Xuse-experimental=kotlin.Experimental"]
+        freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
     }
 }

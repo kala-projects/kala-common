@@ -2,9 +2,9 @@
 
 package kala
 
-typealias Try<T> = asia.kala.Try<out T>
-typealias Success<T> = asia.kala.Try.Success<out T>
-typealias Failure = asia.kala.Try.Failure<Nothing>
+typealias Try<T> = asia.kala.control.Try<out T>
+typealias Success<T> = asia.kala.control.Try.Success<out T>
+typealias Failure = asia.kala.control.Try.Failure<Nothing>
 
 inline fun <T> successOf(value: T): Success<T> = Try.success(value)
 inline fun failureOf(throwable: Throwable): Failure = Try.failure(throwable)

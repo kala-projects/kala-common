@@ -1,4 +1,4 @@
-package asia.kala;
+package asia.kala.control;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

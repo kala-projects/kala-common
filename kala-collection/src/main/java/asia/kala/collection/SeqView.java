@@ -156,7 +156,7 @@ public interface SeqView<@Covariant E> extends Seq<E>, View<E> {
     @NotNull
     @Override
     default Tuple2<? extends SeqView<E>, ? extends SeqView<E>> span(@NotNull Predicate<? super E> predicate) {
-        return new Tuple2<>(this.filter(predicate), this.filterNot(predicate));
+        throw new UnsupportedOperationException(); // TODO
     }
 
     //endregion

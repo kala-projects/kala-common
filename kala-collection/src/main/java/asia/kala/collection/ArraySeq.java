@@ -1,6 +1,6 @@
 package asia.kala.collection;
 
-import asia.kala.Option;
+import asia.kala.control.Option;
 import asia.kala.collection.immutable.ImmutableArray;
 import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.function.IndexedConsumer;

@@ -1,7 +1,5 @@
-package asia.kala.collection;
+package asia.kala;
 
-import asia.kala.Functor;
-import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -25,14 +23,14 @@ public interface Transformable<@Covariant E> extends Functor<E> {
     Transformable<E> filter(@NotNull Predicate<? super E> predicate);
 
     @NotNull
-    Transformable<E> filterNot(@NotNull Predicate<? super E> predicate);
+    default Transformable<E> filterNot(@NotNull Predicate<? super E> predicate) {
+        return filter(predicate.negate());
+    }
 
     @NotNull
     default Transformable<@NotNull E> filterNotNull() {
         return this.filter(Objects::nonNull);
     }
-
-    @NotNull <U> Transformable<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper);
 
     @NotNull
     Tuple2<? extends Transformable<E>, ? extends Transformable<E>> span(@NotNull Predicate<? super E> predicate);

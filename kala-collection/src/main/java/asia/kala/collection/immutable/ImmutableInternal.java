@@ -1,6 +1,6 @@
 package asia.kala.collection.immutable;
 
-import asia.kala.Option;
+import asia.kala.control.Option;
 import asia.kala.collection.Enumerator;
 import asia.kala.collection.mutable.AbstractBuffer;
 import asia.kala.collection.mutable.LinkedBuffer;

@@ -1,5 +1,7 @@
-package asia.kala;
+package asia.kala.control;
 
+import asia.kala.Foldable;
+import asia.kala.Functor;
 import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +21,7 @@ import java.util.stream.Stream;
  * @param <T> the type of value
  * @author Glavo
  */
-public interface OptionContainer<@Covariant T> extends Iterable<T>, Functor<T>, Foldable<T> {
+interface OptionContainer<@Covariant T> extends Iterable<T>, Functor<T>, Foldable<T> {
 
     /**
      * Returns {@code true} if the container contain a value, otherwise return {@code false}.

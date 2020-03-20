@@ -1,7 +1,7 @@
 package asia.kala.collection;
 
 import asia.kala.Foldable;
-import asia.kala.Option;
+import asia.kala.control.Option;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.ImmutableArray;
 import asia.kala.collection.immutable.ImmutableList;
@@ -9,7 +9,6 @@ import asia.kala.collection.immutable.ImmutableSeq;
 import asia.kala.collection.immutable.ImmutableVector;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
 import java.util.Comparator;

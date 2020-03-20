@@ -6,12 +6,12 @@ import kotlin.experimental.ExperimentalTypeInference
 
 typealias Enumerator<E> = asia.kala.collection.Enumerator<out E>
 
-@UseExperimental(ExperimentalTypeInference::class)
+@OptIn(ExperimentalTypeInference::class)
 fun <E> enumerator(@BuilderInference block: suspend SequenceScope<E>.() -> Unit): Enumerator<E> {
     return iterator(block).asKala()
 }
 
-inline fun <E> Traversable<E>.enumerator(): Enumerator<E> {
+inline fun <E> TraversableOnce<E>.enumerator(): Enumerator<E> {
     return this.iterator()
 }
 

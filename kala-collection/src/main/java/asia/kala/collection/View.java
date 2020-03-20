@@ -1,5 +1,6 @@
 package asia.kala.collection;
 
+import asia.kala.Transformable;
 import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
 import org.jetbrains.annotations.Contract;
@@ -50,7 +51,6 @@ public interface View<@Covariant E> extends Traversable<E>, Transformable<E> {
     }
 
     @NotNull
-    @Override
     default <U> View<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         Objects.requireNonNull(mapper);
         return new Views.FlatMapped<>(this, mapper);
@@ -59,6 +59,6 @@ public interface View<@Covariant E> extends Traversable<E>, Transformable<E> {
     @NotNull
     @Override
     default Tuple2<? extends View<E>, ? extends View<E>> span(@NotNull Predicate<? super E> predicate) {
-        return new Tuple2<>(this.filter(predicate), this.filterNot(predicate));
+        throw new UnsupportedOperationException(); // TODO
     }
 }

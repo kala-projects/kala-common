@@ -109,9 +109,16 @@ public abstract class AbstractImmutableCollection<@Covariant E> extends Abstract
         Builder builder1 = factory.newBuilder();
         Builder builder2 = factory.newBuilder();
 
+        boolean flag = true;
+
         for (E e : collection) {
-            if (predicate.test(e)) {
-                factory.addToBuilder(builder1, e);
+            if(flag) {
+                if (predicate.test(e)) {
+                    factory.addToBuilder(builder1, e);
+                } else {
+                    factory.addToBuilder(builder2, e);
+                    flag = false;
+                }
             } else {
                 factory.addToBuilder(builder2, e);
             }

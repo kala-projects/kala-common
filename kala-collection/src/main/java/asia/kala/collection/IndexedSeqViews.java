@@ -1,6 +1,6 @@
 package asia.kala.collection;
 
-import asia.kala.Option;
+import asia.kala.control.Option;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;

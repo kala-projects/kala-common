@@ -6,7 +6,7 @@ package kala
 /**
  * A container object which may or may not contain a value.
  */
-typealias Option<T> = asia.kala.Option<out T>
+typealias Option<T> = asia.kala.control.Option<out T>
 
 @Throws(NoSuchElementException::class)
 inline operator fun <T> Option<T>.component1(): T {

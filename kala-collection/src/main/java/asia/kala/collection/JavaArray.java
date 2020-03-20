@@ -1,12 +1,14 @@
 package asia.kala.collection;
 
-import asia.kala.Option;
+import asia.kala.control.Option;
 import asia.kala.annotations.Covariant;
 import asia.kala.annotations.StaticClass;
 import asia.kala.collection.mutable.ArrayBuffer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -86,7 +88,7 @@ public final class JavaArray {
     }
 
     @NotNull
-    public static <E> E[][] spilt(E @NotNull [] array, int size) {
+    public static <E> E[][] grouped(E @NotNull [] array, int size) {
         Objects.requireNonNull(array);
         if (size <= 0) {
             throw new IllegalArgumentException();
@@ -521,6 +523,63 @@ public final class JavaArray {
             }
         }
         return false;
+    }
+
+    public static <A extends Appendable> A joinTo(
+            @NotNull Object[] array,
+            @NotNull A buffer
+    ) {
+        return joinTo(array, buffer, ", ", "", "");
+    }
+
+    public static <A extends Appendable> A joinTo(
+            @NotNull Object[] array,
+            @NotNull A buffer,
+            CharSequence separator
+    ) {
+        return joinTo(array, buffer, separator, "", "");
+    }
+
+    public static <A extends Appendable> A joinTo(
+            @NotNull Object[] array,
+            @NotNull A buffer,
+            CharSequence separator, CharSequence prefix, CharSequence postfix
+    ) {
+        final int length = array.length;
+        try {
+            if (length == 0) {
+                buffer.append(prefix).append(postfix);
+                return buffer;
+            }
+            buffer.append(prefix).append(Objects.toString(array[0]));
+            for (int i = 1; i < length; i++) {
+                buffer.append(separator).append(Objects.toString(array[i]));
+            }
+            buffer.append(postfix);
+            return buffer;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static String joinToString(
+            @NotNull Object[] array
+    ) {
+        return joinTo(array, new StringBuilder()).toString();
+    }
+
+    public static String joinToString(
+            @NotNull Object[] array,
+            CharSequence separator
+    ) {
+        return joinTo(array, new StringBuilder(), separator).toString();
+    }
+
+    public static String joinToString(
+            @NotNull Object[] array,
+            CharSequence separator, CharSequence prefix, CharSequence postfix
+    ) {
+        return joinTo(array, new StringBuilder(), separator, prefix, postfix).toString();
     }
 
     @NotNull

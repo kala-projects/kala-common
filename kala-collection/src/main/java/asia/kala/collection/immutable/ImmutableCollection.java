@@ -1,9 +1,9 @@
 package asia.kala.collection.immutable;
 
+import asia.kala.Transformable;
 import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
 import asia.kala.collection.CollectionFactory;
-import asia.kala.collection.Transformable;
 import asia.kala.collection.Traversable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -102,7 +102,6 @@ public interface ImmutableCollection<@Covariant E> extends Traversable<E>, Trans
     }
 
     @NotNull
-    @Override
     @Contract(pure = true)
     default <U> ImmutableCollection<U> flatMap(@NotNull Function<? super E, ? extends Iterable<? extends U>> mapper) {
         return AbstractImmutableCollection.flatMap(this, mapper, iterableFactory());
