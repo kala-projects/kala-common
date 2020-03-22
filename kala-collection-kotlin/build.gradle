@@ -1,14 +1,8 @@
 dependencies {
-    api group: group, name: 'kala-collection', version: version
+    api project(':kala-collection')
 
-    api group: group, name: 'kala-base-kotlin', version: version
+    api project(':kala-base-kotlin')
 }
-
-compileKotlin.dependsOn(':kala-collection:publishToMavenLocal')
-compileJava.dependsOn(':kala-collection:publishToMavenLocal')
-
-compileKotlin.dependsOn(':kala-base-kotlin:publishToMavenLocal')
-compileJava.dependsOn(':kala-base-kotlin:publishToMavenLocal')
 
 compileKotlin {
     kotlinOptions {

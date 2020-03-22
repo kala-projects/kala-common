@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.RandomAccess;
@@ -114,7 +115,7 @@ public interface Buffer<E> extends MutableSeq<E> {
     ) {
         Objects.requireNonNull(values);
         if (values instanceof Seq<?>) {
-            Enumerator<?> iterator = ((Seq<?>) values).reverseIterator();
+            Iterator<?> iterator = ((Seq<?>) values).reverseIterator();
             while (iterator.hasNext()) {
                 this.prepend((E) iterator.next());
             }

@@ -4,10 +4,12 @@ import asia.kala.LazyValue;
 import asia.kala.control.Option;
 import asia.kala.annotations.Covariant;
 import asia.kala.function.IndexedConsumer;
+import asia.kala.util.Iterators;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.function.*;
 
 final class SeqViews {
@@ -67,7 +69,7 @@ final class SeqViews {
 
         @NotNull
         @Override
-        public Enumerator<E> reverseIterator() {
+        public Iterator<E> reverseIterator() {
             return collection.reverseIterator();
         }
     }
@@ -112,9 +114,9 @@ final class SeqViews {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return new AbstractEnumerator<E>() {
-                private final Enumerator<E> it = source.iterator();
+        public final Iterator<E> iterator() {
+            return new Iterator<E>() {
+                private final Iterator<E> it = source.iterator();
                 private int i = 0;
 
                 @Override
@@ -168,8 +170,8 @@ final class SeqViews {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return source.iterator().drop(n);
+        public final Iterator<E> iterator() {
+            return Iterators.drop(source.iterator(), n);
         }
     }
 
@@ -190,8 +192,8 @@ final class SeqViews {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return source.iterator().dropWhile(predicate);
+        public final Iterator<E> iterator() {
+            return Iterators.dropWhile(source.iterator(), predicate);
         }
     }
 
@@ -219,8 +221,8 @@ final class SeqViews {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return source.iterator().take(n);
+        public final Iterator<E> iterator() {
+            return Iterators.take(source.iterator(), n);
         }
     }
 
@@ -241,8 +243,8 @@ final class SeqViews {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return source.iterator().takeWhile(predicate);
+        public final Iterator<E> iterator() {
+            return Iterators.takeWhile(source.iterator(), predicate);
         }
     }
 
@@ -269,8 +271,9 @@ final class SeqViews {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return Enumerator.concat(seq1.iterator(), seq1.iterator());
+        @SuppressWarnings("unchecked")
+        public final Iterator<E> iterator() {
+            return Iterators.concat(seq1.iterator(), seq1.iterator());
         }
     }
 
@@ -311,8 +314,8 @@ final class SeqViews {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return source.iterator().prepended(value);
+        public final Iterator<E> iterator() {
+            return Iterators.prepended(source.iterator(), value);
         }
     }
 
@@ -336,8 +339,8 @@ final class SeqViews {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return source.iterator().appended(value);
+        public final Iterator<E> iterator() {
+            return Iterators.appended(source.iterator(), value);
         }
     }
 
@@ -374,8 +377,8 @@ final class SeqViews {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return source.iterator().map(mapper);
+        public final Iterator<E> iterator() {
+            return Iterators.map(source.iterator(), mapper);
         }
     }
 
@@ -396,8 +399,8 @@ final class SeqViews {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return source.iterator().filter(predicate);
+        public final Iterator<E> iterator() {
+            return Iterators.filter(source.iterator(), predicate);
         }
     }
 
@@ -419,8 +422,8 @@ final class SeqViews {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return new Enumerators.Concat<>(source.map(it -> mapper.apply(it).iterator()).iterator());
+        public final Iterator<E> iterator() {
+            return Iterators.concat(source.map(it -> mapper.apply(it).iterator()));
         }
     }
 
@@ -462,7 +465,7 @@ final class SeqViews {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
+        public final Iterator<E> iterator() {
             return sortedSeq.get().iterator();
         }
     }

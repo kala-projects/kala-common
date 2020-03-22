@@ -14,6 +14,7 @@ import asia.kala.collection.*;
 import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.factory.CollectionFactory;
 import asia.kala.function.IndexedFunction;
+import asia.kala.util.JavaArray;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

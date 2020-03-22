@@ -7,6 +7,7 @@ import asia.kala.collection.*;
 import asia.kala.collection.mutable.LinkedBuffer;
 import asia.kala.factory.CollectionFactory;
 import asia.kala.function.IndexedFunction;
+import asia.kala.util.Iterators;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -188,9 +189,11 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
             return prependedAllImpl(prefix);
         }
 
+
         ImmutableList<E> result = this;
-        for (E e : s.reverseIterator()) {
-            result = result.prepended(e);
+        Iterator<E> it = s.reverseIterator();
+        while (it.hasNext()) {
+            result = result.prepended(it.next());
         }
         return result;
     }
@@ -411,8 +414,8 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
 
         @NotNull
         @Override
-        public final Enumerator<Object> iterator() {
-            return Enumerator.empty();
+        public final Iterator<Object> iterator() {
+            return Iterators.empty();
         }
 
         @Override
@@ -464,7 +467,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
+        public final Iterator<E> iterator() {
             return new Itr<>(this);
         }
     }
@@ -519,7 +522,7 @@ public abstract class ImmutableList<@Covariant E> extends AbstractImmutableSeq<E
         }
     }
 
-    static final class Itr<@Covariant E> extends AbstractEnumerator<E> implements Enumerator<E> {
+    static final class Itr<@Covariant E> implements Iterator<E> {
         @NotNull
         private ImmutableList<? extends E> list;
 

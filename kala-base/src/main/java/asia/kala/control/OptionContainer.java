@@ -235,8 +235,8 @@ interface OptionContainer<@Covariant T> extends Iterable<T>, Functor<T>, Foldabl
      * {@inheritDoc}
      */
     @Override
-    default boolean contains(Object v) {
-        return isDefined() && Objects.equals(v, get());
+    default boolean contains(Object value) {
+        return isDefined() && Objects.equals(value, get());
     }
 
     /**

@@ -139,7 +139,7 @@ public interface MutableSet<E> extends MutableCollection<E>, Set<E> {
             return false;
         }
 
-        Traversable<E> t = KalaCollectionUtils.asTraversable(values);
+        Collection<E> t = KalaCollectionUtils.asTraversable(values);
         if (t.isEmpty()) {
             return false;
         }
@@ -148,7 +148,7 @@ public interface MutableSet<E> extends MutableCollection<E>, Set<E> {
         boolean m = false;
 
         for (Object value : arr) {
-            if (!t.contains(value)) {
+            if (!t.contains((E) value)) {
                 this.remove((E) value);
                 m = true;
             }

@@ -5,17 +5,19 @@ import asia.kala.annotations.Covariant;
 import asia.kala.collection.immutable.*;
 import asia.kala.factory.CollectionFactory;
 import asia.kala.function.IndexedConsumer;
+import asia.kala.util.Iterators;
 import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-public interface Seq<@Covariant E> extends Traversable<E> {
+public interface Seq<@Covariant E> extends Collection<E> {
 
     //region Narrow method
 
@@ -177,7 +179,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
     @Contract(pure = true)
     default int lastIndexOf(Object value) {
         int idx = size() - 1;
-        Enumerator<E> it = reverseIterator();
+        Iterator<E> it = reverseIterator();
         while (it.hasNext()) {
             if (Objects.equals(value, it.next())) {
                 return idx;
@@ -190,7 +192,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
     @Contract(pure = true)
     default int lastIndexOf(Object value, int end) {
         int idx = size() - 1;
-        Enumerator<E> it = reverseIterator();
+        Iterator<E> it = reverseIterator();
         while (it.hasNext()) {
             if (idx <= end && Objects.equals(value, it.next())) {
                 return idx;
@@ -205,7 +207,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         Objects.requireNonNull(predicate);
 
         int idx = size() - 1;
-        Enumerator<E> it = reverseIterator();
+        Iterator<E> it = reverseIterator();
         while (it.hasNext()) {
             if (predicate.test(it.next())) {
                 return idx;
@@ -220,7 +222,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
         Objects.requireNonNull(predicate);
 
         int idx = size() - 1;
-        Enumerator<E> it = reverseIterator();
+        Iterator<E> it = reverseIterator();
         while (it.hasNext()) {
             if (idx <= end && predicate.test(it.next())) {
                 return idx;
@@ -240,7 +242,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
     @Flow(sourceIsContainer = true, target = "array", targetIsContainer = true)
     default int copyToArray(Object @NotNull [] array, int start) {
         int arrayLength = array.length;
-        Enumerator<E> it = iterator();
+        Iterator<E> it = iterator();
 
         int i = start;
         while (i < arrayLength && it.hasNext()) {
@@ -252,7 +254,7 @@ public interface Seq<@Covariant E> extends Traversable<E> {
     @Contract(pure = true)
     @Flow(sourceIsContainer = true, target = "array", targetIsContainer = true)
     default int copyToArray(Object @NotNull [] array, int start, int length) {
-        Enumerator<E> it = iterator();
+        Iterator<E> it = iterator();
         int i = start;
         int end = start + Math.min(length, array.length - start);
         while (i < end && it.hasNext()) {
@@ -263,11 +265,14 @@ public interface Seq<@Covariant E> extends Traversable<E> {
 
     @Contract(pure = true)
     default void forEachIndexed(@NotNull IndexedConsumer<? super E> action) {
-        iterator().forEachIndexed(action);
+        int idx = 0;
+        for (E e : this) {
+            action.accept(idx++, e);
+        }
     }
 
     @NotNull
-    default Enumerator<E> reverseIterator() {
+    default Iterator<E> reverseIterator() {
         ImmutableList<E> l = ImmutableList.nil();
         for (E e : this) {
             l = l.cons(e);

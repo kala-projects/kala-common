@@ -1,14 +1,15 @@
 package asia.kala.collection.immutable;
 
 import asia.kala.control.Option;
-import asia.kala.collection.Enumerator;
 import asia.kala.collection.mutable.AbstractBuffer;
 import asia.kala.collection.mutable.LinkedBuffer;
+import asia.kala.util.Iterators;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.function.Function;
 
 @ApiStatus.Internal
@@ -270,9 +271,9 @@ public final class ImmutableInternal {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
+        public final Iterator<E> iterator() {
             if (len == 0) {
-                return Enumerator.empty();
+                return Iterators.empty();
             }
             return first.iterator();
         }

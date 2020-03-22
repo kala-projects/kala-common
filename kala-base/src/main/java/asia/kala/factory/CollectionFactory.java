@@ -64,6 +64,12 @@ public interface CollectionFactory<E, Builder, @Covariant R>
         }
     }
 
+    default void addAllToBuilder(@NotNull Builder builder, @NotNull Iterator<? extends E> it) {
+        while (it.hasNext()) {
+            addToBuilder(builder, it.next());
+        }
+    }
+
     default void addAllToBuilder(@NotNull Builder builder, E @NotNull [] values) {
         Objects.requireNonNull(values);
         for (E value : values) {

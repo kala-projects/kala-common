@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface View<@Covariant E> extends Traversable<E>, Transformable<E> {
+public interface View<@Covariant E> extends Collection<E>, Transformable<E> {
     @NotNull
     @Override
     @Contract(value = "-> this", pure = true)

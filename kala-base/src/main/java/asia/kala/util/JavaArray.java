@@ -1,12 +1,13 @@
-package asia.kala.collection;
+package asia.kala.util;
 
+import asia.kala.Terminal;
 import asia.kala.control.Option;
 import asia.kala.annotations.Covariant;
 import asia.kala.annotations.StaticClass;
-import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.factory.CollectionFactory;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -21,6 +22,8 @@ import java.util.function.Predicate;
 public final class JavaArray {
     private JavaArray() {
     }
+
+    public static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
     @NotNull
     @Contract(pure = true)
@@ -46,14 +49,13 @@ public final class JavaArray {
     }
 
     @NotNull
+    @Contract(value = "_ -> param1", pure = true)
     public static <E> E[] of(E... elements) {
-        Objects.requireNonNull(elements);
-        return elements.clone();
+        return elements;
     }
 
     @NotNull
     public static <E> E[] from(E @NotNull [] elements) {
-        Objects.requireNonNull(elements);
         return elements.clone();
     }
 
@@ -61,10 +63,6 @@ public final class JavaArray {
     public static <E> E[] from(@NotNull Iterable<? extends E> elements, @NotNull IntFunction<? extends E[]> generator) {
         Objects.requireNonNull(elements);
         Objects.requireNonNull(generator);
-
-        if (elements instanceof TraversableOnce<?>) {
-            return ((TraversableOnce<?>) elements).toArray(generator);
-        }
 
         if (elements instanceof Collection<?>) {
             Collection<E> collection = (Collection<E>) elements;
@@ -77,7 +75,7 @@ public final class JavaArray {
             return arr;
         }
 
-        return ArrayBuffer.from(elements).toArray(generator);
+        throw new UnsupportedOperationException(); // TODO
     }
 
     @NotNull
@@ -274,35 +272,41 @@ public final class JavaArray {
         return -1;
     }
 
-    static Object maxImpl(Object @NotNull [] array) {
+
+    @Contract(pure = true)
+    public static <E extends Comparable<E>> E max(E @NotNull [] array) {
+        return (E) Unsafe.max(array);
+    }
+
+    @Contract(pure = true)
+    public static <E> E max(E @NotNull [] array, @NotNull Comparator<? super E> comparator) {
         assert array != null;
+        assert comparator != null;
 
         final int length = array.length;
-        if (length == 0) {
-            throw new NoSuchElementException();
-        }
-
-        Object e = array[0];
+        E e = array[0];
         for (int i = 1; i < length; i++) {
-            Object v = array[i];
-            if (((Comparable<Object>) e).compareTo(v) < 0) {
+            E v = array[i];
+            if (comparator.compare(e, v) < 0) {
                 e = v;
             }
         }
         return e;
     }
 
+    @Nullable
     @Contract(pure = true)
-    public static <E extends Comparable<E>> E max(E @NotNull [] array) {
-        return (E) maxImpl(array);
+    public static <E extends Comparable<E>> E maxOrNull(E @NotNull [] array) {
+        return (E) Unsafe.maxOrNull(array);
     }
 
+    @Nullable
     @Contract(pure = true)
-    public static <E> E maxBy(E @NotNull [] array, @NotNull Comparator<? super E> comparator) {
-        assert array != null;
-        assert comparator != null;
-
+    public static <E> E maxOrNull(E @NotNull [] array, @NotNull Comparator<? super E> comparator) {
         final int length = array.length;
+        if (length == 0) {
+            return null;
+        }
         E e = array[0];
         for (int i = 1; i < length; i++) {
             E v = array[i];
@@ -319,30 +323,33 @@ public final class JavaArray {
         if (array.length == 0) {
             return Option.none();
         }
-        return Option.some((E) maxImpl(array));
+        return Option.some((E) Unsafe.max(array));
     }
 
     @NotNull
     @Contract(pure = true)
-    public static <E> Option<E> maxByOption(E @NotNull [] array, @NotNull Comparator<? super E> comparator) {
+    public static <E> Option<E> maxOption(E @NotNull [] array, @NotNull Comparator<? super E> comparator) {
         if (array.length == 0) {
             return Option.none();
         }
-        return Option.some(maxBy(array, comparator));
+        return Option.some(max(array, comparator));
     }
 
-    static Object minImpl(Object @NotNull [] array) {
+    @Contract(pure = true)
+    public static <E extends Comparable<E>> E min(E @NotNull [] array) {
+        return (E) Unsafe.min(array);
+    }
+
+    @Contract(pure = true)
+    public static <E> E min(E @NotNull [] array, @NotNull Comparator<? super E> comparator) {
         assert array != null;
+        assert comparator != null;
 
         final int length = array.length;
-        if (length == 0) {
-            throw new NoSuchElementException();
-        }
-
-        Object e = array[0];
+        E e = array[0];
         for (int i = 1; i < length; i++) {
-            Object v = array[i];
-            if (((Comparable<Object>) e).compareTo(v) > 0) {
+            E v = array[i];
+            if (comparator.compare(e, v) > 0) {
                 e = v;
             }
         }
@@ -350,13 +357,12 @@ public final class JavaArray {
     }
 
     @Contract(pure = true)
-    public static <E extends Comparable<E>> E min(E @NotNull [] array) {
-        return (E) minImpl(array);
+    public static <E extends Comparable<E>> E minOrNull(E @NotNull [] array) {
+        return (E) Unsafe.minOrNull(array);
     }
 
     @Contract(pure = true)
-    public static <E> E minBy(E @NotNull [] array, @NotNull Comparator<? super E> comparator) {
-        assert array != null;
+    public static <E> E minOrNull(E @NotNull [] array, @NotNull Comparator<? super E> comparator) {
         assert comparator != null;
 
         final int length = array.length;
@@ -376,16 +382,16 @@ public final class JavaArray {
         if (array.length == 0) {
             return Option.none();
         }
-        return Option.some((E) minImpl(array));
+        return Option.some((E) Unsafe.min(array));
     }
 
     @NotNull
     @Contract(pure = true)
-    public static <E> Option<E> minByOption(E @NotNull [] array, @NotNull Comparator<? super E> comparator) {
+    public static <E> Option<E> minOption(E @NotNull [] array, @NotNull Comparator<? super E> comparator) {
         if (array.length == 0) {
             return Option.none();
         }
-        return Option.some(minBy(array, comparator));
+        return Option.some(min(array, comparator));
     }
 
     @Contract(pure = true)
@@ -554,7 +560,8 @@ public final class JavaArray {
             }
             buffer.append(prefix).append(Objects.toString(array[0]));
             for (int i = 1; i < length; i++) {
-                buffer.append(separator).append(Objects.toString(array[i]));
+                buffer.append(separator);
+                buffer.append(Objects.toString(array[i]));
             }
             buffer.append(postfix);
             return buffer;
@@ -584,33 +591,135 @@ public final class JavaArray {
     }
 
     @NotNull
-    public static <E> Enumerator<E> iterator(E @NotNull [] array) {
-        assert array != null;
-        int l = array.length;
-        if (l == 0) {
-            return Enumerator.empty();
+    public static <E> Iterator<E> iterator(E @NotNull [] array) {
+        final int arrayLength = array.length;
+        if (arrayLength == 0) {
+            return Iterators.empty();
         }
-        if (l == 1) {
-            return new Enumerators.Id<>(array[0]);
+        if (arrayLength == 1) {
+            return new Iterators.Id<>(array[0]);
         }
-        return new Itr<>(array, 0, array.length);
+        return new Itr<>(array, 0, arrayLength);
     }
 
     @NotNull
-    public static <E> Enumerator<E> reverseIterator(E @NotNull [] array) {
-        assert array != null;
+    public static <E> Iterator<E> iterator(E @NotNull [] array, int from) {
+        final int arrayLength = array.length;
+        if (from < 0 || from > arrayLength) {
+            throw new IndexOutOfBoundsException();
+        }
+        final int len = arrayLength - from;
 
+        if (len == 0) {
+            return Iterators.empty();
+        }
+        if (len == 1) {
+            return new Iterators.Id<>(array[0]);
+        }
+        return new Itr<>(array, from, arrayLength);
+    }
+
+    @NotNull
+    public static <E> Iterator<E> iterator(E @NotNull [] array, int from, int to) {
+        final int arrayLength = array.length;
+        if (from < 0 || from > arrayLength) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (to < from || to > arrayLength) {
+            throw new IndexOutOfBoundsException();
+        }
+        final int len = to - from;
+
+        if (len == 0) {
+            return Iterators.empty();
+        }
+        if (len == 1) {
+            return new Iterators.Id<>(array[0]);
+        }
+        return new Itr<>(array, from, to);
+    }
+
+    @NotNull
+    public static <E> Iterator<E> reverseIterator(E @NotNull [] array) {
         final int length = array.length;
         if (length == 0) {
-            return Enumerator.empty();
+            return Iterators.empty();
         }
         if (length == 1) {
-            return Enumerator.of(array[0]);
+            return Iterators.of(array[0]);
         }
         return new ReverseItr<>(array, length - 1);
     }
 
-    private static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, E[]> {
+    public static final class Unsafe {
+        public static Object max(Object @NotNull [] array) {
+            final int length = array.length;
+            if (length == 0) {
+                throw new NoSuchElementException();
+            }
+
+            Object e = array[0];
+            for (int i = 1; i < length; i++) {
+                Object v = array[i];
+                if (((Comparable<Object>) e).compareTo(v) < 0) {
+                    e = v;
+                }
+            }
+            return e;
+        }
+
+        @Nullable
+        public static Object maxOrNull(Object @NotNull [] array) {
+            final int length = array.length;
+            if (length == 0) {
+                return null;
+            }
+
+            Object e = array[0];
+            for (int i = 1; i < length; i++) {
+                Object v = array[i];
+                if (((Comparable<Object>) e).compareTo(v) < 0) {
+                    e = v;
+                }
+            }
+            return e;
+        }
+
+        public static Object min(Object @NotNull [] array) {
+            final int length = array.length;
+            if (length == 0) {
+                throw new NoSuchElementException();
+            }
+
+            Object e = array[0];
+            for (int i = 1; i < length; i++) {
+                Object v = array[i];
+                if (((Comparable<Object>) e).compareTo(v) > 0) {
+                    e = v;
+                }
+            }
+            return e;
+        }
+
+        @Nullable
+        public static Object minOrNull(Object @NotNull [] array) {
+            final int length = array.length;
+            if (length == 0) {
+                return null;
+            }
+
+            Object e = array[0];
+            for (int i = 1; i < length; i++) {
+                Object v = array[i];
+                if (((Comparable<Object>) e).compareTo(v) > 0) {
+                    e = v;
+                }
+            }
+            return e;
+        }
+    }
+
+    private static final class Factory<E> implements CollectionFactory<E, ArrayList<E>, E[]> {
         @NotNull
         private final IntFunction<? extends E[]> generator;
 
@@ -630,37 +739,34 @@ public final class JavaArray {
         }
 
         @Override
-        public final ArrayBuffer<E> newBuilder() {
-            return new ArrayBuffer<>();
+        public final ArrayList<E> newBuilder() {
+            return new ArrayList<>();
         }
 
         @Override
-        public final void addToBuilder(@NotNull ArrayBuffer<E> buffer, E value) {
-            buffer.append(value);
+        public final void addToBuilder(@NotNull ArrayList<E> buffer, E value) {
+            buffer.add(value);
         }
 
         @Override
-        public final ArrayBuffer<E> mergeBuilder(@NotNull ArrayBuffer<E> builder1, @NotNull ArrayBuffer<E> builder2) {
-            builder1.appendAll(builder2);
+        public final ArrayList<E> mergeBuilder(@NotNull ArrayList<E> builder1, @NotNull ArrayList<E> builder2) {
+            builder1.addAll(builder2);
             return builder1;
         }
 
         @Override
-        public final void sizeHint(@NotNull ArrayBuffer<E> buffer, int size) {
-            buffer.sizeHint(size);
-        }
+        public final E[] build(@NotNull ArrayList<E> buffer) {
+            final int size = buffer.size();
 
-        @Override
-        public final E[] build(@NotNull ArrayBuffer<E> buffer) {
-            if (buffer.isEmpty()) {
+            if (size == 0) {
                 return empty;
             }
 
-            return buffer.toArray(generator);
+            return buffer.toArray(generator.apply(size));
         }
     }
 
-    static final class Itr<@Covariant E> extends AbstractEnumerator<E> {
+    static final class Itr<@Covariant E> implements Iterator<E> {
         @NotNull
         private final E[] array;
         private final int end;
@@ -690,7 +796,7 @@ public final class JavaArray {
         }
     }
 
-    static final class ReverseItr<@Covariant E> extends AbstractEnumerator<E> {
+    static final class ReverseItr<@Covariant E> implements Iterator<E> {
         @NotNull
         private final E[] array;
 
@@ -704,7 +810,6 @@ public final class JavaArray {
         ReverseItr(E @NotNull [] array) {
             this(array, array.length - 1);
         }
-
 
         @Override
         public final boolean hasNext() {

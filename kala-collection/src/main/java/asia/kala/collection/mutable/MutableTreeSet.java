@@ -1,17 +1,16 @@
 package asia.kala.collection.mutable;
 
-import asia.kala.collection.AbstractEnumerator;
+import asia.kala.collection.Set;
 import asia.kala.factory.CollectionFactory;
-import asia.kala.collection.Enumerator;
 import asia.kala.collection.SortedSet;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -635,8 +634,8 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
     }
 
     @Override
-    public final boolean contains(Object value) {
-        return getNode((E) value) != null;
+    public final boolean contains(E value) {
+        return getNode(value) != null;
     }
 
     //endregion
@@ -673,7 +672,7 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
 
     @Override
     public final String className() {
-        return "MutableHashSet";
+        return "MutableTreeSet";
     }
 
     @NotNull
@@ -684,13 +683,19 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
 
     @NotNull
     @Override
+    public <U> CollectionFactory<U, ?, MutableTreeSet<U>> iterableFactory(Comparator<? super U> comparator) {
+        return factory(comparator);
+    }
+
+    @NotNull
+    @Override
     public final MutableSetEditor<E, MutableTreeSet<E>> edit() {
         return new MutableSetEditor<>(this);
     }
 
     @NotNull
     @Override
-    public final Enumerator<E> iterator() {
+    public final Iterator<E> iterator() {
         return new MutableTreeSet.Itr<>(firstNode());
     }
 
@@ -755,7 +760,7 @@ public final class MutableTreeSet<E> extends AbstractMutableSet<E>
         }
     }
 
-    private static final class Itr<E> extends AbstractEnumerator<E> {
+    private static final class Itr<E> implements Iterator<E> {
         private Node<E> node;
 
         Itr(Node<E> node) {

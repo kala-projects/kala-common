@@ -8,16 +8,14 @@ import asia.kala.collection.immutable.ImmutableSeq;
 import asia.kala.collection.immutable.ImmutableVector;
 import asia.kala.factory.CollectionFactory;
 import asia.kala.function.IndexedConsumer;
+import asia.kala.util.Iterators;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.RandomAccess;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -232,7 +230,7 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
     }
 
     @Override
-    default E maxBy(@NotNull Comparator<? super E> comparator) {
+    default E max(@NotNull Comparator<? super E> comparator) {
         final int size = size();
 
         if (size == 0) {
@@ -253,15 +251,15 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
 
     @NotNull
     @Override
-    default Option<E> maxByOption(@NotNull Comparator<? super E> comparator) {
+    default Option<E> maxOption(@NotNull Comparator<? super E> comparator) {
         if (isEmpty()) {
             return Option.none();
         }
-        return Option.some(maxBy(comparator));
+        return Option.some(max(comparator));
     }
 
     @Override
-    default E minBy(@NotNull Comparator<? super E> comparator) {
+    default E min(@NotNull Comparator<? super E> comparator) {
         final int size = size();
 
         if (size == 0) {
@@ -282,11 +280,11 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
 
     @NotNull
     @Override
-    default Option<E> minByOption(@NotNull Comparator<? super E> comparator) {
+    default Option<E> minOption(@NotNull Comparator<? super E> comparator) {
         if (isEmpty()) {
             return Option.none();
         }
-        return Option.some(minBy(comparator));
+        return Option.some(min(comparator));
     }
 
     @Override
@@ -324,8 +322,7 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
             if (size > 0) {
                 buffer.append(Objects.toString(get(0)));
                 for (int i = 1; i < size; i++) {
-                    buffer.append(separator);
-                    buffer.append(Objects.toString(get(i)));
+                    buffer.append(separator).append(Objects.toString(get(i)));
                 }
             }
             buffer.append(postfix);
@@ -459,7 +456,7 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
     }
 
     @Override
-    default boolean contains(Object value) {
+    default boolean contains(E value) {
         final int size = size();
 
         if (size == 0) {
@@ -512,14 +509,14 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
 
     @NotNull
     @Override
-    default Enumerator<E> iterator() {
+    default Iterator<E> iterator() {
         final int size = size();
 
         if (size == 0) {
-            return Enumerator.empty();
+            return Iterators.empty();
         }
 
-        return new AbstractEnumerator<E>() {
+        return new Iterator<E>() {
             private int idx = 0;
 
             @Override
@@ -539,8 +536,8 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
 
     @NotNull
     @Override
-    default Enumerator<E> reverseIterator() {
-        return new AbstractEnumerator<E>() {
+    default Iterator<E> reverseIterator() {
+        return new Iterator<E>() {
             private int idx = size() - 1;
 
             @Override
@@ -597,7 +594,7 @@ public interface IndexedSeq<@Covariant E> extends Seq<E>, RandomAccess {
     @NotNull
     @Override
     @SuppressWarnings("unchecked")
-    default <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
+    default <U> U[] toArray(@NotNull IntFunction<U[]> generator) {
         final int size = size();
         U[] arr = generator.apply(size);
 

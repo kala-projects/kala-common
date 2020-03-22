@@ -1,5 +1,6 @@
 package asia.kala.collection.immutable;
 
+import asia.kala.Traversable;
 import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
 import asia.kala.annotations.StaticClass;
@@ -7,6 +8,7 @@ import asia.kala.collection.*;
 import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.factory.CollectionFactory;
 import asia.kala.function.IndexedFunction;
+import asia.kala.util.JavaArray;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +28,7 @@ public final class ImmutableArray<@Covariant E> extends ArraySeq<E> implements I
     //region Constructors
 
     private ImmutableArray() {
-        this(EMPTY_ARRAY);
+        this(JavaArray.EMPTY_OBJECT_ARRAY);
     }
 
     private ImmutableArray(Object[] array) {
@@ -103,7 +105,7 @@ public final class ImmutableArray<@Covariant E> extends ArraySeq<E> implements I
     }
 
     @NotNull
-    public static <E> ImmutableArray<E> from(@NotNull TraversableOnce<? extends E> values) {
+    public static <E> ImmutableArray<E> from(@NotNull Traversable<? extends E> values) {
         if (values instanceof ImmutableArray<?>) {
             return (ImmutableArray<E>) values;
         }
@@ -131,14 +133,26 @@ public final class ImmutableArray<@Covariant E> extends ArraySeq<E> implements I
     public static <E> ImmutableArray<E> from(@NotNull Iterable<? extends E> values) {
         Objects.requireNonNull(values);
 
-        if (values instanceof TraversableOnce<?>) {
-            return from((TraversableOnce<E>) values);
+        if (values instanceof Traversable<?>) {
+            return from((Traversable<E>) values);
         }
         if (values instanceof java.util.Collection<?>) {
             return from(((java.util.Collection<E>) values));
         }
 
         return ArrayBuffer.<E>from(values).toImmutableArray();
+    }
+
+    @NotNull
+    public static <E> ImmutableArray<E> from(@NotNull Iterator<? extends E> it) {
+        if (!it.hasNext()) {
+            return empty();
+        }
+        ArrayBuffer<E> buffer = new ArrayBuffer<>();
+        while (it.hasNext()) {
+            buffer.append(it.next());
+        }
+        return buffer.toImmutableArray();
     }
 
     @StaticClass

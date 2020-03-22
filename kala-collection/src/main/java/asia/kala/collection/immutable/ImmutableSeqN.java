@@ -1,10 +1,11 @@
 package asia.kala.collection.immutable;
 
-import asia.kala.collection.Enumerator;
 import asia.kala.collection.IndexedSeq;
+import asia.kala.util.Iterators;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -72,8 +73,8 @@ final class ImmutableSeq0<E> extends ImmutableSeqN<E> {
 
     @NotNull
     @Override
-    public final Enumerator<E> iterator() {
-        return Enumerator.empty();
+    public final Iterator<E> iterator() {
+        return Iterators.empty();
     }
 
     @NotNull

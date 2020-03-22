@@ -9,14 +9,23 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.AbstractList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.RandomAccess;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
 
 @ApiStatus.Internal
+@SuppressWarnings("unchecked")
 public final class JDKConverters {
-    public static class TraversableAsJava<@Covariant E, C extends Traversable<E>> extends AbstractCollection<E> {
+
+    public static class TraversableAsJava<@Covariant E, C extends Collection<E>>
+            extends java.util.AbstractCollection<E> {
         @NotNull
         protected final C collection;
 
@@ -31,12 +40,16 @@ public final class JDKConverters {
 
         @Override
         public boolean contains(Object o) {
-            return collection.contains(o);
+            try {
+                return collection.contains((E) o);
+            } catch (ClassCastException e) {
+                return false;
+            }
         }
 
         @Override
-        public boolean containsAll(@NotNull Collection<?> c) {
-            return collection.containsAll(c);
+        public boolean containsAll(@NotNull java.util.Collection<?> c) {
+            return collection.containsAll((Iterable<E>) c);
         }
 
         public <T> T[] toArray(IntFunction<T[]> generator) {
@@ -103,7 +116,7 @@ public final class JDKConverters {
         }
 
         @Override
-        public boolean addAll(int index, @NotNull Collection<? extends E> c) {
+        public boolean addAll(int index, @NotNull java.util.Collection<? extends E> c) {
             throw new UnsupportedOperationException();
         }
 
@@ -134,12 +147,12 @@ public final class JDKConverters {
 
         @Override
         public boolean contains(Object o) {
-            return collection.contains(o);
+            return collection.contains((E) o);
         }
 
         @Override
-        public boolean containsAll(@NotNull Collection<?> c) {
-            return collection.containsAll(c);
+        public boolean containsAll(@NotNull java.util.Collection<?> c) {
+            return collection.containsAll(((Iterable<E>) c));
         }
 
         public <T> T[] toArray(IntFunction<T[]> generator) {
@@ -211,7 +224,8 @@ public final class JDKConverters {
         }
     }
 
-    public static class MutableCollectionAsJava<E, C extends MutableCollection<E>> extends AbstractCollection<E> {
+    public static class MutableCollectionAsJava<E, C extends MutableCollection<E>>
+            extends java.util.AbstractCollection<E> {
         protected final C collection;
 
         public MutableCollectionAsJava(C collection) {
@@ -298,7 +312,7 @@ public final class JDKConverters {
         }
 
         @Override
-        public boolean addAll(int index, @NotNull Collection<? extends E> c) {
+        public boolean addAll(int index, @NotNull java.util.Collection<? extends E> c) {
             collection.insertAll(index, c);
             return !c.isEmpty();
         }
@@ -330,19 +344,19 @@ public final class JDKConverters {
         // TODO
     }
 
-    public static class CollectionWrapper<E> extends AbstractTraversable<E> implements Traversable<E> {
+    public static class CollectionWrapper<E> extends AbstractCollection<E> implements Collection<E> {
 
         @NotNull
-        protected final Collection<E> collection;
+        protected final java.util.Collection<E> collection;
 
-        public CollectionWrapper(@NotNull Collection<E> collection) {
+        public CollectionWrapper(@NotNull java.util.Collection<E> collection) {
             this.collection = collection;
         }
 
         @NotNull
         @Override
-        public Enumerator<E> iterator() {
-            return Enumerator.fromJava(collection.iterator());
+        public Iterator<E> iterator() {
+            return collection.iterator();
         }
 
         @NotNull
@@ -365,7 +379,7 @@ public final class JDKConverters {
 
         @NotNull
         @Override
-        public Collection<E> asJava() {
+        public java.util.Collection<E> asJava() {
             return collection;
         }
 
@@ -411,22 +425,21 @@ public final class JDKConverters {
         }
 
         @Override
-        @SuppressWarnings("SuspiciousMethodCalls")
-        public boolean contains(Object value) {
+        public boolean contains(E value) {
             return list.contains(value);
         }
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return Enumerator.fromJava(list.iterator());
+        public final Iterator<E> iterator() {
+            return list.iterator();
         }
 
         @NotNull
         @Override
-        public Enumerator<E> reverseIterator() {
-            return new AbstractEnumerator<E>() {
-                private final ListIterator<E> it = list.listIterator(list.size());
+        public Iterator<E> reverseIterator() {
+            return new Iterator<E>() {
+                private final java.util.ListIterator<E> it = list.listIterator(list.size());
 
                 @Override
                 public final boolean hasNext() {

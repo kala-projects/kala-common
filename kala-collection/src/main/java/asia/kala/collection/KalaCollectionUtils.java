@@ -1,5 +1,6 @@
 package asia.kala.collection;
 
+import asia.kala.Traversable;
 import asia.kala.annotations.StaticClass;
 import asia.kala.collection.immutable.ImmutableArray;
 import asia.kala.collection.immutable.ImmutableSeq;
@@ -20,11 +21,11 @@ public final class KalaCollectionUtils {
         if (it instanceof MutableArray<?>) {
             return ((MutableArray<?>) it).getArray();
         }
-        if (it instanceof TraversableOnce<?>) {
-            return ((TraversableOnce<?>) it).toArray(Object[]::new);
+        if (it instanceof Traversable<?>) {
+            return ((Traversable<?>) it).toArray(Object[]::new);
         }
-        if (it instanceof Collection<?>) {
-            return ((Collection<?>) it).toArray();
+        if (it instanceof java.util.Collection<?>) {
+            return ((java.util.Collection<?>) it).toArray();
         }
         ArrayBuffer<Object> buffer = new ArrayBuffer<>();
         for (Object o : it) {
@@ -40,21 +41,21 @@ public final class KalaCollectionUtils {
         if (collection instanceof java.util.List<?> && collection instanceof RandomAccess) {
             return new JDKConverters.RandomAccessListWrapper<>(((List<E>) collection));
         }
-        if (collection instanceof TraversableOnce<?>) {
-            return (ArraySeq<E>) ArraySeq.wrap(((TraversableOnce<?>) collection).toArray(Object[]::new));
+        if (collection instanceof Traversable<?>) {
+            return (ArraySeq<E>) ArraySeq.wrap(((Traversable<?>) collection).toArray(Object[]::new));
         }
         if (collection instanceof Object[]) {
             return ArraySeq.wrap(((E[]) collection));
         }
 
-        if (collection instanceof Collection<?>) {
-            return (ArraySeq<E>) ArraySeq.wrap(((Collection<?>) collection).toArray());
+        if (collection instanceof java.util.Collection) {
+            return (ArraySeq<E>) ArraySeq.wrap(((java.util.Collection) collection).toArray());
         }
         if (collection instanceof Iterable<?>) {
             return ArrayBuffer.from(((Iterable<E>) collection));
         }
         if (collection instanceof Iterator<?>) {
-            return ArrayBuffer.from(Enumerator.fromJava(((Iterator<E>) collection)));
+            return ArrayBuffer.from((Iterator<E>) collection);
         }
 
         throw new IllegalArgumentException();
@@ -70,13 +71,13 @@ public final class KalaCollectionUtils {
         return null;
     }
 
-    public static <E> Traversable<E> asTraversable(Object collection) {
-        if (collection instanceof Traversable<?>) {
-            return ((Traversable<E>) collection);
+    public static <E> Collection<E> asTraversable(Object collection) {
+        if (collection instanceof Collection<?>) {
+            return ((Collection<E>) collection);
         }
 
-        if (collection instanceof Collection<?>) {
-            return new JDKConverters.CollectionWrapper<>(((Collection<E>) collection));
+        if (collection instanceof java.util.Collection<?>) {
+            return new JDKConverters.CollectionWrapper<>(((java.util.Collection<E>) collection));
         }
 
         if (collection instanceof Iterator<?>) {
@@ -115,25 +116,25 @@ public final class KalaCollectionUtils {
             return ArraySeq.wrap(((E[]) collection));
         }
 
-        if (collection instanceof Collection<?>) {
-            return (ArraySeq<E>) ArraySeq.wrap(((Collection<?>) collection).toArray());
+        if (collection instanceof java.util.Collection) {
+            return (ArraySeq<E>) ArraySeq.wrap(((java.util.Collection<?>) collection).toArray());
         }
         if (collection instanceof Iterable<?>) {
             return ImmutableArray.from(((Iterable<E>) collection));
         }
         if (collection instanceof Iterator<?>) {
-            return ImmutableArray.from(Enumerator.fromJava(((Iterator<E>) collection)));
+            return ImmutableArray.from((Iterator<E>) collection);
         }
 
         throw new IllegalArgumentException();
     }
 
     public static int knowSize(@NotNull Object collection) {
-        if (collection instanceof TraversableOnce<?>) {
-            return ((TraversableOnce<?>) collection).knownSize();
+        if (collection instanceof Traversable<?>) {
+            return ((Traversable<?>) collection).knownSize();
         }
-        if (collection instanceof Collection<?>) {
-            return ((Collection<?>) collection).size();
+        if (collection instanceof java.util.Collection) {
+            return ((java.util.Collection<?>) collection).size();
         }
 
         return -1;

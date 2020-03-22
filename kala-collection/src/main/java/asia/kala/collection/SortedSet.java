@@ -1,10 +1,12 @@
 package asia.kala.collection;
 
 import asia.kala.annotations.Covariant;
+import asia.kala.factory.CollectionFactory;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
+import java.util.Iterator;
 
 public interface SortedSet<@Covariant E> extends Set<E> {
 
@@ -22,7 +24,7 @@ public interface SortedSet<@Covariant E> extends Set<E> {
 
     @Contract(pure = true)
     default E last() {
-        Enumerator<E> iterator = iterator();
+        Iterator<E> iterator = iterator();
         E res = iterator.next();
         while (iterator.hasNext()) {
             res = iterator.next();
@@ -30,5 +32,5 @@ public interface SortedSet<@Covariant E> extends Set<E> {
         return res;
     }
 
-    //
+    @NotNull <U> CollectionFactory<U, ?, ? extends SortedSet<U>> iterableFactory(Comparator<? super U> comparator);
 }

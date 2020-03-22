@@ -184,8 +184,17 @@ public interface Foldable<@Covariant T> {
         return this.foldLeft(false, (l, r) -> l || predicate.test(r));
     }
 
-    default boolean contains(Object v) {
-        return exists(Predicate.isEqual(v));
+    default boolean contains(T value) {
+        return exists(Predicate.isEqual(value));
+    }
+
+    @SuppressWarnings("unchecked")
+    default boolean containsObject(Object value) {
+        try {
+            return contains((T) value);
+        } catch (ClassCastException ignored) {
+            return false;
+        }
     }
 
     default int count(@NotNull Predicate<? super T> predicate) {

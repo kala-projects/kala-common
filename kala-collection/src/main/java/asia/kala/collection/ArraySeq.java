@@ -1,10 +1,13 @@
 package asia.kala.collection;
 
+import asia.kala.Traversable;
 import asia.kala.control.Option;
 import asia.kala.collection.immutable.ImmutableArray;
 import asia.kala.collection.mutable.ArrayBuffer;
 import asia.kala.factory.CollectionFactory;
 import asia.kala.function.IndexedConsumer;
+import asia.kala.util.Iterators;
+import asia.kala.util.JavaArray;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,11 +20,10 @@ import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
-public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
+public class ArraySeq<E> extends AbstractCollection<E> implements Seq<E>, IndexedSeq<E>, Serializable {
     private static final long serialVersionUID = 4981379062449237945L;
 
-    public static final Object[] EMPTY_ARRAY = new Object[0];
-    public static final ArraySeq<?> EMPTY = new ArraySeq<>(EMPTY_ARRAY);
+    public static final ArraySeq<?> EMPTY = new ArraySeq<>(JavaArray.EMPTY_OBJECT_ARRAY);
 
     private static final ArraySeq.Factory<?> FACTORY = new ArraySeq.Factory<>();
 
@@ -105,7 +107,7 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
     }
 
     @NotNull
-    public static <E> ArraySeq<E> from(@NotNull TraversableOnce<? extends E> values) {
+    public static <E> ArraySeq<E> from(@NotNull Traversable<? extends E> values) {
         if (values instanceof ImmutableArray<?> || values.getClass() == ArraySeq.class) {
             return (ArraySeq<E>) values;
         }
@@ -133,8 +135,8 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
     public static <E> ArraySeq<E> from(@NotNull Iterable<? extends E> values) {
         Objects.requireNonNull(values);
 
-        if (values instanceof TraversableOnce<?>) {
-            return from((TraversableOnce<E>) values);
+        if (values instanceof Traversable<?>) {
+            return from((Traversable<E>) values);
         }
         if (values instanceof java.util.Collection<?>) {
             return from(((java.util.Collection<E>) values));
@@ -215,12 +217,12 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
 
     @Override
     public final E max() {
-        return (E) JavaArray.maxImpl(array);
+        return (E) JavaArray.Unsafe.max(array);
     }
 
     @Override
-    public final E maxBy(@NotNull Comparator<? super E> comparator) {
-        return (E) JavaArray.maxBy(array, (Comparator<Object>) comparator);
+    public final E max(@NotNull Comparator<? super E> comparator) {
+        return (E) JavaArray.max(array, (Comparator<Object>) comparator);
     }
 
     @NotNull
@@ -230,26 +232,26 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
         if (array.length == 0) {
             return Option.none();
         }
-        return Option.some((E) JavaArray.maxImpl(array));
+        return Option.some((E) JavaArray.Unsafe.max(array));
     }
 
     @NotNull
     @Override
-    public final Option<E> maxByOption(@NotNull Comparator<? super E> comparator) {
+    public final Option<E> maxOption(@NotNull Comparator<? super E> comparator) {
         if (array.length == 0) {
             return Option.none();
         }
-        return Option.some(maxBy(comparator));
+        return Option.some(max(comparator));
     }
 
     @Override
     public final E min() {
-        return (E) JavaArray.minImpl(array);
+        return (E) JavaArray.Unsafe.min(array);
     }
 
     @Override
-    public final E minBy(@NotNull Comparator<? super E> comparator) {
-        return (E) JavaArray.minBy(array, (Comparator<Object>) comparator);
+    public final E min(@NotNull Comparator<? super E> comparator) {
+        return (E) JavaArray.min(array, (Comparator<Object>) comparator);
     }
 
     @NotNull
@@ -259,16 +261,16 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
         if (array.length == 0) {
             return Option.none();
         }
-        return Option.some((E) JavaArray.minImpl(array));
+        return Option.some((E) JavaArray.Unsafe.min(array));
     }
 
     @NotNull
     @Override
-    public final Option<E> minByOption(@NotNull Comparator<? super E> comparator) {
+    public final Option<E> minOption(@NotNull Comparator<? super E> comparator) {
         if (array.length == 0) {
             return Option.none();
         }
-        return Option.some(minBy(comparator));
+        return Option.some(min(comparator));
     }
 
     @Override
@@ -344,7 +346,7 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
     }
 
     @Override
-    public final boolean contains(Object value) {
+    public final boolean contains(E value) {
         final Object[] array = this.array;
 
         if (array.length == 0) {
@@ -367,10 +369,10 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
     }
 
     @Override
-    public final boolean containsAll(@NotNull Iterable<?> values) {
+    public final boolean containsAll(@NotNull Iterable<? extends E> values) {
         assert values != null;
 
-        for (Object v : values) {
+        for (E v : values) {
             if (!contains(v)) {
                 return false;
             }
@@ -495,7 +497,7 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
     @NotNull
     @Override
     @SuppressWarnings("SuspiciousSystemArraycopy")
-    public final <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
+    public final <U> U[] toArray(@NotNull IntFunction<U[]> generator) {
         assert generator != null;
 
         final Object[] array = this.array;
@@ -515,14 +517,14 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
 
     @NotNull
     @Override
-    public final Enumerator<E> iterator() {
-        return (Enumerator<E>) JavaArray.iterator(array);
+    public final Iterator<E> iterator() {
+        return (Iterator<E>) JavaArray.iterator(array);
     }
 
     @NotNull
     @Override
-    public final Enumerator<E> reverseIterator() {
-        return (Enumerator<E>) JavaArray.reverseIterator(array);
+    public final Iterator<E> reverseIterator() {
+        return (Iterator<E>) JavaArray.reverseIterator(array);
     }
 
     @NotNull
@@ -568,6 +570,11 @@ public class ArraySeq<E> implements Seq<E>, IndexedSeq<E>, Serializable {
         for (int i = 0; i < length; i++) {
             action.accept(i, (E) array[i]);
         }
+    }
+
+    @Override
+    public final int hashCode() {
+        return Iterators.hash(iterator()) + Collection.SEQ_HASH_MAGIC;
     }
 
     private static final class Factory<E> implements CollectionFactory<E, ArrayBuffer<E>, ArraySeq<E>> {

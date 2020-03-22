@@ -1,8 +1,10 @@
 package asia.kala.collection;
 
 import asia.kala.annotations.Covariant;
+import asia.kala.util.Iterators;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
 import java.util.function.Predicate;
 
 final class SetViews {
@@ -29,8 +31,8 @@ final class SetViews {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return source.iterator().filter(predicate);
+        public final Iterator<E> iterator() {
+            return Iterators.filter(source.iterator(), predicate);
         }
     }
 }

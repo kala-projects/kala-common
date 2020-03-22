@@ -4,10 +4,12 @@ import asia.kala.annotations.Covariant;
 import asia.kala.collection.*;
 import asia.kala.factory.CollectionFactory;
 import asia.kala.function.IndexedFunction;
+import asia.kala.util.Iterators;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -59,7 +61,8 @@ public abstract class AbstractImmutableSeq<@Covariant E> extends AbstractImmutab
             factory.sizeHint(builder, Integer.max(s - n, 0));
         }
 
-        for (E e : seq.iterator().drop(n)) {
+        for (Iterator<? extends E> it = Iterators.drop(seq.iterator(), n); it.hasNext(); ) {
+            E e = it.next();
             factory.addToBuilder(builder, e);
         }
         return factory.build(builder);
@@ -77,7 +80,7 @@ public abstract class AbstractImmutableSeq<@Covariant E> extends AbstractImmutab
 
         Builder builder = factory.newBuilder();
 
-        factory.addAllToBuilder(builder, seq.iterator().dropWhile(predicate));
+        factory.addAllToBuilder(builder, Iterators.dropWhile(seq.iterator(), predicate));
 
         return factory.build(builder);
     }
@@ -389,6 +392,6 @@ public abstract class AbstractImmutableSeq<@Covariant E> extends AbstractImmutab
 
     @Override
     public int hashCode() {
-        return Enumerator.hash(iterator()) + Traversable.SEQ_HASH_MAGIC;
+        return Iterators.hash(iterator()) + Collection.SEQ_HASH_MAGIC;
     }
 }

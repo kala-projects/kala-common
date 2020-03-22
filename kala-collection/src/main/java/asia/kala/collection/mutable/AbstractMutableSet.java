@@ -1,10 +1,11 @@
 package asia.kala.collection.mutable;
 
 import asia.kala.collection.*;
+import asia.kala.util.Iterators;
 
-public abstract class AbstractMutableSet<E> extends AbstractTraversable<E> implements MutableSet<E> {
+public abstract class AbstractMutableSet<E> extends AbstractCollection<E> implements MutableSet<E> {
     @Override
     public int hashCode() {
-        return Enumerator.hash(iterator()) + Traversable.SET_HASH_MAGIC;
+        return Iterators.hash(iterator()) + Collection.SET_HASH_MAGIC;
     }
 }

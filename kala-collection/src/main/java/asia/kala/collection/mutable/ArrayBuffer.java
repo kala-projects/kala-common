@@ -2,6 +2,8 @@ package asia.kala.collection.mutable;
 
 import asia.kala.collection.*;
 import asia.kala.factory.CollectionFactory;
+import asia.kala.util.Iterators;
+import asia.kala.util.JavaArray;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +40,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     }
 
     public ArrayBuffer() {
-        this(MutableArray.EMPTY_ARRAY, 0);
+        this(JavaArray.EMPTY_OBJECT_ARRAY, 0);
     }
 
     public ArrayBuffer(int initialCapacity) {
@@ -46,7 +48,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
             throw new IllegalArgumentException("illegal initialCapacity: " + initialCapacity);
         }
 
-        this.elements = initialCapacity == 0 ? MutableArray.EMPTY_ARRAY : new Object[initialCapacity];
+        this.elements = initialCapacity == 0 ? JavaArray.EMPTY_OBJECT_ARRAY: new Object[initialCapacity];
         this.size = 0;
     }
 
@@ -139,6 +141,15 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     public static <E> ArrayBuffer<E> from(@NotNull Iterable<? extends E> values) {
         ArrayBuffer<E> buffer = new ArrayBuffer<>();
         buffer.appendAll(values);
+        return buffer;
+    }
+
+    @NotNull
+    public static <E> ArrayBuffer<E> from(@NotNull Iterator<? extends E> it) {
+        ArrayBuffer<E> buffer = new ArrayBuffer<>();
+        while (it.hasNext()) {
+            buffer.append(it.next());
+        }
         return buffer;
     }
 
@@ -410,15 +421,14 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
 
     @NotNull
     @Override
-    public final Enumerator<E> iterator() {
-        return (Enumerator<E>) Enumerator.ofArray(elements, 0, size);
+    public final Iterator<E> iterator() {
+        return (Iterator<E>) JavaArray.iterator(elements, 0, size);
     }
 
     @NotNull
     @Override
     @SuppressWarnings("SuspiciousSystemArraycopy")
-    public final <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
-        Objects.requireNonNull(generator);
+    public final <U> U[] toArray(@NotNull IntFunction<U[]> generator) {
         U[] arr = generator.apply(size);
         System.arraycopy(elements, 0, arr, 0, size);
         return arr;
@@ -429,6 +439,7 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     //region Serialization
 
     private void writeObject(ObjectOutputStream out) throws IOException {
+        final int size = this.size;
         out.writeInt(size);
         if (size != 0) {
             Object[] values = elements.length == size ? elements : Arrays.copyOf(elements, size);
@@ -437,9 +448,9 @@ public final class ArrayBuffer<E> extends AbstractBuffer<E> implements IndexedSe
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        this.size = in.readInt();
+        final int size = this.size = in.readInt();
         if (size == 0) {
-            elements = MutableArray.EMPTY_ARRAY;
+            elements = JavaArray.EMPTY_OBJECT_ARRAY;
         } else {
             elements = (Object[]) in.readObject();
         }

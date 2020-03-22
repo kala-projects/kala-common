@@ -22,7 +22,8 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'com.jfrog.bintray'
 
-    modularity.mixedJavaRelease 8
+    sourceCompatibility = 9
+    targetCompatibility = 9
 
     repositories {
         mavenLocal()
@@ -55,6 +56,22 @@ subprojects {
             }
         }
     }
+
+    task processClassFile(dependsOn: compileJava) {
+        doLast {
+            FileTree tree = fileTree(sourceSets.main.java.outputDir)
+            tree.include '**/*.class'
+            tree.exclude 'module-info.class'
+            tree.each {
+                RandomAccessFile rf = new RandomAccessFile(it, "rw")
+                rf.seek(7)   // major version
+                rf.write(52) // java 8
+                rf.close()
+            }
+        }
+    }
+
+    compileJava.finalizedBy(processClassFile)
 
     test {
         testLogging.showStandardStreams = true
@@ -101,7 +118,6 @@ subprojects {
         }
         */
     }
-
 
     task sourcesJar(type: Jar) {
         from sourceSets.main.allSource

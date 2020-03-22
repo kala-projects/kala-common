@@ -1,8 +1,6 @@
 package asia.kala.collection.mutable;
 
-import asia.kala.collection.AbstractEnumerator;
 import asia.kala.factory.CollectionFactory;
-import asia.kala.collection.Enumerator;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
@@ -10,6 +8,7 @@ import org.jetbrains.annotations.Range;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -367,7 +366,7 @@ public final class MutableHashSet<E> extends AbstractMutableSet<E> implements Se
 
     @NotNull
     @Override
-    public final Enumerator<E> iterator() {
+    public final Iterator<E> iterator() {
         return new Itr();
     }
 
@@ -413,7 +412,7 @@ public final class MutableHashSet<E> extends AbstractMutableSet<E> implements Se
 
     //endregion
 
-    private final class Itr extends AbstractEnumerator<E> {
+    private final class Itr implements Iterator<E> {
         private int i = 0;
         private Node<E> node = null;
         private int len = table.length;

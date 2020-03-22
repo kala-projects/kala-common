@@ -6,10 +6,9 @@ package kala.collection
 // -- Traversable
 //
 
-typealias TraversableOnce<E> = asia.kala.collection.TraversableOnce<out E>
-typealias Traversable<E> = asia.kala.collection.Traversable<out E>
+typealias Collection<E> = asia.kala.collection.Collection<out E>
 
-inline fun <E> Traversable<E>.asKotlin(): Collection<E> {
+inline fun <E> Collection<E>.asKotlin(): kotlin.collections.Collection<E> {
     return this.asJava()
 }
 

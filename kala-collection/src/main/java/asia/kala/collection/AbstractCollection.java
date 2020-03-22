@@ -2,15 +2,16 @@ package asia.kala.collection;
 
 import asia.kala.annotations.Covariant;
 import asia.kala.factory.CollectionFactory;
+import asia.kala.util.Iterators;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.stream.Collector;
 
-public abstract class AbstractTraversable<@Covariant E> implements Traversable<E> {
+public abstract class AbstractCollection<@Covariant E> implements Collection<E> {
     static <E, R, Builder> R collectTo(
-            @NotNull TraversableOnce<? extends E> collection,
+            @NotNull Collection<? extends E> collection,
             @NotNull Collector<? super E, Builder, ? extends R> collector
     ) {
         assert collection != null;
@@ -28,7 +29,7 @@ public abstract class AbstractTraversable<@Covariant E> implements Traversable<E
     }
 
     static <E, R, Builder> R collectTo(
-            @NotNull TraversableOnce<? extends E> collection,
+            @NotNull Collection<? extends E> collection,
             @NotNull CollectionFactory<? super E, Builder, ? extends R> factory
     ) {
         assert collection != null;
@@ -49,7 +50,7 @@ public abstract class AbstractTraversable<@Covariant E> implements Traversable<E
 
     @Override
     public int hashCode() {
-        return Enumerator.hash(iterator());
+        return Iterators.hash(iterator());
     }
 
     @Override
@@ -57,12 +58,12 @@ public abstract class AbstractTraversable<@Covariant E> implements Traversable<E
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof Traversable<?>)
+        if (!(obj instanceof Collection<?>)
                 || !(canEqual(obj))
-                || !(((Traversable<?>) obj).canEqual(this))) {
+                || !(((Collection<?>) obj).canEqual(this))) {
             return false;
         }
-        return sameElements(((Traversable<?>) obj));
+        return sameElements(((Collection<?>) obj));
     }
 
     @Override

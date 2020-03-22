@@ -200,8 +200,8 @@ public final class Option<@Covariant T> implements OptionContainer<T>, Transform
      */
     @Override
     @Contract(pure = true)
-    public final boolean contains(Object v) {
-        return Objects.equals(value, v);
+    public final boolean contains(Object value) {
+        return Objects.equals(this.value, value);
     }
 
     /**

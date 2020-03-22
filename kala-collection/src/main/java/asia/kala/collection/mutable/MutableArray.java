@@ -1,7 +1,9 @@
 package asia.kala.collection.mutable;
 
+import asia.kala.Traversable;
 import asia.kala.collection.*;
 import asia.kala.factory.CollectionFactory;
+import asia.kala.util.JavaArray;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,8 +15,7 @@ import java.util.function.Function;
 public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>, IndexedSeq<E>, Serializable {
     private static final long serialVersionUID = 6278999671163491762L;
 
-    public static final Object[] EMPTY_ARRAY = ArraySeq.EMPTY_ARRAY;
-    public static final MutableArray<?> EMPTY = new MutableArray<>(EMPTY_ARRAY);
+    public static final MutableArray<?> EMPTY = new MutableArray<>(JavaArray.EMPTY_OBJECT_ARRAY);
 
     private static final MutableArray.Factory<?> FACTORY = new Factory<>();
 
@@ -102,7 +103,7 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
     }
 
     @NotNull
-    public static <E> MutableArray<E> from(@NotNull TraversableOnce<? extends E> values) {
+    public static <E> MutableArray<E> from(@NotNull Traversable<? extends E> values) {
         Objects.requireNonNull(values);
 
         if (KalaCollectionUtils.knowSize(values) == 0) {
@@ -113,7 +114,7 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
     }
 
     @NotNull
-    public static <E> MutableArray<E> from(@NotNull Collection<? extends E> values) {
+    public static <E> MutableArray<E> from(@NotNull java.util.Collection<? extends E> values) {
         Objects.requireNonNull(values);
 
         if (values.size() == 0) {
@@ -127,12 +128,12 @@ public final class MutableArray<E> extends ArraySeq<E> implements MutableSeq<E>,
     public static <E> MutableArray<E> from(@NotNull Iterable<? extends E> values) {
         Objects.requireNonNull(values);
 
-        if (values instanceof TraversableOnce<?>) {
-            return from((TraversableOnce<E>) values);
+        if (values instanceof Traversable<?>) {
+            return from((Traversable<E>) values);
         }
 
-        if (values instanceof Collection<?>) {
-            return from(((Collection<E>) values));
+        if (values instanceof java.util.Collection<?>) {
+            return from(((java.util.Collection<E>) values));
         }
 
         ArrayBuffer<E> buffer = new ArrayBuffer<>();

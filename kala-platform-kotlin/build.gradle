@@ -1,6 +1,0 @@
-dependencies {
-    api group: group, name: 'kala-platform', version: version
-}
-
-compileKotlin.dependsOn(':kala-platform:publishToMavenLocal')
-compileJava.dependsOn(':kala-platform:publishToMavenLocal')

@@ -1,23 +1,23 @@
 package asia.kala.collection;
 
-import asia.kala.collection.immutable.ImmutableSeq;
 import asia.kala.collection.immutable.ImmutableSet;
 import asia.kala.factory.CollectionFactory;
+import asia.kala.util.Iterators;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Predicate;
 
-public interface Set<E> extends Traversable<E> {
+public interface Set<E> extends Collection<E> {
 
     static <E> CollectionFactory<E, ?, ? extends Set<E>> factory() {
         return ImmutableSet.factory();
     }
 
     @Override
-    default boolean contains(Object value) {
-        return iterator().contains(value);
+    default boolean contains(E value) {
+        return Iterators.contains(iterator(), value);
     }
 
     default Predicate<E> asPredicate() {

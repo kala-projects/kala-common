@@ -2,13 +2,11 @@ package asia.kala.collection.mutable;
 
 import asia.kala.factory.CollectionFactory;
 import asia.kala.collection.JDKConverters;
-import asia.kala.collection.Traversable;
+import asia.kala.collection.Collection;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-
-public interface MutableCollection<E> extends Traversable<E> {
+public interface MutableCollection<E> extends Collection<E> {
 
     //region Factory methods
 
@@ -88,7 +86,7 @@ public interface MutableCollection<E> extends Traversable<E> {
 
     @NotNull
     @Override
-    default Collection<E> asJava() {
+    default java.util.Collection<E> asJava() {
         return new JDKConverters.MutableCollectionAsJava<>(this);
     }
 }

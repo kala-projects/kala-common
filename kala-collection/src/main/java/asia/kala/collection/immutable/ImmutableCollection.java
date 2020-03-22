@@ -4,8 +4,7 @@ import asia.kala.Transformable;
 import asia.kala.Tuple2;
 import asia.kala.annotations.Covariant;
 import asia.kala.factory.CollectionFactory;
-import asia.kala.collection.Traversable;
-import asia.kala.factory.CollectionFactory;
+import asia.kala.collection.Collection;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +14,7 @@ import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface ImmutableCollection<@Covariant E> extends Traversable<E>, Transformable<E> {
+public interface ImmutableCollection<@Covariant E> extends Collection<E>, Transformable<E> {
 
     //region Narrow method
 

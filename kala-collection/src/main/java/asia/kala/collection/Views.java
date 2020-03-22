@@ -2,15 +2,17 @@ package asia.kala.collection;
 
 import asia.kala.control.Option;
 import asia.kala.annotations.Covariant;
+import asia.kala.util.Iterators;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Spliterator;
 import java.util.function.*;
 
 final class Views {
-    static class Of<@Covariant E, C extends Traversable<E>> implements View<E> {
+    static class Of<@Covariant E, C extends Collection<E>> implements View<E> {
         @NotNull
         protected final C collection;
 
@@ -46,14 +48,14 @@ final class Views {
         }
 
         @Override
-        public final E maxBy(@NotNull Comparator<? super E> comparator) {
-            return collection.maxBy(comparator);
+        public final E max(@NotNull Comparator<? super E> comparator) {
+            return collection.max(comparator);
         }
 
         @NotNull
         @Override
-        public final Option<E> maxByOption(@NotNull Comparator<? super E> comparator) {
-            return collection.maxByOption(comparator);
+        public final Option<E> maxOption(@NotNull Comparator<? super E> comparator) {
+            return collection.maxOption(comparator);
         }
 
         @Override
@@ -68,14 +70,14 @@ final class Views {
         }
 
         @Override
-        public final E minBy(@NotNull Comparator<? super E> comparator) {
-            return collection.minBy(comparator);
+        public final E min(@NotNull Comparator<? super E> comparator) {
+            return collection.min(comparator);
         }
 
         @NotNull
         @Override
-        public final Option<E> minByOption(@NotNull Comparator<? super E> comparator) {
-            return collection.minByOption(comparator);
+        public final Option<E> minOption(@NotNull Comparator<? super E> comparator) {
+            return collection.minOption(comparator);
         }
 
         @Override
@@ -111,7 +113,7 @@ final class Views {
 
         @NotNull
         @Override
-        public final <U> U[] toArray(@NotNull IntFunction<? extends U[]> generator) {
+        public final <U> U[] toArray(@NotNull IntFunction<U[]> generator) {
             return collection.toArray(generator);
         }
 
@@ -153,7 +155,7 @@ final class Views {
         }
 
         @Override
-        public final boolean contains(Object value) {
+        public final boolean contains(E value) {
             return collection.contains(value);
         }
 
@@ -207,7 +209,7 @@ final class Views {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
+        public final Iterator<E> iterator() {
             return collection.iterator();
         }
 
@@ -239,8 +241,8 @@ final class Views {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return source.iterator().map(mapper);
+        public final Iterator<E> iterator() {
+            return Iterators.map(source.iterator(), mapper);
         }
     }
 
@@ -261,8 +263,8 @@ final class Views {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return source.iterator().filter(predicate);
+        public final Iterator<E> iterator() {
+            return Iterators.filter(source.iterator(), predicate);
         }
     }
 
@@ -284,8 +286,8 @@ final class Views {
 
         @NotNull
         @Override
-        public final Enumerator<E> iterator() {
-            return new Enumerators.Concat<>(source.map(it -> mapper.apply(it).iterator()).iterator());
+        public final Iterator<E> iterator() {
+            return Iterators.concat(source.map(it -> mapper.apply(it).iterator()));
         }
     }
 }
